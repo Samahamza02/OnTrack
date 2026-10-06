@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "Confirm Email";
+}
+
+<div class="container">
+    <div class="auth-card shadow-sm p-4 p-md-5 text-center">
+        @if (ViewBag.Succeeded)
+        {
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+            <h2 class="h4 mt-3">Email Confirmed</h2>
+            <p class="text-muted">Your account is now active. You can log in.</p>
+            <a asp-action="Login" class="btn btn-primary mt-2">Go to Login</a>
+        }
+        else
+        {
+            <i class="bi bi-x-circle-fill text-danger" style="font-size: 3rem;"></i>
+            <h2 class="h4 mt-3">Confirmation Failed</h2>
+            <p class="text-muted">This link is invalid or has expired.</p>
+            <a asp-action="ResendEmailConfirmation" class="btn btn-primary mt-2">Resend Confirmation Email</a>
+        }
+    </div>
+</div>

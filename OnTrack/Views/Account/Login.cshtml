@@ -1,0 +1,51 @@
+@model OnTrack.ViewModels.LoginVM
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container">
+    <div class="auth-card shadow-sm p-4 p-md-5">
+        <h2 class="h4 mb-4 text-center">Welcome Back</h2>
+
+        @if (ViewBag.ShowResendLink == true)
+        {
+            <div class="alert alert-warning small">
+                Didn't get the confirmation email? <a asp-action="ResendEmailConfirmation">Resend it</a>.
+            </div>
+        }
+
+        <form asp-controller="Account" asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label fw-semibold"></label>
+                <input asp-for="Email" class="form-control" placeholder="you@example.com" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label fw-semibold"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+                <div class="text-end mt-1">
+                    <a asp-action="ForgetPassword" class="small">Forgot password?</a>
+                </div>
+            </div>
+
+            <div class="form-check mb-4">
+                <input asp-for="RememberMe" class="form-check-input" />
+                <label asp-for="RememberMe" class="form-check-label"></label>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+
+        <p class="text-center text-muted mt-4 mb-0">
+            Don't have an account? <a asp-controller="Account" asp-action="Register">Register</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
