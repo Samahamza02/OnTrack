@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using OnTrack.Data;
 using OnTrack.Models;
 using OnTrack.Services;
+using OnTrack.Repositories;
 
 namespace OnTrack
 {
@@ -31,6 +32,9 @@ namespace OnTrack
 
             // 3. Register Email Service
             builder.Services.AddTransient<IEmailSender, EmailSender>();
+
+            // 4. Register generic repository
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             var app = builder.Build();
 
