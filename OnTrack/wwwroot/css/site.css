@@ -29,3 +29,71 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+/* Shared OnTrack navigation */
+.ontrack-navbar {
+    padding: 12px max(20px, calc((100vw - 1160px)/2));
+    margin-bottom: 0 !important;
+}
+
+.ontrack-nav-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #142c3c !important;
+    font-weight: 800;
+    letter-spacing: -.4px;
+}
+
+    .ontrack-nav-brand .brand-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px 10px 10px 3px;
+        font-size: 11px;
+    }
+
+.ontrack-navbar .nav-link {
+    color: #52646d;
+    font-size: 13px;
+}
+
+    .ontrack-navbar .nav-link:hover {
+        color: #0c796f;
+    }
+
+.ontrack-navbar .nav-join-link {
+    padding: 9px 15px !important;
+    border-radius: 9px;
+    background: #102b3a;
+    color: #fff !important;
+    font-weight: 650;
+}
+
+    .ontrack-navbar .nav-join-link:hover {
+        background: #174254;
+    }
+
+body:has(.auth-shell) {
+    background: #f4f6f5;
+}
+
+    body:has(.auth-shell) footer {
+        background: #f4f6f5;
+        border-top: 0 !important;
+        font-size: 11px;
+    }
+
+/* Authentication pages use a distraction-free full-screen layout. */
+html:has(body.auth-route) {
+    min-height: 100%;
+}
+
+body.auth-route {
+    margin: 0;
+    min-height: 100vh;
+    background: #f4f6f5;
+}
+
+    body.auth-route main.auth-main {
+        padding: 0 !important;
+        margin: 0;
+    }

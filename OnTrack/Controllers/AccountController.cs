@@ -1,4 +1,4 @@
-﻿using Azure.Core;
+﻿
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnTrack.Models;
@@ -51,6 +51,9 @@ namespace OnTrack.Controllers
                     ModelState.AddModelError(string.Empty, error.Description);
                 return View(model);
             }
+
+            // NEW
+            await _userManager.AddToRoleAsync(user, "Customer");
 
             // Email confirmation is required before login (see Program.cs:
             // options.SignIn.RequireConfirmedAccount = true), so we do NOT
@@ -152,12 +155,17 @@ namespace OnTrack.Controllers
             {
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                     return Redirect(returnUrl);
+                // NEW: admins go to the admin area
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user != null && await _userManager.IsInRoleAsync(user, "Admin"))
+                    return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
                 return RedirectToAction("Index", "Home");
             }
 
             if (result.IsLockedOut)
             {
-                ModelState.AddModelError(string.Empty, "This account has been locked. Try again later.");
+                // CHANGED: "try again later" was wrong for accounts locked by an admin
+                ModelState.AddModelError(string.Empty, "Your account is locked. Please contact support.");
             }
             else if (result.IsNotAllowed)
             {
@@ -171,7 +179,9 @@ namespace OnTrack.Controllers
 
             return View(model);
         }
-
+        // GET: /Account/AccessDenied
+        [HttpGet]
+        public IActionResult AccessDenied() => View();
         // POST: /Account/Logout
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -250,4 +260,5 @@ namespace OnTrack.Controllers
             return View("ResetPasswordConfirmation");
         }
     }
+
 }

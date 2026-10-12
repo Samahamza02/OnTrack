@@ -1,51 +1,40 @@
 @model OnTrack.ViewModels.LoginVM
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Sign in";
 }
+<link rel="stylesheet"
+      href="~/css/auth.css"
+      asp-append-version="true" />
+<section class="auth-shell">
+    <aside class="auth-showcase">
+        <a class="auth-brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">OT</span><span>OnTrack</span></a>
+        <div class="showcase-copy">
+            <span class="eyebrow">YOUR JOURNEY, CONNECTED</span>
+            <h1>Every journey<br />starts <em>somewhere.</em></h1>
+            <p>Plan your next trip, keep your tickets close, and stay on track from departure to arrival.</p>
+        </div>
+        <div class="rail-illustration" aria-hidden="true"><div class="sun"></div><div class="rail-horizon"></div><div class="rail-line rail-one"></div><div class="rail-line rail-two"></div><div class="mini-train"><span></span><span></span><span></span></div></div>
+        <div class="showcase-footer"><span class="live-dot"></span> A smoother way to travel <span class="footer-divider">•</span> Built for your next destination</div>
+    </aside>
 
-<div class="container">
-    <div class="auth-card shadow-sm p-4 p-md-5">
-        <h2 class="h4 mb-4 text-center">Welcome Back</h2>
+    <div class="auth-content">
+        <div class="auth-mobile-brand"><span class="brand-mark">OT</span><span>OnTrack</span></div>
+        <div class="auth-heading"><span class="eyebrow">WELCOME ABOARD</span><h2>Good to see you again</h2><p>Sign in to continue your journey.</p></div>
 
         @if (ViewBag.ShowResendLink == true)
         {
-            <div class="alert alert-warning small">
-                Didn't get the confirmation email? <a asp-action="ResendEmailConfirmation">Resend it</a>.
-            </div>
+            <div class="auth-notice notice-warning"><span class="notice-icon">✉</span><div>One quick stop before you sign in.<br /><a asp-action="ResendEmailConfirmation">Resend your confirmation email</a>.</div></div>
         }
 
-        <form asp-controller="Account" asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label fw-semibold"></label>
-                <input asp-for="Email" class="form-control" placeholder="you@example.com" />
-                <span asp-validation-for="Email" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label fw-semibold"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger small"></span>
-                <div class="text-end mt-1">
-                    <a asp-action="ForgetPassword" class="small">Forgot password?</a>
-                </div>
-            </div>
-
-            <div class="form-check mb-4">
-                <input asp-for="RememberMe" class="form-check-input" />
-                <label asp-for="RememberMe" class="form-check-label"></label>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+        <form asp-controller="Account" asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" class="auth-form">
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+            <div class="field-group"><label asp-for="Email">Email address</label><input asp-for="Email" class="form-control auth-input" placeholder="you@example.com" autocomplete="email" /><span asp-validation-for="Email" class="field-error"></span></div>
+            <div class="field-group"><div class="field-label-row"><label asp-for="Password">Password</label><a asp-action="ForgetPassword">Forgot password?</a></div><input asp-for="Password" class="form-control auth-input" placeholder="Enter your password" autocomplete="current-password" /><span asp-validation-for="Password" class="field-error"></span></div>
+            <label class="remember-row"><input asp-for="RememberMe" /><span>Keep me signed in</span></label>
+            <button type="submit" class="auth-submit">Sign in <span aria-hidden="true">→</span></button>
         </form>
-
-        <p class="text-center text-muted mt-4 mb-0">
-            Don't have an account? <a asp-controller="Account" asp-action="Register">Register</a>
-        </p>
+        <div class="auth-switch">New to OnTrack? <a asp-controller="Account" asp-action="Register">Create an account</a></div>
+        <div class="auth-security"><span aria-hidden="true">▣</span> Your account details are protected.</div>
     </div>
-</div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

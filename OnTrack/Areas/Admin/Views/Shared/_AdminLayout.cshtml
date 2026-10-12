@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>@ViewData["Title"] - Admin</title>
+  <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body>
+<div class="d-flex" style="min-height:100vh">
+  <nav class="bg-dark text-white p-3" style="width:240px">
+    <h5 class="mb-4">Admin Panel</h5>
+    <ul class="nav flex-column">
+      <li class="nav-item"><a class="nav-link text-white" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Dashboard</a></li>
+      <li class="nav-item"><a class="nav-link text-white" asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a></li>
+
+      @* Your teammates add their CRUD links below as they finish them *@
+      @* <li class="nav-item"><a class="nav-link text-white" asp-area="Admin" asp-controller="Stations" asp-action="Index">Stations</a></li> *@
+      @* Trains, Trips, TripStops, TripLocations, Tickets, Payments, Evaluations, Notifications *@
+
+      <li class="nav-item mt-4"><a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">← Back to site</a></li>
+    </ul>
+  </nav>
+
+  <main class="flex-grow-1 p-4">
+    @RenderBody()
+  </main>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
