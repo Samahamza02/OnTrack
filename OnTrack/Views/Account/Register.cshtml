@@ -1,48 +1,32 @@
 @model OnTrack.ViewModels.RegisterVM
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Create account";
 }
+<link rel="stylesheet"
+      href="~/css/auth.css"
+      asp-append-version="true" />
 
-<div class="container">
-    <div class="auth-card shadow-sm p-4 p-md-5">
-        <h2 class="h4 mb-4 text-center">Create an Account</h2>
-
-        <form asp-controller="Account" asp-action="Register" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-            <div class="mb-3">
-                <label asp-for="FullName" class="form-label fw-semibold"></label>
-                <input asp-for="FullName" class="form-control" placeholder="Enter your full name" />
-                <span asp-validation-for="FullName" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label fw-semibold"></label>
-                <input asp-for="Email" class="form-control" placeholder="you@example.com" />
-                <span asp-validation-for="Email" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label fw-semibold"></label>
-                <input asp-for="Password" class="form-control" placeholder="At least 6 characters" />
-                <span asp-validation-for="Password" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-4">
-                <label asp-for="ConfirmPassword" class="form-label fw-semibold"></label>
-                <input asp-for="ConfirmPassword" class="form-control" />
-                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">Register</button>
+<section class="auth-shell auth-shell-register">
+    <aside class="auth-showcase">
+        <a class="auth-brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">OT</span><span>OnTrack</span></a>
+        <div class="showcase-copy"><span class="eyebrow">YOUR NEXT ADVENTURE</span><h1>Make room for<br /><em>new places.</em></h1><p>Create your account and make planning your next train journey a little easier.</p></div>
+        <div class="rail-illustration" aria-hidden="true"><div class="sun"></div><div class="rail-horizon"></div><div class="rail-line rail-one"></div><div class="rail-line rail-two"></div><div class="mini-train"><span></span><span></span><span></span></div></div>
+        <div class="showcase-footer"><span class="live-dot"></span> Your journey begins here</div>
+    </aside>
+    <div class="auth-content">
+        <div class="auth-mobile-brand"><span class="brand-mark">OT</span><span>OnTrack</span></div>
+        <div class="auth-heading"><span class="eyebrow">JOIN ONTRACK</span><h2>Create your account</h2><p>Just a few details, then you're ready to go.</p></div>
+        <form asp-controller="Account" asp-action="Register" method="post" class="auth-form">
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+            <div class="field-group"><label asp-for="FullName">Full name</label><input asp-for="FullName" class="form-control auth-input" placeholder="Enter your full name" autocomplete="name" /><span asp-validation-for="FullName" class="field-error"></span></div>
+            <div class="field-group"><label asp-for="Email">Email address</label><input asp-for="Email" class="form-control auth-input" placeholder="you@example.com" autocomplete="email" /><span asp-validation-for="Email" class="field-error"></span></div>
+            <div class="field-group"><label asp-for="Password">Create password</label><input asp-for="Password" class="form-control auth-input" placeholder="Choose a strong password" autocomplete="new-password" /><span asp-validation-for="Password" class="field-error"></span><small class="field-hint">Use a password that you don't use on other websites.</small></div>
+            <div class="field-group"><label asp-for="ConfirmPassword">Confirm password</label><input asp-for="ConfirmPassword" class="form-control auth-input" placeholder="Enter your password again" autocomplete="new-password" /><span asp-validation-for="ConfirmPassword" class="field-error"></span></div>
+            <button type="submit" class="auth-submit">Create account <span aria-hidden="true">→</span></button>
+            <p class="email-note"><span aria-hidden="true">✉</span> We'll send you an email to confirm your account.</p>
         </form>
-
-        <p class="text-center text-muted mt-4 mb-0">
-            Already have an account? <a asp-controller="Account" asp-action="Login">Login</a>
-        </p>
+        <div class="auth-switch">Already have an account? <a asp-controller="Account" asp-action="Login">Sign in</a></div>
+        <div class="auth-security"><span aria-hidden="true">▣</span> Your account details are protected.</div>
     </div>
-</div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+</section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

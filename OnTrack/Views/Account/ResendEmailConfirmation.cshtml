@@ -1,26 +1,8 @@
 @model OnTrack.ViewModels.ResendEmailConfirmationVM
-@{
-    ViewData["Title"] = "Resend Confirmation";
-}
-
-<div class="container">
-    <div class="auth-card shadow-sm p-4 p-md-5">
-        <h2 class="h4 mb-4 text-center">Resend Confirmation Email</h2>
-
-        <form asp-action="ResendEmailConfirmation" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-            <div class="mb-4">
-                <label asp-for="Email" class="form-label fw-semibold"></label>
-                <input asp-for="Email" class="form-control" placeholder="you@example.com" />
-                <span asp-validation-for="Email" class="text-danger small"></span>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Resend Email</button>
-        </form>
-
-        <p class="text-center text-muted mt-4 mb-0">
-            <a asp-action="Login">Back to Login</a>
-        </p>
-    </div>
-</div>
-
+@{ ViewData["Title"] = "Resend confirmation"; }
+<link rel="stylesheet"
+      href="~/css/auth.css"
+      asp-append-version="true" />
+<section class="auth-shell auth-shell-status"><aside class="auth-showcase"><a class="auth-brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">OT</span><span>OnTrack</span></a><div class="showcase-copy"><span class="eyebrow">CHECK YOUR TICKETS, CHECK YOUR EMAIL</span><h1>One more step<br />to <em>get on track.</em></h1><p>Confirm your email address to finish setting up your account and access your journeys.</p></div><div class="rail-illustration" aria-hidden="true"><div class="sun"></div><div class="rail-horizon"></div><div class="rail-line rail-one"></div><div class="rail-line rail-two"></div><div class="mini-train"><span></span><span></span><span></span></div></div><div class="showcase-footer"><span class="live-dot"></span> Your journey is waiting</div></aside>
+<div class="auth-content"><div class="auth-mobile-brand"><span class="brand-mark">OT</span><span>OnTrack</span></div><div class="auth-heading"><span class="eyebrow">EMAIL CONFIRMATION</span><h2>Need a new confirmation link?</h2><p>Enter your email and we'll send another link if your account needs confirmation.</p></div><form asp-action="ResendEmailConfirmation" method="post" class="auth-form"><div asp-validation-summary="ModelOnly" class="validation-summary"></div><div class="field-group"><label asp-for="Email">Email address</label><input asp-for="Email" class="form-control auth-input" placeholder="you@example.com" autocomplete="email" /><span asp-validation-for="Email" class="field-error"></span></div><button type="submit" class="auth-submit">Resend confirmation <span>→</span></button></form><div class="auth-switch"><a asp-action="Login">← Back to sign in</a></div><div class="auth-security"><span>▣</span> We'll never share your email address.</div></div></section>
 @section Scripts { <partial name="_ValidationScriptsPartial" /> }

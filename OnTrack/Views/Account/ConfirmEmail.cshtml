@@ -1,22 +1,21 @@
 @{
-    ViewData["Title"] = "Confirm Email";
+    ViewData["Title"] = "Email confirmation";
+    var succeeded = ViewBag.Succeeded == true;
 }
-
-<div class="container">
-    <div class="auth-card shadow-sm p-4 p-md-5 text-center">
-        @if (ViewBag.Succeeded)
+<link rel="stylesheet"
+      href="~/css/auth.css"
+      asp-append-version="true" />
+<section class="auth-shell auth-shell-status">
+    <aside class="auth-showcase"><a class="auth-brand" asp-controller="Home" asp-action="Index"><span class="brand-mark">OT</span><span>OnTrack</span></a><div class="showcase-copy"><span class="eyebrow">ONE LAST CHECK</span><h1>Almost ready<br />for <em>departure.</em></h1><p>Confirming your email helps keep your OnTrack account safe and ready for your journeys.</p></div><div class="rail-illustration" aria-hidden="true"><div class="sun"></div><div class="rail-horizon"></div><div class="rail-line rail-one"></div><div class="rail-line rail-two"></div><div class="mini-train"><span></span><span></span><span></span></div></div><div class="showcase-footer"><span class="live-dot"></span> A small step before take-off</div></aside>
+    <div class="auth-content status-content"><div class="status-symbol @(succeeded ? "status-success" : "status-error")">@(succeeded ? "✓" : "!")</div>
+        @if (succeeded)
         {
-            <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
-            <h2 class="h4 mt-3">Email Confirmed</h2>
-            <p class="text-muted">Your account is now active. You can log in.</p>
-            <a asp-action="Login" class="btn btn-primary mt-2">Go to Login</a>
+            <span class="eyebrow">ALL ABOARD</span><h2>Email confirmed!</h2><p class="status-description">Your email address is verified and your account is ready. Sign in to start planning your next trip.</p><a asp-controller="Account" asp-action="Login" class="auth-submit auth-link-button">Go to sign in <span>→</span></a>
         }
         else
         {
-            <i class="bi bi-x-circle-fill text-danger" style="font-size: 3rem;"></i>
-            <h2 class="h4 mt-3">Confirmation Failed</h2>
-            <p class="text-muted">This link is invalid or has expired.</p>
-            <a asp-action="ResendEmailConfirmation" class="btn btn-primary mt-2">Resend Confirmation Email</a>
+            <span class="eyebrow">WE HIT A SMALL BUMP</span><h2>Link not working</h2><p class="status-description">This confirmation link may be invalid or expired. Request a fresh email and try again.</p><a asp-controller="Account" asp-action="ResendEmailConfirmation" class="auth-submit auth-link-button">Send a new link <span>→</span></a>
         }
+        <div class="auth-switch"><a asp-controller="Home" asp-action="Index">← Back to OnTrack</a></div>
     </div>
-</div>
+</section>

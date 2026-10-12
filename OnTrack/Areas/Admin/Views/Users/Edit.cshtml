@@ -1,0 +1,33 @@
+﻿@model EditUserVm
+@{ ViewData["Title"] = "Edit user"; }
+<h2>Edit user</h2>
+
+<form asp-action="Edit" method="post" class="col-md-6">
+  <div asp-validation-summary="All" class="text-danger"></div>
+  <input type="hidden" asp-for="Id" />
+
+  <div class="mb-3">
+    <label asp-for="Email" class="form-label"></label>
+    <input asp-for="Email" class="form-control" />
+    <span asp-validation-for="Email" class="text-danger"></span>
+  </div>
+  <div class="mb-3">
+    <label asp-for="PhoneNumber" class="form-label"></label>
+    <input asp-for="PhoneNumber" class="form-control" />
+  </div>
+
+  <h5>Roles</h5>
+  @for (int i = 0; i < Model.Roles.Count; i++)
+  {
+    <div class="form-check">
+      <input type="hidden" asp-for="Roles[i].Name" />
+      <input type="checkbox" class="form-check-input" asp-for="Roles[i].Selected" />
+      <label class="form-check-label" asp-for="Roles[i].Selected">@Model.Roles[i].Name</label>
+    </div>
+  }
+
+  <button class="btn btn-primary mt-3">Save</button>
+  <a asp-action="Index" class="btn btn-secondary mt-3">Cancel</a>
+</form>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

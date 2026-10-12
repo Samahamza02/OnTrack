@@ -1,0 +1,185 @@
+﻿@model CreateUserVm
+@{
+    ViewData["Title"] = "Create user";
+}
+
+<link rel="stylesheet"
+      href="~/css/auth.css"
+      asp-append-version="true" />
+
+<section class="auth-shell auth-shell-register">
+
+    <!-- Left showcase panel -->
+    <aside class="auth-showcase">
+
+        <a class="auth-brand"
+           asp-controller="Home"
+           asp-action="Index">
+            <span class="brand-mark">OT</span>
+            <span>OnTrack</span>
+        </a>
+
+        <div class="showcase-copy">
+            <span class="eyebrow">ADMINISTRATION</span>
+
+            <h1>Build your<br /><em>OnTrack team.</em></h1>
+
+            <p>
+                Create user accounts, assign roles, and help your team
+                manage every journey with ease.
+            </p>
+        </div>
+
+        <div class="rail-illustration" aria-hidden="true">
+            <div class="sun"></div>
+            <div class="rail-horizon"></div>
+            <div class="rail-line rail-one"></div>
+            <div class="rail-line rail-two"></div>
+
+            <div class="mini-train">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <div class="showcase-footer">
+            <span class="live-dot"></span>
+            Manage your team in one place
+        </div>
+
+    </aside>
+
+    <!-- Right form panel -->
+    <div class="auth-content">
+
+        <div class="auth-mobile-brand">
+            <span class="brand-mark">OT</span>
+            <span>OnTrack</span>
+        </div>
+
+        <div class="auth-heading">
+            <span class="eyebrow">USER MANAGEMENT</span>
+            <h2>Create a user</h2>
+            <p>Add a new member and choose their permissions.</p>
+        </div>
+
+        <form asp-area="Admin"
+              asp-controller="Users"
+              asp-action="Create"
+              method="post"
+              class="auth-form">
+
+            <div asp-validation-summary="All"
+                 class="validation-summary"></div>
+
+            <div class="field-group">
+                <label asp-for="FullName">Full name</label>
+
+                <input asp-for="FullName"
+                       class="form-control auth-input"
+                       placeholder="Enter the user's full name"
+                       autocomplete="name" />
+
+                <span asp-validation-for="FullName"
+                      class="field-error"></span>
+            </div>
+
+            <div class="field-group">
+                <label asp-for="Email">Email address</label>
+
+                <input asp-for="Email"
+                       type="email"
+                       class="form-control auth-input"
+                       placeholder="user@example.com"
+                       autocomplete="email" />
+
+                <span asp-validation-for="Email"
+                      class="field-error"></span>
+            </div>
+
+            <div class="field-group">
+                <label asp-for="Password">Temporary password</label>
+
+                <input asp-for="Password"
+                       type="password"
+                       class="form-control auth-input"
+                       placeholder="Create a strong password"
+                       autocomplete="new-password" />
+
+                <span asp-validation-for="Password"
+                      class="field-error"></span>
+
+                <small class="field-hint">
+                    Choose a password that meets your security requirements.
+                </small>
+            </div>
+
+            <div class="field-group">
+                <label asp-for="PhoneNumber">Phone number</label>
+
+                <input asp-for="PhoneNumber"
+                       type="tel"
+                       class="form-control auth-input"
+                       placeholder="Enter the phone number"
+                       autocomplete="tel" />
+
+                <span asp-validation-for="PhoneNumber"
+                      class="field-error"></span>
+            </div>
+
+            <!-- Role selection -->
+            <div class="field-group role-group">
+                <label class="role-heading">Assign roles</label>
+
+                <p class="field-hint">
+                    Select one or more roles for this user.
+                </p>
+
+                <div class="role-options">
+                    @for (int i = 0; i < Model.Roles.Count; i++)
+                    {
+                        <label class="role-option"
+                               for="Roles_@(i)__Selected">
+
+                            <input type="hidden"
+                                   asp-for="Roles[i].Name" />
+
+                            <input asp-for="Roles[i].Selected"
+                                   class="role-checkbox" />
+
+                            <span class="role-name">
+                                @Model.Roles[i].Name
+                            </span>
+                        </label>
+                    }
+                </div>
+            </div>
+
+            <button type="submit" class="auth-submit">
+                Create user <span aria-hidden="true">→</span>
+            </button>
+
+        </form>
+
+        <div class="auth-switch">
+            Finished managing users?
+            <a asp-area="Admin"
+               asp-controller="Users"
+               asp-action="Index">
+                Back to users
+            </a>
+        </div>
+
+        <div class="auth-security">
+            <span aria-hidden="true">▣</span>
+            User access is managed securely by administrators.
+        </div>
+
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+```
