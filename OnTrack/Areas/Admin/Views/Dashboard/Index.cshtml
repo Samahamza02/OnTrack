@@ -110,11 +110,23 @@
 
             <p class="ot-stat-label">Total users</p>
             <h3 class="ot-stat-value">@Model.TotalUsers.ToString("N0")</h3>
+
             <div class="ot-stat-footer">
                 <span class="ot-stat-marker"></span>
                 Registered accounts
             </div>
+
+            <div class="ot-users-action">
+                <a asp-area="Admin"
+                   asp-controller="Users"
+                   asp-action="Index"
+                   class="ot-view-users-link">
+                    View Users
+                    <span aria-hidden="true">&rarr;</span>
+                </a>
+            </div>
         </article>
+
 
         @for (var i = 0; i < Model.Statistics.Count; i++)
         {
