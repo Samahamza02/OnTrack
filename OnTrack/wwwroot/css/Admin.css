@@ -599,3 +599,36 @@
         font-size: 26px;
     }
 }
+
+
+/* View Users link inside Total Users card */
+.ot-users-action {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid #edf1f2;
+}
+
+.ot-view-users-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #188f80;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease, gap 0.2s ease;
+}
+
+
+    .ot-view-users-link:hover {
+        color: #188f80;
+        gap: 8px;
+    }
+
+
+    .ot-view-users-link:focus-visible {
+        outline: 2px solid #42d6bd;
+        outline-offset: 4px;
+        border-radius: 3px;
+    }
+
