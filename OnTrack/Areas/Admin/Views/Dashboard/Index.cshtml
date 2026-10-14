@@ -1,3 +1,404 @@
-﻿@{ ViewData["Title"] = "Dashboard"; }
-<h2>Dashboard</h2>
-<p>Statistics coming soon.</p>
+﻿@using System.Text.Json
+@model OnTrack.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+
+    var labels = Model.Statistics.Select(s => s.Name).ToArray();
+    var counts = Model.Statistics.Select(s => s.Count).ToArray();
+    var totalRecords = Model.Statistics.Sum(s => s.Count);
+
+    var jsonLabels = JsonSerializer.Serialize(labels);
+    var jsonCounts = JsonSerializer.Serialize(counts);
+}
+
+<link rel="stylesheet"
+      href="~/css/Admin.css"
+      asp-append-version="true" />
+
+<div class="ot-dashboard">
+
+    <!-- Dashboard Header -->
+    <section class="ot-welcome">
+        <div class="ot-welcome-content">
+            <div class="ot-overline">
+                <span class="ot-status-dot"></span>
+                ADMINISTRATION CENTER
+            </div>
+
+            <h1>Welcome back, Admin.</h1>
+
+            <p>
+                Here's what's happening across your OnTrack system.
+                Manage your data and keep everything on track.
+            </p>
+
+            <a asp-area=""
+               asp-controller="Home"
+               asp-action="Index"
+               class="ot-back-link">
+                <span aria-hidden="true">←</span>
+                Back to website
+            </a>
+        </div>
+
+        <div class="ot-welcome-art" aria-hidden="true">
+            <div class="ot-orbit ot-orbit-one"></div>
+            <div class="ot-orbit ot-orbit-two"></div>
+
+            <div class="ot-train-illustration">
+                <svg viewBox="0 0 140 110"
+                     width="140"
+                     height="110"
+                     fill="none">
+                    <rect x="30" y="9" width="80" height="76" rx="17"
+                          fill="#42D6BD" />
+                    <rect x="39" y="19" width="62" height="30" rx="7"
+                          fill="#142C3C" />
+                    <path d="M48 25H64V42H48Z"
+                          fill="#A9EDE2" />
+                    <path d="M70 25H92V42H70Z"
+                          fill="#A9EDE2" />
+                    <rect x="43" y="56" width="54" height="7" rx="3.5"
+                          fill="#142C3C" />
+                    <rect x="49" y="69" width="42" height="6" rx="3"
+                          fill="#142C3C" />
+                    <circle cx="48" cy="86" r="8" fill="#FFB36B" />
+                    <circle cx="92" cy="86" r="8" fill="#FFB36B" />
+                    <path d="M19 100H121" stroke="#42D6BD"
+                          stroke-width="3" stroke-linecap="round" />
+                    <path d="M31 108H109" stroke="#42D6BD"
+                          stroke-width="2" stroke-linecap="round"
+                          opacity=".5" />
+                </svg>
+            </div>
+
+            <div class="ot-art-badge">
+                <span></span>
+                OnTrack
+            </div>
+        </div>
+    </section>
+
+    <!-- Summary -->
+    <div class="ot-section-heading">
+        <div>
+            <span class="ot-section-kicker">AT A GLANCE</span>
+            <h2>System overview</h2>
+        </div>
+
+        <div class="ot-records-summary">
+            <span class="ot-summary-label">Total records</span>
+            <strong>@totalRecords.ToString("N0")</strong>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <section class="ot-stats-grid">
+
+        <article class="ot-stat-card ot-users-card">
+            <div class="ot-stat-top">
+                <div class="ot-stat-icon ot-users-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="9" cy="8" r="3.5" />
+                        <path d="M2.5 20v-1.5A5.5 5.5 0 0 1 8 13h2a5.5 5.5 0 0 1 5.5 5.5V20Z" />
+                        <path d="M16 4.8a3.5 3.5 0 0 1 0 6.5M18 13.5a5.5 5.5 0 0 1 3.5 5V20h-4" />
+                    </svg>
+                </div>
+                <span class="ot-stat-index">01</span>
+            </div>
+
+            <p class="ot-stat-label">Total users</p>
+            <h3 class="ot-stat-value">@Model.TotalUsers.ToString("N0")</h3>
+            <div class="ot-stat-footer">
+                <span class="ot-stat-marker"></span>
+                Registered accounts
+            </div>
+        </article>
+
+        @for (var i = 0; i < Model.Statistics.Count; i++)
+        {
+            var statistic = Model.Statistics[i];
+
+            <article class="ot-stat-card">
+                <div class="ot-stat-top">
+                    <div class="ot-stat-icon ot-entity-icon">
+                        @switch (statistic.Name)
+                        {
+                            case "Trips":
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M5 19V6a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v13" />
+                                    <path d="M5 12h14M8 7h8M8 16h1m6 0h1M3 22l4-3m14 3-4-3" />
+                                </svg>
+                                break;
+                            case "Tickets":
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M4 5h16v5a2 2 0 0 0 0 4v5H4v-5a2 2 0 0 0 0-4Z" />
+                                    <path d="M14 8v2m0 4v2" />
+                                </svg>
+                                break;
+                            case "Trains":
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <rect x="5" y="2" width="14" height="17" rx="4" />
+                                    <path d="M8 6h8v5H8Zm-3 4h14M8 15h.01M16 15h.01M8 22l2-3m6 3-2-3" />
+                                </svg>
+                                break;
+                            case "Stations":
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-7h6v7M9 9h.01M15 9h.01" />
+                                </svg>
+                                break;
+                            case "Payments":
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <rect x="3" y="5" width="18" height="14" rx="3" />
+                                    <path d="M3 10h18M7 15h4" />
+                                </svg>
+                                break;
+                            default:
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <ellipse cx="12" cy="5" rx="8" ry="3" />
+                                    <path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" />
+                                </svg>
+                                break;
+                        }
+                    </div>
+
+                    <span class="ot-stat-index">
+                        @((i + 2).ToString("00"))
+                    </span>
+                </div>
+
+                <p class="ot-stat-label">@statistic.Name</p>
+                <h3 class="ot-stat-value">@statistic.Count.ToString("N0")</h3>
+
+                <div class="ot-stat-footer">
+                    <span class="ot-stat-marker"></span>
+                    Total @statistic.Name.ToLowerInvariant()
+                </div>
+            </article>
+        }
+
+    </section>
+
+    <!-- Analytics -->
+    <section class="ot-analytics-section">
+        <div class="ot-section-heading ot-analytics-heading">
+            <div>
+                <span class="ot-section-kicker">DATA & INSIGHTS</span>
+                <h2>Analytics</h2>
+                <p>Explore how records are distributed across your system.</p>
+            </div>
+        </div>
+
+        <div class="ot-charts-grid">
+
+            <article class="ot-chart-card ot-main-chart">
+                <div class="ot-chart-header">
+                    <div>
+                        <h3>Records by entity</h3>
+                        <p>Compare the number of records in each category.</p>
+                    </div>
+                    <span class="ot-chart-tag">OVERVIEW</span>
+                </div>
+
+                <div class="ot-chart-canvas ot-bar-canvas">
+                    <canvas id="recordsBarChart"></canvas>
+                </div>
+            </article>
+
+            <article class="ot-chart-card">
+                <div class="ot-chart-header">
+                    <div>
+                        <h3>Records distribution</h3>
+                        <p>Share of each entity in the total.</p>
+                    </div>
+                </div>
+
+                <div class="ot-chart-canvas ot-doughnut-canvas">
+                    <canvas id="recordsDoughnutChart"></canvas>
+                </div>
+            </article>
+
+            <article class="ot-chart-card ot-line-chart-card">
+                <div class="ot-chart-header">
+                    <div>
+                        <h3>Entity comparison</h3>
+                        <p>Compare counts across different record types.</p>
+                    </div>
+                </div>
+
+                <div class="ot-chart-canvas ot-line-canvas">
+                    <canvas id="recordsLineChart"></canvas>
+                </div>
+            </article>
+
+        </div>
+
+        <p class="ot-chart-note">
+            <span aria-hidden="true">ⓘ</span>
+            Charts reflect current record counts. The line chart compares entity
+            categories, not changes over time.
+        </p>
+    </section>
+
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        (() => {
+        const labels = @Html.Raw(jsonLabels);
+        const counts = @Html.Raw(jsonCounts);
+
+        if (typeof Chart === 'undefined') {
+        return;
+        }
+
+        const colors = [
+        '#42D6BD',
+        '#142C3C',
+        '#FFB36B',
+        '#6D91B7',
+        '#9CD9CE',
+        '#D58E91',
+        '#B6A3D7',
+        '#D6C66F',
+        '#80A5AC'
+        ];
+
+        const commonScales = {
+        x: {
+        grid: { display: false },
+        border: { display: false },
+        ticks: {
+        color: '#74838B',
+        font: { size: 11 }
+        }
+        },
+        y: {
+        beginAtZero: true,
+        border: { display: false, dash: [4, 4] },
+        grid: { color: '#EDF1F2' },
+        ticks: {
+        precision: 0,
+        color: '#74838B',
+        font: { size: 11 },
+        padding: 10
+        }
+        }
+        };
+
+        const barCanvas = document.getElementById('recordsBarChart');
+
+        if (barCanvas) {
+        new Chart(barCanvas, {
+        type: 'bar',
+        data: {
+        labels,
+        datasets: [{
+        label: 'Records',
+        data: counts,
+        backgroundColor: colors,
+        borderRadius: 6,
+        borderSkipped: false,
+        maxBarThickness: 42
+        }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+        legend: { display: false },
+        tooltip: {
+        backgroundColor: '#142C3C',
+        padding: 12,
+        displayColors: false
+        }
+        },
+        scales: commonScales
+        }
+        });
+        }
+
+        const doughnutCanvas =
+        document.getElementById('recordsDoughnutChart');
+
+        if (doughnutCanvas) {
+        new Chart(doughnutCanvas, {
+        type: 'doughnut',
+        data: {
+        labels,
+        datasets: [{
+        data: counts,
+        backgroundColor: colors,
+        borderColor: '#FFFFFF',
+        borderWidth: 4,
+        hoverOffset: 7
+        }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: {
+        legend: {
+        position: 'bottom',
+        labels: {
+        color: '#536670',
+        padding: 14,
+        usePointStyle: true,
+        pointStyle: 'circle',
+        boxWidth: 8,
+        font: { size: 11 }
+        }
+        },
+        tooltip: {
+        backgroundColor: '#142C3C',
+        padding: 12
+        }
+        }
+        }
+        });
+        }
+
+        const lineCanvas =
+        document.getElementById('recordsLineChart');
+
+        if (lineCanvas) {
+        new Chart(lineCanvas, {
+        type: 'line',
+        data: {
+        labels,
+        datasets: [{
+        label: 'Records',
+        data: counts,
+        borderColor: '#42BDA8',
+        backgroundColor: 'rgba(66, 214, 189, 0.13)',
+        pointBackgroundColor: '#142C3C',
+        pointBorderColor: '#FFFFFF',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        borderWidth: 3,
+        tension: 0.35,
+        fill: true
+        }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+        legend: { display: false },
+        tooltip: {
+        backgroundColor: '#142C3C',
+        padding: 12
+        }
+        },
+        scales: commonScales
+        }
+        });
+        }
+        })();
+    </script>
+}

@@ -53,6 +53,8 @@ namespace OnTrack
             // 4. Register generic repository
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
+            builder.Services.AddScoped<OnTrack.Services.IDashboardService,
+                           OnTrack.Services.DashboardService>();
             var app = builder.Build();
 
             // Configure middleware
