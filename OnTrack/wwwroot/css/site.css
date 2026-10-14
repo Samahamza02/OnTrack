@@ -31,7 +31,7 @@ body {
 }
 /* Shared OnTrack navigation */
 .ontrack-navbar {
-    padding: 12px max(20px, calc((100vw - 1160px)/2));
+    padding: 12px 16px;
     margin-bottom: 0 !important;
 }
 
