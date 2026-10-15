@@ -4,6 +4,8 @@ using OnTrack.Data;
 using OnTrack.Models;
 using OnTrack.Services;
 using OnTrack.Repositories;
+using OnTrack.Interfaces;
+
 
 namespace OnTrack
 {
@@ -52,6 +54,14 @@ namespace OnTrack
 
             // 4. Register generic repository
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+            
+
+            // Services
+            builder.Services.AddScoped<ITicketService, TicketService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<IEvaluationService, EvaluationService>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
 
             builder.Services.AddScoped<OnTrack.Services.IDashboardService,
                            OnTrack.Services.DashboardService>();
