@@ -1,8 +1,344 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@* Google Fonts — move this <link> into _Layout.cshtml's <head> if you haven't already *@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<div class="ontrack-home">
+
+    <!-- ============ HERO ============ -->
+    <section class="ot-hero">
+        <div class="ot-hero-text">
+            <p class="ot-eyebrow">Your next trip</p>
+            <h1 class="ot-headline">Every train,<br><em>tracked live.</em></h1>
+            <p class="ot-sub">
+                Search a route, book your seat, and follow the train on the map
+                until you pull into the platform — all in one place.
+            </p>
+
+            <div class="ot-cta-row">
+                <a href="#" class="ot-btn ot-btn-primary">Find a train</a>
+                <a href="#" class="ot-btn ot-btn-ghost">Track a train live</a>
+            </div>
+
+            <p class="ot-live-note"><span class="ot-dot"></span> 42 trains running right now</p>
+        </div>
+
+        <div class="ot-hero-art" aria-hidden="true">
+            <svg viewBox="0 0 520 420" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <radialGradient id="otSun" cx="35%" cy="30%" r="70%">
+                        <stop offset="0%" stop-color="#e3a279" />
+                        <stop offset="100%" stop-color="#b5603a" />
+                    </radialGradient>
+                </defs>
+                <circle cx="330" cy="150" r="95" fill="url(#otSun)" />
+                <path d="M40 360 L230 180 L420 360 Z" fill="none" stroke="#2fe3bb" stroke-width="2.5" opacity="0.9" />
+                <line x1="90" y1="360" x2="250" y2="210" stroke="#2fe3bb" stroke-width="2" opacity="0.5" />
+                <line x1="370" y1="360" x2="210" y2="210" stroke="#2fe3bb" stroke-width="2" opacity="0.5" />
+                <rect x="178" y="330" width="130" height="46" rx="8" fill="#0c2326" stroke="#2fe3bb" stroke-width="2" />
+                <rect x="192" y="342" width="30" height="20" rx="3" fill="#2fe3bb" opacity="0.85" />
+                <rect x="232" y="342" width="30" height="20" rx="3" fill="#2fe3bb" opacity="0.55" />
+                <circle cx="200" cy="384" r="9" fill="#13282b" stroke="#2fe3bb" stroke-width="2" />
+                <circle cx="286" cy="384" r="9" fill="#13282b" stroke="#2fe3bb" stroke-width="2" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- ============ HOW IT WORKS (as a route line) ============ -->
+    <section class="ot-route">
+        <h2 class="ot-route-title">How a trip comes together</h2>
+        <div class="ot-route-line">
+            <div class="ot-stop">
+                <span class="ot-stop-dot"></span>
+                <h3>Search</h3>
+                <p>Pick where you're starting and where you're getting off.</p>
+            </div>
+            <div class="ot-stop">
+                <span class="ot-stop-dot"></span>
+                <h3>Book</h3>
+                <p>Choose your seat and pay in a couple of taps.</p>
+            </div>
+            <div class="ot-stop">
+                <span class="ot-stop-dot"></span>
+                <h3>Track</h3>
+                <p>Watch your train move on the map, stop by stop.</p>
+            </div>
+            <div class="ot-stop ot-stop-end">
+                <span class="ot-stop-dot"></span>
+                <h3>Arrive</h3>
+                <p>Get a nudge a few minutes before your station.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ STATS ============ -->
+    <section class="ot-stats">
+        <div class="ot-stat"><strong>40+</strong><span>stations covered</span></div>
+        <div class="ot-stat"><strong>98%</strong><span>on-time rate</span></div>
+        <div class="ot-stat"><strong>24/7</strong><span>live tracking</span></div>
+    </section>
+
 </div>
+
+<style>
+   
+    .ontrack-home {
+        font-family: 'Inter', sans-serif;
+        color: #142c3c;
+        padding: 0 30px 32px;
+        box-sizing: border-box;
+    }
+
+    .ontrack-home h1,
+    .ontrack-home h2,
+    .ontrack-home h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        margin: 0;
+    }
+
+    /* ---------- Hero ---------- */
+    .ot-hero {
+        background: linear-gradient(160deg, #102b3a 0%, #193b4b 100%);
+        border-radius: 20px;
+        padding: 64px 56px;
+        display: flex;
+        align-items: center;
+        gap: 48px;
+        margin-bottom: 72px;
+    }
+
+    .ot-hero-text {
+        flex: 1 1 420px;
+        min-width: 280px;
+    }
+
+    .ot-eyebrow {
+        color: #42d6bd;
+        font-weight: 600;
+        font-size: 0.8rem;
+        letter-spacing: .04em;
+        margin: 0 0 14px;
+    }
+
+    .ot-headline {
+        color: #fff;
+        font-size: clamp(2.2rem, 4vw, 3.1rem);
+        font-weight: 700;
+        line-height: 1.12;
+        margin-bottom: 20px;
+    }
+
+        .ot-headline em {
+            color: #42d6bd;
+            font-style: italic;
+        }
+
+    .ot-sub {
+        color: #d5e0e7;
+        font-size: 1.05rem;
+        line-height: 1.6;
+        max-width: 46ch;
+        margin-bottom: 32px;
+    }
+
+    .ot-cta-row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 28px;
+    }
+
+    .ot-btn {
+        display: inline-block;
+        padding: 13px 26px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: all .2s ease;
+    }
+
+        .ot-btn:hover {
+            transform: translateY(-2px);
+        }
+
+    .ot-btn-primary {
+        background: #42d6bd;
+        color: #102b3a;
+        border: 1px solid #42d6bd;
+    }
+
+        .ot-btn-primary:hover {
+            background: #35c5ad;
+            border-color: #35c5ad;
+            color: #102b3a;
+        }
+
+    .ot-btn-ghost {
+        background: transparent;
+        color: #fbfaf7;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+        .ot-btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+    .ot-live-note {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #c2d0da;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .ot-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #42d6bd;
+        display: inline-block;
+    }
+
+    .ot-hero-art {
+        flex: 1 1 320px;
+        min-width: 240px;
+        max-width: 420px;
+    }
+
+        .ot-hero-art svg {
+            width: 100%;
+            height: auto;
+        }
+
+    /* ---------- Route / How It Works ---------- */
+    .ot-route {
+        margin-bottom: 72px;
+    }
+
+    .ot-route-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 40px;
+        color: #142c3c;
+    }
+
+    .ot-route-line {
+        display: flex;
+        position: relative;
+    }
+
+        .ot-route-line::before {
+            content: "";
+            position: absolute;
+            top: 7px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #dfe7e8;
+        }
+
+    .ot-stop {
+        flex: 1;
+        position: relative;
+        padding-right: 20px;
+    }
+
+    .ot-stop-dot {
+        display: block;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fbfaf7;
+        border: 2px solid #42d6bd;
+        position: relative;
+        z-index: 1;
+        margin-bottom: 18px;
+    }
+
+    .ot-stop h3 {
+        font-size: 1.05rem;
+        margin-bottom: 6px;
+        color: #142c3c;
+    }
+
+    .ot-stop p {
+        font-size: 0.9rem;
+        color: #71808a;
+        line-height: 1.5;
+        margin: 0;
+        max-width: 24ch;
+    }
+
+    .ot-stop-end {
+        padding-right: 0;
+    }
+
+    /* ---------- Stats ---------- */
+    .ot-stats {
+        display: flex;
+        gap: 48px;
+        border-top: 1px solid #dfe7e8;
+        padding-top: 32px;
+        flex-wrap: wrap;
+    }
+
+    .ot-stat {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+        .ot-stat strong {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            color: #142c3c;
+        }
+
+        .ot-stat span {
+            font-size: 0.85rem;
+            color: #71808a;
+        }
+
+    /* ---------- Mobile ---------- */
+    @@media (max-width: 760px) {
+        .ot-hero {
+            flex-direction: column;
+            padding: 40px 28px;
+            text-align: left;
+        }
+
+        .ot-route-line {
+            flex-direction: column;
+            gap: 28px;
+        }
+
+            .ot-route-line::before {
+                top: 0;
+                bottom: 0;
+                left: 7px;
+                right: auto;
+                width: 2px;
+                height: auto;
+            }
+
+        .ot-stop {
+            padding-left: 28px;
+            padding-right: 0;
+        }
+
+        .ot-stop-dot {
+            position: absolute;
+            left: -28px;
+            top: 2px;
+            margin-bottom: 0;
+        }
+    }
+
+
+</style>

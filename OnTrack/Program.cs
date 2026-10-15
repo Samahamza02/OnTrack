@@ -63,6 +63,8 @@ namespace OnTrack
             builder.Services.AddScoped<IEvaluationService, EvaluationService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
 
+            builder.Services.AddScoped<OnTrack.Services.IDashboardService,
+                           OnTrack.Services.DashboardService>();
             var app = builder.Build();
 
             // Configure middleware
