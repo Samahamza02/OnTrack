@@ -1,0 +1,194 @@
+﻿@model IEnumerable<OnTrack.Models.Evaluation>
+
+@{
+    ViewData["Title"] = "Evaluations";
+}
+
+<style>
+    .ontrack-page {
+        background: #f2f5f6;
+        min-height: 100vh;
+        padding: 30px;
+        color: #173440;
+        font-family: Arial, sans-serif;
+    }
+
+    .ontrack-header {
+        background: linear-gradient(135deg, #10313d, #174b56);
+        color: white;
+        padding: 30px;
+        border-radius: 18px;
+        margin-bottom: 25px;
+    }
+
+    .ontrack-brand {
+        color: #43d3be;
+        font-weight: bold;
+        letter-spacing: 2px;
+        font-size: 13px;
+    }
+
+    .ontrack-header h1 {
+        margin-top: 18px;
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+    .ontrack-header p {
+        color: #d0dee2;
+        margin-bottom: 0;
+    }
+
+    .ontrack-card {
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(16, 49, 61, 0.06);
+    }
+
+    .ontrack-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .ontrack-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+        .ontrack-table th {
+            background: #edf4f5;
+            color: #31515b;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 15px 12px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .ontrack-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #edf0f1;
+            color: #425761;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .ontrack-table tbody tr:hover {
+            background: #f7fbfb;
+        }
+
+    .rating-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        background: #e4f7f3;
+        color: #168777;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .ontrack-count {
+        color: #71828a;
+        font-size: 14px;
+    }
+
+    .ontrack-empty {
+        text-align: center;
+        padding: 35px;
+        color: #71828a;
+    }
+
+    @@media (max-width: 768px) {
+        .ontrack-page {
+            padding: 15px;
+        }
+
+        .ontrack-header {
+            padding: 22px;
+        }
+
+            .ontrack-header h1 {
+                font-size: 26px;
+            }
+
+        .ontrack-card {
+            padding: 15px;
+        }
+    }
+</style>
+
+<div class="ontrack-page">
+
+    <div class="ontrack-header">
+        <div class="ontrack-brand">
+            ONTRACK · TRAIN TRIPS TRACKING
+        </div>
+
+        <h1>Evaluations</h1>
+
+        <p>Review passenger ratings and feedback.</p>
+    </div>
+
+    <div class="ontrack-card">
+
+        <h4>Evaluation Records</h4>
+
+        <p class="ontrack-count">
+            View ratings and comments submitted for tickets.
+        </p>
+
+        <div class="ontrack-table-wrapper">
+            <table class="ontrack-table">
+                <thead>
+                    <tr>
+                        <th>Evaluation ID</th>
+                        <th>Ticket ID</th>
+                        <th>Rating</th>
+                        <th>Comment</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var evaluation in Model)
+                        {
+                            <tr>
+                                <td>#@evaluation.EvaluationId</td>
+                                <td>#@evaluation.TicketId</td>
+
+                                <td>
+                                    <span class="rating-badge">
+                                        @evaluation.rating / 5
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @(string.IsNullOrWhiteSpace(evaluation.comment)
+                                        ? "No comment"
+                                        : evaluation.comment)
+                                </td>
+
+                                <td>
+                                    @evaluation.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="ontrack-empty">
+                                No evaluations found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>

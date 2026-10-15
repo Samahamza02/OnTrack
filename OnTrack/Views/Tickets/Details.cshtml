@@ -1,0 +1,20 @@
+﻿@model OnTrack.Models.Ticket
+
+@{
+    ViewData["Title"] = "Ticket Details";
+}
+
+<h1>Ticket Details</h1>
+
+<div>
+    <p><strong>Ticket ID:</strong> @Model.TicketId</p>
+    <p><strong>Seat Number:</strong> @Model.SeatNumber</p>
+    <p><strong>Price:</strong> @Model.Price</p>
+    <p><strong>Status:</strong> @Model.Status</p>
+    <p><strong>Booking Date:</strong> @Model.BookingDate</p>
+    <p><strong>Trip ID:</strong> @Model.TripId</p>
+</div>
+
+<a asp-controller="Tickets" asp-action="Index" class="btn btn-secondary">
+    Back to Tickets
+</a>

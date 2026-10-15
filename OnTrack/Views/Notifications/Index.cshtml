@@ -1,0 +1,216 @@
+﻿@model IEnumerable<OnTrack.Models.Notification>
+
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+<style>
+    .notifications-page {
+        background: #f2f5f6;
+        min-height: 100vh;
+        padding: 30px;
+        color: #173440;
+        font-family: Arial, sans-serif;
+    }
+
+    .notifications-header {
+        background: linear-gradient(135deg, #10313d, #174b56);
+        color: white;
+        padding: 30px;
+        border-radius: 18px;
+        margin-bottom: 25px;
+    }
+
+    .notifications-brand {
+        color: #43d3be;
+        font-weight: bold;
+        letter-spacing: 2px;
+        font-size: 13px;
+    }
+
+    .notifications-header h1 {
+        margin-top: 18px;
+        font-weight: bold;
+        font-size: 32px;
+    }
+
+    .notifications-header p {
+        color: #d0dee2;
+        margin-bottom: 0;
+    }
+
+    .notifications-card {
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(16, 49, 61, 0.06);
+    }
+
+    .notifications-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .notifications-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+        .notifications-table th {
+            background: #edf4f5;
+            color: #31515b;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 15px 12px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .notifications-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #edf0f1;
+            color: #425761;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .notifications-table tbody tr:hover {
+            background: #f7fbfb;
+        }
+
+    .notification-status {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .notification-read {
+        background: #e4f7f3;
+        color: #168777;
+    }
+
+    .notification-unread {
+        background: #fff0d9;
+        color: #a76313;
+    }
+
+    .notifications-count {
+        color: #71828a;
+        font-size: 14px;
+    }
+
+    .notifications-empty {
+        text-align: center;
+        padding: 35px;
+        color: #71828a;
+    }
+
+    @@media (max-width: 768px) {
+        .notifications-page {
+            padding: 15px;
+        }
+
+        .notifications-header {
+            padding: 22px;
+        }
+
+            .notifications-header h1 {
+                font-size: 26px;
+            }
+
+        .notifications-card {
+            padding: 15px;
+        }
+    }
+</style>
+
+<div class="notifications-page">
+
+    <div class="notifications-header">
+        <div class="notifications-brand">
+            ONTRACK · TRAIN TRIPS TRACKING
+        </div>
+
+        <h1>Notifications</h1>
+
+        <p>Stay updated with train trips and schedule changes.</p>
+    </div>
+
+    <div class="notifications-card">
+
+        <h4>Notification Records</h4>
+
+        <p class="notifications-count">
+            View notifications sent to users.
+        </p>
+
+        <div class="notifications-table-wrapper">
+            <table class="notifications-table">
+                <thead>
+                    <tr>
+                        <th>Notification ID</th>
+                        <th>User ID</th>
+                        <th>Trip ID</th>
+                        <th>Message</th>
+                        <th>Status</th>
+                        <th>Sent At</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var notification in Model)
+                        {
+                            <tr>
+                                <td>#@notification.NotificationId</td>
+
+                                <td>@notification.UserId</td>
+
+                                <td>
+                                    @(notification.TripId.HasValue
+                                        ? notification.TripId.Value.ToString()
+                                        : "General")
+                                </td>
+
+                                <td>@notification.Message</td>
+
+                                <td>
+                                    @if (notification.IsRead)
+                                    {
+                                        <span class="notification-status notification-read">
+                                            Read
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="notification-status notification-unread">
+                                            Unread
+                                        </span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @notification.SentAt.ToString("dd/MM/yyyy HH:mm")
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="notifications-empty">
+                                No notifications found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
