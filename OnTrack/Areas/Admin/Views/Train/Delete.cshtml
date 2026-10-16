@@ -1,0 +1,66 @@
+﻿@model OnTrack.Models.Train
+
+@{
+    ViewData["Title"] = "Delete Train";
+}
+
+<div class="container mt-4">
+
+    <h1>Delete Train</h1>
+
+    <div class="alert alert-danger mt-4">
+        Are you sure you want to delete this train?
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+
+            <dl class="row">
+
+                <dt class="col-sm-3">
+                    Train Number
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.TrainNumber
+                </dd>
+
+                <dt class="col-sm-3">
+                    Name
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.TrainName
+                </dd>
+
+                <dt class="col-sm-3">
+                    Type
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.TrainType
+                </dd>
+
+            </dl>
+
+            <form asp-action="Delete" method="post">
+
+                <input type="hidden"
+                       asp-for="TrainId" />
+
+                <button type="submit"
+                        class="btn btn-danger">
+                    Delete
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>

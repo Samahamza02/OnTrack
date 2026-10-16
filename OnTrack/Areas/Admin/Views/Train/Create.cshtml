@@ -1,0 +1,73 @@
+﻿@model OnTrack.Models.Train
+
+@{
+    ViewData["Title"] = "Create Train";
+}
+
+<div class="container mt-4">
+
+    <h1>Create Train</h1>
+    <p class="text-muted">Add a new train to the system.</p>
+
+    <form asp-action="Create" method="post">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="mb-3">
+            <label asp-for="TrainNumber" class="form-label">
+                Train Number
+            </label>
+
+            <input asp-for="TrainNumber"
+                   class="form-control" />
+
+            <span asp-validation-for="TrainNumber"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="TrainName" class="form-label">
+                Name
+            </label>
+
+            <input asp-for="TrainName"
+                   class="form-control" />
+
+            <span asp-validation-for="TrainName"
+                  class="text-danger"></span>
+        </div>
+              <div class="mb-3">
+    <label asp-for="Capacity" class="form-label"></label>
+    <input asp-for="Capacity" class="form-control" type="number" />
+    <span asp-validation-for="Capacity" class="text-danger"></span>
+</div>
+        <div class="mb-3">
+            <label asp-for="TrainType" class="form-label">
+                Type
+            </label>
+
+            <input asp-for="TrainType"
+                   class="form-control" />
+
+            <span asp-validation-for="TrainType"
+                  class="text-danger"></span>
+        </div>
+ 
+        <button type="submit" class="btn btn-primary">
+            Create
+        </button>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Back to Trains
+        </a>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

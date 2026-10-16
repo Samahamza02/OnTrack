@@ -1,0 +1,56 @@
+﻿@model OnTrack.Models.Train
+
+@{
+    ViewData["Title"] = "Train Details";
+}
+
+<div class="container mt-4">
+
+    <h1>Train Details</h1>
+
+    <div class="card mt-4">
+        <div class="card-body">
+
+            <dl class="row">
+
+                <dt class="col-sm-3">
+                    Train Number
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.TrainNumber
+                </dd>
+
+                <dt class="col-sm-3">
+                    Name
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.TrainName
+                </dd>
+
+                <dt class="col-sm-3">
+                    Type
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.TrainType
+                </dd>
+
+            </dl>
+
+            <a asp-action="Edit"
+               asp-route-id="@Model.TrainId"
+               class="btn btn-warning">
+                Edit
+            </a>
+
+            <a asp-action="Index"
+               class="btn btn-secondary">
+                Back to Trains
+            </a>
+
+        </div>
+    </div>
+
+</div>
