@@ -1,0 +1,71 @@
+﻿@model List<Station>
+@{ ViewData["Title"] = "Stations"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Stations</h2>
+  <a asp-action="Create" class="add-Create-btn">Add station</a>
+</div>
+
+@if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+@if (TempData["Error"] != null)   { <div class="alert alert-danger">@TempData["Error"]</div> }
+
+<div id="map" style="height:350px; border-radius:8px;" class="mb-3"></div>
+
+<form method="get" class="mb-3 d-flex gap-2">
+  <input name="search" value="@ViewBag.Search" class="form-control" placeholder="Search by name or city" />
+  <button class="btn btn-outline-secondary">Search</button>
+</form>
+
+<table class="table table-striped align-middle">
+  <thead>
+    <tr><th>Name</th><th>City</th><th>Latitude</th><th>Longitude</th><th></th></tr>
+  </thead>
+  <tbody>
+  @foreach (var s in Model)
+  {
+    <tr>
+      <td>@s.StationName</td>
+      <td>@s.City</td>
+      <td>@s.Latitude</td>
+      <td>@s.Longitude</td>
+      <td class="text-end">
+        <a asp-action="Details" asp-route-id="@s.StationId" class="btn btn-sm btn-info">Details</a>
+        <a asp-action="Edit" asp-route-id="@s.StationId" class="btn btn-sm btn-warning">Edit</a>
+        <a asp-action="Delete" asp-route-id="@s.StationId" class="btn btn-sm btn-danger">Delete</a>
+      </td>
+    </tr>
+  }
+  @if (!Model.Any())
+  {
+    <tr><td colspan="5" class="text-center text-muted">No stations found.</td></tr>
+  }
+  </tbody>
+</table>
+
+@section Scripts {
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+  const stations = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+      Model.Select(s => new { s.StationName, s.City, lat = s.Latitude, lng = s.Longitude })));
+
+  const map = L.map('map').setView([30.0444, 31.2357], 6);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  const points = [];
+  stations.forEach(s => {
+    if (s.lat === 0 && s.lng === 0) return;       // 0,0 = no location set
+    const popup = document.createElement('div');
+    const b = document.createElement('b');
+    b.textContent = s.StationName;
+    popup.appendChild(b);
+    popup.appendChild(document.createElement('br'));
+    popup.appendChild(document.createTextNode(s.City));
+    L.marker([s.lat, s.lng]).addTo(map).bindPopup(popup);
+    points.push([s.lat, s.lng]);
+  });
+  if (points.length) map.fitBounds(points, { padding: [30, 30] });
+</script>
+}

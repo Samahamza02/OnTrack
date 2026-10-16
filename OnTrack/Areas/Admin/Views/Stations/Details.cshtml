@@ -1,0 +1,45 @@
+﻿@model Station
+@{
+  ViewData["Title"] = "Station details";
+  var inv = System.Globalization.CultureInfo.InvariantCulture;
+  var lat = Model.Latitude.ToString(inv);
+  var lng = Model.Longitude.ToString(inv);
+  var hasPos = Model.Latitude != 0 || Model.Longitude != 0;
+}
+<h2>@Model.StationName</h2>
+
+<dl class="row col-md-8">
+  <dt class="col-sm-3">City</dt><dd class="col-sm-9">@Model.City</dd>
+  <dt class="col-sm-3">Latitude</dt><dd class="col-sm-9">@Model.Latitude</dd>
+  <dt class="col-sm-3">Longitude</dt><dd class="col-sm-9">@Model.Longitude</dd>
+  <dt class="col-sm-3">Trip stops</dt><dd class="col-sm-9">@ViewBag.StopsCount</dd>
+  <dt class="col-sm-3">Tickets using it</dt><dd class="col-sm-9">@ViewBag.TicketsCount</dd>
+</dl>
+
+@if (hasPos)
+{
+  <div id="map" style="height:300px; border-radius:8px;" class="mb-3"></div>
+}
+else
+{
+  <p class="text-muted">No location set for this station.</p>
+}
+
+<a asp-action="Edit" asp-route-id="@Model.StationId" class="btn btn-warning">Edit</a>
+<a asp-action="Index" class="btn btn-secondary">Back</a>
+
+@if (hasPos)
+{
+  @section Scripts {
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script>
+    const pos = [@lat, @lng];
+    const map = L.map('map').setView(pos, 14);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    L.marker(pos).addTo(map);
+  </script>
+  }
+}

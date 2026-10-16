@@ -1,0 +1,22 @@
+﻿@model Station
+@{ ViewData["Title"] = "Delete station"; }
+<h2>Delete station</h2>
+
+@if ((bool)ViewBag.InUse)
+{
+  <div class="alert alert-warning">
+    This station is used by trip stops or tickets and can't be deleted.
+  </div>
+  <a asp-action="Index" class="btn btn-secondary">Back</a>
+}
+else
+{
+  <div class="alert alert-danger">
+    Are you sure you want to delete <strong>@Model.StationName</strong> (@Model.City)?
+  </div>
+  <form asp-action="Delete" method="post">
+    <input type="hidden" name="id" value="@Model.StationId" />
+    <button class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+  </form>
+}
