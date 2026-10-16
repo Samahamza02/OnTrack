@@ -98,30 +98,36 @@ namespace OnTrack.Areas.Admin.Controllers
         {
             if (id != train.TrainId)
             {
+                return BadRequest($"ID mismatch: URL={id}, Model={train.TrainId}");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value != null && x.Value.Errors.Count > 0)
+                    .SelectMany(x => x.Value!.Errors.Select(e =>
+                        $"{x.Key}: {e.ErrorMessage}"));
+
+                ViewBag.ValidationErrors = string.Join(" | ", errors);
+
+                return View(train);
+            }
+
+            var existingTrain = await _context.Trains.FindAsync(id);
+
+            if (existingTrain == null)
+            {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(train);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TrainExists(train.TrainId))
-                    {
-                        return NotFound();
-                    }
+            existingTrain.TrainNumber = train.TrainNumber;
+            existingTrain.TrainName = train.TrainName;
+            existingTrain.Capacity = train.Capacity;
+            existingTrain.TrainType = train.TrainType;
 
-                    throw;
-                }
+            await _context.SaveChangesAsync();
 
-                return RedirectToAction(nameof(Index));
-            }
-
-            return View(train);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Admin/Trains/Delete/5
