@@ -1,0 +1,32 @@
+﻿<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function () {
+  const latInput = document.getElementById('Latitude');
+  const lngInput = document.getElementById('Longitude');
+  const lat = parseFloat(latInput.value), lng = parseFloat(lngInput.value);
+  const hasPos = !isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0);
+
+  // default view: Egypt
+  const map = L.map('map').setView(hasPos ? [lat, lng] : [30.0444, 31.2357], hasPos ? 14 : 6);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  let marker = hasPos ? L.marker([lat, lng]).addTo(map) : null;
+
+  function setPos(la, ln) {
+    latInput.value = la.toFixed(6);
+    lngInput.value = ln.toFixed(6);
+    if (marker) marker.setLatLng([la, ln]); else marker = L.marker([la, ln]).addTo(map);
+  }
+
+  map.on('click', e => setPos(e.latlng.lat, e.latlng.lng));
+
+  // typing the numbers also moves the pin
+  [latInput, lngInput].forEach(i => i.addEventListener('change', () => {
+    const a = parseFloat(latInput.value), b = parseFloat(lngInput.value);
+    if (!isNaN(a) && !isNaN(b)) { setPos(a, b); map.setView([a, b], 14); }
+  }));
+})();
+</script>

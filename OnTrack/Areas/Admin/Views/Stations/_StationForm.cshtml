@@ -1,0 +1,31 @@
+﻿@model Station
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<div class="mb-3">
+  <label asp-for="StationName" class="form-label"></label>
+  <input asp-for="StationName" class="form-control" />
+  <span asp-validation-for="StationName" class="text-danger"></span>
+</div>
+<div class="mb-3">
+  <label asp-for="City" class="form-label"></label>
+  <input asp-for="City" class="form-control" />
+  <span asp-validation-for="City" class="text-danger"></span>
+</div>
+<div class="row">
+  <div class="col-md-6 mb-3">
+    <label asp-for="Latitude" class="form-label"></label>
+    <input asp-for="Latitude" class="form-control" type="number" step="any" />
+    <span asp-validation-for="Latitude" class="text-danger"></span>
+  </div>
+  <div class="col-md-6 mb-3">
+    <label asp-for="Longitude" class="form-label"></label>
+    <input asp-for="Longitude" class="form-control" type="number" step="any" />
+    <span asp-validation-for="Longitude" class="text-danger"></span>
+  </div>
+</div>
+
+<div class="mb-3">
+  <label class="form-label">Click the map to set the location</label>
+  <div id="map" style="height:350px; border-radius:8px;"></div>
+</div>

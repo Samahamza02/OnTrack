@@ -187,6 +187,18 @@
                     <span class="ot-stat-marker"></span>
                     Total @statistic.Name.ToLowerInvariant()
                 </div>
+                @if (statistic.Name == "Stations")
+{
+    <div class="ot-users-action">
+        <a asp-area="Admin"
+           asp-controller="Stations"
+           asp-action="Index"
+           class="ot-view-users-link">
+            View Stations
+            <span aria-hidden="true">&rarr;</span>
+        </a>
+    </div>
+}
             </article>
         }
 
