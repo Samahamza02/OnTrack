@@ -1,4 +1,4 @@
-﻿```cshtml
+﻿
 @model OnTrack.Models.Trip
 
 @{
@@ -6,16 +6,10 @@
 }
 
 <div class="container mt-4">
-
     <h1>Create Trip</h1>
 
-    <form asp-area="Admin"
-          asp-controller="Trips"
-          asp-action="Create"
-          method="post">
-
-        <div asp-validation-summary="All"
-             class="text-danger mb-3"></div>
+    <form asp-area="Admin" asp-controller="Trips" asp-action="Create" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="mb-3">
             <label asp-for="RouteName" class="form-label"></label>
@@ -48,10 +42,8 @@
 
         <div class="mb-3">
             <label asp-for="TrainId" class="form-label"></label>
-            <select asp-for="TrainId"
-                    class="form-select"
-                    asp-items="ViewBag.TrainId">
-                <option value="">-- Select a train --</option>
+            <select asp-for="TrainId" class="form-select" asp-items="ViewBag.TrainId">
+                <option value="">-- Select Train --</option>
             </select>
             <span asp-validation-for="TrainId"
                   class="text-danger"></span>
