@@ -1,0 +1,68 @@
+﻿@model OnTrack.Models.ViewModels.BookTripViewModel
+
+@{
+    ViewData["Title"] = "Book a Trip";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Book a Trip</h1>
+        <a asp-area="Admin" asp-controller="Trip" asp-action="Index" class="btn btn-secondary">
+            Back to List
+        </a>
+    </div>
+
+    <dl class="row mb-4">
+        <dt class="col-sm-3">Route</dt>
+        <dd class="col-sm-9">@Model.RouteName</dd>
+
+        <dt class="col-sm-3">Train</dt>
+        <dd class="col-sm-9">@Model.TrainNumber</dd>
+
+        <dt class="col-sm-3">Date</dt>
+        <dd class="col-sm-9">@Model.TripDate.ToString("g")</dd>
+        <dt class="col-sm-3">Price</dt>
+        <dd class="col-sm-9">@Model.Price.ToString("C")</dd>
+    </dl>
+
+    <form asp-area="Admin" asp-controller="Trips" asp-action="Book" asp-route-id="@Model.TripId" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <input type="hidden" asp-for="TripId" />
+
+        <div class="mb-3">
+            <label asp-for="FromStationId" class="form-label">From Station</label>
+            <select asp-for="FromStationId" class="form-select">
+                <option value=""> Choose Boarding Station </option>
+                @foreach (var stop in Model.Stops)
+                {
+                    <option value="@stop.StationId">@stop.Station.StationName (@stop.Station.City)</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ToStationId" class="form-label">To Station</label>
+            <select asp-for="ToStationId" class="form-select">
+                <option value="">Choose Destination Station</option>
+                @foreach (var stop in Model.Stops)
+                {
+                    <option value="@stop.StationId">@stop.Station.StationName (@stop.Station.City)</option>
+                }
+            </select>
+        </div>
+
+      <div class="mb-3">
+    <label asp-for="SeatNumber" class="form-label">Seat Number</label>
+    <select asp-for="SeatNumber" class="form-select">
+        <option value="">Choose Seat Number</option>
+        @foreach (var seat in Model.AvailableSeats)
+        {
+            <option value="@seat">@seat</option>
+        }
+    </select>
+</div>
+        <button type="submit" class="btn btn-primary">Confirm Booking</button>
+    </form>
+
+</div>

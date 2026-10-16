@@ -14,9 +14,9 @@ namespace OnTrack.Models
     {
         public int TripId { get; set; }
         public string? RouteName { get; set; }
-        public string Status { get; set; }
+        public TripStatus Status { get; set; }
         public DateTime TripDate { get; set; }
-
+        public decimal Price { get; set; }
         [ForeignKey(nameof(Train))]
         public int TrainId { get; set; }
         public Train Train { get; set; }

@@ -1,0 +1,71 @@
+﻿@model IEnumerable<OnTrack.Models.Train>
+
+@{
+    ViewData["Title"] = "Trains";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>Trains</h1>
+            <p class="text-muted">Manage all trains in the system.</p>
+        </div>
+
+        <a asp-area="Admin"
+           asp-controller="Train"
+           asp-action="Create"
+           class="btn btn-primary">
+            Create Train
+        </a>
+    </div>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Train Number</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var train in Model)
+            {
+                <tr>
+                    <td>@train.TrainNumber</td>
+                    <td>@train.TrainName</td>
+                    <td>@train.TrainType</td>
+
+                    <td>
+                        <a asp-area="Admin"
+                           asp-controller="Train"
+                           asp-action="Details"
+                           asp-route-id="@train.TrainId"
+                           class="btn btn-sm btn-info">
+                            Details
+                        </a>
+
+                        <a asp-area="Admin"
+                           asp-controller="Train"
+                           asp-action="Edit"
+                           asp-route-id="@train.TrainId"
+                           class="btn btn-sm btn-warning">
+                            Edit
+                        </a>
+
+                        <a asp-area="Admin"
+                           asp-controller="Train"
+                           asp-action="Delete"
+                           asp-route-id="@train.TrainId"
+                           class="btn btn-sm btn-danger">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
