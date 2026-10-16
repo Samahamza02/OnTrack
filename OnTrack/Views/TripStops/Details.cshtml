@@ -1,0 +1,52 @@
+﻿@model OnTrack.Models.TripStop
+
+@{
+    ViewData["Title"] = "Trip Stop Details";
+}
+
+<h1>Trip Stop Details</h1>
+
+<div class="card">
+    <div class="card-body">
+        <p>
+            <strong>Trip Stop ID:</strong>
+            @Model.TripStopId
+        </p>
+
+        <p>
+            <strong>Stop Order:</strong>
+            @Model.StopOrder
+        </p>
+
+        <p>
+            <strong>Scheduled Time:</strong>
+            @(Model.ScheduledTime?.ToString("g") ?? "Not set")
+        </p>
+
+        <p>
+            <strong>Actual Time:</strong>
+            @(Model.ActualTime?.ToString("g") ?? "Not set")
+        </p>
+
+        <p>
+            <strong>Platform:</strong>
+            @Model.Platform
+        </p>
+
+        <p>
+            <strong>Trip ID:</strong>
+            @Model.TripId
+        </p>
+
+        <p>
+            <strong>Station ID:</strong>
+            @Model.StationId
+        </p>
+
+        <a asp-controller="TripStops"
+           asp-action="Index"
+           class="btn btn-secondary">
+            Back to Trip Stops
+        </a>
+    </div>
+</div>

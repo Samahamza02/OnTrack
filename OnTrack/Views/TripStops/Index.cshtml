@@ -1,0 +1,45 @@
+﻿@model IEnumerable<OnTrack.Models.TripStop>
+
+@{
+    ViewData["Title"] = "Trip Stops";
+}
+
+<h1>Trip Stops</h1>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Stop Order</th>
+            <th>Scheduled Time</th>
+            <th>Actual Time</th>
+            <th>Platform</th>
+            <th>Trip ID</th>
+            <th>Station ID</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.TripStopId</td>
+                <td>@item.StopOrder</td>
+                <td>@item.ScheduledTime?.ToString("g")</td>
+                <td>@item.ActualTime?.ToString("g")</td>
+                <td>@item.Platform</td>
+                <td>@item.TripId</td>
+                <td>@item.StationId</td>
+                <td>
+                    <a asp-controller="TripStops"
+                       asp-action="Details"
+                       asp-route-id="@item.TripStopId"
+                       class="btn btn-info">
+                        Details
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
