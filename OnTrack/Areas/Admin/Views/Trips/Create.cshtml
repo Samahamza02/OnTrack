@@ -14,13 +14,17 @@
         <div class="mb-3">
             <label asp-for="RouteName" class="form-label"></label>
             <input asp-for="RouteName" class="form-control" />
-            <span asp-validation-for="RouteName" class="text-danger"></span>
+            <span asp-validation-for="RouteName"
+                  class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label asp-for="TripDate" class="form-label"></label>
-            <input asp-for="TripDate" class="form-control" type="datetime-local" />
-            <span asp-validation-for="TripDate" class="text-danger"></span>
+            <input asp-for="TripDate"
+                   class="form-control"
+                   type="datetime-local" />
+            <span asp-validation-for="TripDate"
+                  class="text-danger"></span>
         </div>
 
         <div class="mb-3">
@@ -32,7 +36,8 @@
                 <option value="Completed">Completed</option>
                 <option value="Cancelled">Cancelled</option>
             </select>
-            <span asp-validation-for="Status" class="text-danger"></span>
+            <span asp-validation-for="Status"
+                  class="text-danger"></span>
         </div>
 
         <div class="mb-3">
@@ -40,19 +45,33 @@
             <select asp-for="TrainId" class="form-select" asp-items="ViewBag.TrainId">
                 <option value="">-- Select Train --</option>
             </select>
-            <span asp-validation-for="TrainId" class="text-danger"></span>
+            <span asp-validation-for="TrainId"
+                  class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label asp-for="Price" class="form-label"></label>
             <input asp-for="Price" class="form-control" />
-            <span asp-validation-for="Price" class="text-danger"></span>
+            <span asp-validation-for="Price"
+                  class="text-danger"></span>
         </div>
 
-        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="submit" class="btn btn-primary">
+            Create
+        </button>
 
-        <a asp-area="Admin" asp-controller="Trips" asp-action="Index" class="btn btn-secondary">
+        <a asp-area="Admin"
+           asp-controller="Trips"
+           asp-action="Index"
+           class="btn btn-secondary">
             Cancel
         </a>
+
     </form>
+
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+```

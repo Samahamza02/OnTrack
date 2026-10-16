@@ -23,10 +23,10 @@
         <dd class="col-sm-9">@Model.Status</dd>
     </dl>
 
-    <form asp-area="Admin" asp-controller="Trip" asp-action="Delete" method="post">
+    <form asp-area="Admin" asp-controller="Trips" asp-action="Delete" method="post">
         <input type="hidden" asp-for="TripId" />
         <button type="submit" class="btn btn-danger">Delete</button>
-        <a asp-area="Admin" asp-controller="Trip" asp-action="Index" class="btn btn-secondary">Cancel</a>
+        <a asp-area="Admin" asp-controller="Trips" asp-action="Index" class="btn btn-secondary">Cancel</a>
     </form>
 
 </div>

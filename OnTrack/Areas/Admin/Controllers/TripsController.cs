@@ -52,92 +52,223 @@ namespace OnTrack.Areas.Admin.Controllers
             return View(trip);
         }
 
-        // GET: Admin/Trip/Create
+        //// GET: Admin/Trip/Create
+        //[Authorize(Roles = "Admin")]
+        //public IActionResult Create()
+        //{
+        //    ViewBag.TrainId = new SelectList(_context.Trains, "TrainId", "TrainNumber");
+        //    return View();
+        //}
+
+        //// POST: Admin/Trip/Create
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> Create(Trip trip)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        _context.Trips.Add(trip);
+        //        await _context.SaveChangesAsync();
+
+        //        return RedirectToAction(nameof(Index));
+        //    }
+
+        //    return View(trip);
+        //}
+
+        //// GET: Admin/Trip/Edit/5
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> Edit(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var trip = await _context.Trips.FindAsync(id);
+
+        //    if (trip == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    ViewBag.TrainId = new SelectList(_context.Trains, "TrainId", "TrainNumber");
+        //    return View(trip);
+        //}
+
+        //// POST: Admin/Trip/Edit/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> Edit(int id, Trip trip)
+        //{
+        //    if (id != trip.TripId)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            _context.Update(trip);
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        catch (DbUpdateConcurrencyException)
+        //        {
+        //            if (!TripExists(trip.TripId))
+        //            {
+        //                return NotFound();
+        //            }
+
+        //            throw;
+        //        }
+
+        //        return RedirectToAction(nameof(Index));
+        //    }
+
+        //    return View(trip);
+        //}
+
+        //// GET: Admin/Trip/Delete/5
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var trip = await _context.Trips
+        //        .AsNoTracking()
+        //        .Include(t => t.Train)
+        //        .FirstOrDefaultAsync(t => t.TripId == id);
+
+        //    if (trip == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(trip);
+        //}
+
+        //// POST: Admin/Trip/Delete/5
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> DeleteConfirmed(int id)
+        //{
+        //    var trip = await _context.Trips.FindAsync(id);
+
+        //    if (trip != null)
+        //    {
+        //        _context.Trips.Remove(trip);
+        //        await _context.SaveChangesAsync();
+        //    }
+
+        //    return RedirectToAction(nameof(Index));
+        //}
+
+        //private bool TripExists(int id)
+        //{
+        //    return _context.Trips.Any(t => t.TripId == id);
+        //}
+
+
+        // GET: /Admin/Trips/Create
+        [HttpGet]
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            ViewBag.TrainId = new SelectList(_context.Trains, "TrainId", "TrainNumber");
+            LoadTrains();
             return View();
         }
 
-        // POST: Admin/Trip/Create
+        // POST: /Admin/Trips/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(Trip trip)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Trips.Add(trip);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction(nameof(Index));
+                LoadTrains(trip.TrainId);
+                return View(trip);
             }
 
-            return View(trip);
+            _context.Trips.Add(trip);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Trip created successfully.";
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Admin/Trip/Edit/5
+        // GET: /Admin/Trips/Edit/5
+        [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var trip = await _context.Trips.FindAsync(id);
 
             if (trip == null)
-            {
                 return NotFound();
-            }
-            ViewBag.TrainId = new SelectList(_context.Trains, "TrainId", "TrainNumber");
+
+            LoadTrains(trip.TrainId);
             return View(trip);
         }
 
-        // POST: Admin/Trip/Edit/5
+        // POST: /Admin/Trips/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, Trip trip)
         {
             if (id != trip.TripId)
-            {
                 return NotFound();
+
+            if (!ModelState.IsValid)
+            {
+                LoadTrains(trip.TrainId);
+                return View(trip);
             }
 
-            if (ModelState.IsValid)
+            var existingTrip = await _context.Trips.FindAsync(id);
+
+            if (existingTrip == null)
+                return NotFound();
+
+            // Update the existing database record.
+            existingTrip.RouteName = trip.RouteName;
+            existingTrip.TripDate = trip.TripDate;
+            existingTrip.Status = trip.Status;
+            existingTrip.TrainId = trip.TrainId;
+            existingTrip.Price = trip.Price;
+
+            try
             {
-                try
-                {
-                    _context.Update(trip);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TripExists(trip.TripId))
-                    {
-                        return NotFound();
-                    }
-
-                    throw;
-                }
-
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Trip updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await _context.Trips.AnyAsync(t => t.TripId == id))
+                    return NotFound();
 
-            return View(trip);
+                throw;
+            }
         }
 
-        // GET: Admin/Trip/Delete/5
+        // GET: /Admin/Trips/Delete/5
+        [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var trip = await _context.Trips
                 .AsNoTracking()
@@ -145,14 +276,12 @@ namespace OnTrack.Areas.Admin.Controllers
                 .FirstOrDefaultAsync(t => t.TripId == id);
 
             if (trip == null)
-            {
                 return NotFound();
-            }
 
             return View(trip);
         }
 
-        // POST: Admin/Trip/Delete/5
+        // POST: /Admin/Trips/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
@@ -160,19 +289,46 @@ namespace OnTrack.Areas.Admin.Controllers
         {
             var trip = await _context.Trips.FindAsync(id);
 
-            if (trip != null)
+            if (trip == null)
+                return NotFound();
+
+            // Do not delete a trip that still has tickets.
+            bool hasTickets = await _context.Tickets
+                .AnyAsync(t => t.TripId == id);
+
+            if (hasTickets)
             {
-                _context.Trips.Remove(trip);
-                await _context.SaveChangesAsync();
+                TempData["Error"] =
+                    "This trip cannot be deleted because tickets are linked to it.";
+
+                return RedirectToAction(nameof(Index));
             }
 
+            // Remove related route stops first, if any.
+            var stops = await _context.TripStops
+                .Where(s => s.TripId == id)
+                .ToListAsync();
+
+            _context.TripStops.RemoveRange(stops);
+            _context.Trips.Remove(trip);
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Trip deleted successfully.";
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TripExists(int id)
+        private void LoadTrains(int? selectedTrainId = null)
         {
-            return _context.Trips.Any(t => t.TripId == id);
+            ViewBag.TrainId = new SelectList(
+                _context.Trains.AsNoTracking().ToList(),
+                "TrainId",
+                "TrainNumber",
+                selectedTrainId);
         }
+
+
+
 
         // GET: Admin/Trip/Book/5
         public async Task<IActionResult> Book(int? id)
