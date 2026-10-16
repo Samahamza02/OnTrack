@@ -62,6 +62,7 @@ namespace OnTrack
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<IEvaluationService, EvaluationService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddScoped<ITripStopService, TripStopService>();
 
             builder.Services.AddScoped<OnTrack.Services.IDashboardService,
                            OnTrack.Services.DashboardService>();
@@ -95,6 +96,10 @@ namespace OnTrack
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
+
+            app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
             // NEW: create roles and the first admin
             using (var scope = app.Services.CreateScope())
