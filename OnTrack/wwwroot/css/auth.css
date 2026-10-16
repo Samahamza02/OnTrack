@@ -225,3 +225,22 @@ body { background:#f4f6f5; color:var(--ot-ink); }
     }
 }
 
+/*create btn*/
+.add-Create-btn {
+    background-color: #42d6bd;
+    color: #102b3a;
+    border: none;
+    border-radius: 9px;
+    margin: 12px 10px 10px;
+    padding: 7px 16px;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.2s ease;
+}
+
+    .add-Create-btn:hover {
+        background-color: #32c9b0;
+        color: #102b3a;
+    }

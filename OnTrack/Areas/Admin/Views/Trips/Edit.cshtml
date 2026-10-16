@@ -8,7 +8,7 @@
 
     <h1>Edit Trip</h1>
 
-    <form asp-area="Admin" asp-controller="Trip" asp-action="Edit" method="post">
+    <form asp-area="Admin" asp-controller="Trips" asp-action="Edit" method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="TripId" />
 
@@ -49,7 +49,7 @@
             <span asp-validation-for="Price" class="text-danger"></span>
         </div>
         <button type="submit" class="btn btn-primary">Save</button>
-        <a asp-area="Admin" asp-controller="Trip" asp-action="Index" class="btn btn-secondary">Cancel</a>
+        <a asp-area="Admin" asp-controller="Trips" asp-action="Index" class="btn btn-secondary">Cancel</a>
     </form>
 
 </div>

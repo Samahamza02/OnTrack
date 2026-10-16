@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace OnTrack.Models
 {
@@ -19,14 +20,16 @@ namespace OnTrack.Models
         public decimal Price { get; set; }
         [ForeignKey(nameof(Train))]
         public int TrainId { get; set; }
-        public Train Train { get; set; }
-        public ICollection<TripStop> TripStops { get; set; }
+        [ValidateNever]
+        public Train Train { get; set; } = null!;
 
-        public ICollection<Ticket> Tickets { get; set; }
+        public ICollection<TripStop> TripStops { get; set; } = new List<TripStop>();
 
-        public ICollection<TripLocation> TripLocations { get; set; }
+        public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 
-        public ICollection<Notification> Notifications { get; set; }
+        public ICollection<TripLocation> TripLocations { get; set; } = new List<TripLocation>();
+
+        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     }
 }

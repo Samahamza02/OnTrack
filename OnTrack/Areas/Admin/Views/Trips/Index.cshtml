@@ -51,7 +51,7 @@
                         @if (User.IsInRole("Admin"))
                         {
                             <a asp-area="Admin"
-                               asp-controller="Trip"
+                               asp-controller="Trips"
                                asp-action="Details"
                                asp-route-id="@trip.TripId"
                                class="btn btn-sm btn-info">
@@ -59,7 +59,7 @@
                             </a>
 
                             <a asp-area="Admin"
-                               asp-controller="Trip"
+                               asp-controller="Trips"
                                asp-action="Edit"
                                asp-route-id="@trip.TripId"
                                class="btn btn-sm btn-warning">
@@ -67,7 +67,7 @@
                             </a>
 
                             <a asp-area="Admin"
-                               asp-controller="Trip"
+                               asp-controller="Trips"
                                asp-action="Delete"
                                asp-route-id="@trip.TripId"
                                class="btn btn-sm btn-danger">
