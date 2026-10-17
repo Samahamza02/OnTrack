@@ -1,0 +1,88 @@
+﻿@model OnTrack.Models.Ticket
+
+@{
+    ViewData["Title"] = "Ticket Details";
+}
+
+<style>
+    .td-page {
+        background: #f2f6f5;
+        padding: 35px;
+        min-height: 75vh;
+        border-radius: 18px;
+        color: #183744;
+    }
+
+        .td-page h1 {
+            color: #102f3b;
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+    .td-card {
+        max-width: 760px;
+        background: white;
+        border: 1px solid #e3ebe9;
+        border-radius: 20px;
+        padding: 30px;
+        margin-top: 25px;
+        box-shadow: 0 8px 28px #102f3b0c;
+    }
+
+        .td-card h3 {
+            color: #137d74;
+        }
+
+    .td-row {
+        padding: 14px 0;
+        border-bottom: 1px solid #e8efed;
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    .td-label {
+        color: #788990;
+    }
+
+    .td-value {
+        color: #102f3b;
+        font-weight: 700;
+        text-align: right;
+    }
+
+    .td-btn {
+        display: inline-block;
+        margin-top: 25px;
+        padding: 11px 17px;
+        background: #102f3b;
+        color: white !important;
+        text-decoration: none;
+        border-radius: 9px;
+        font-weight: 700;
+    }
+
+        .td-btn:hover {
+            background: #43d6be;
+            color: #102f3b !important;
+        }
+</style>
+
+<div class="td-page">
+    <h1>Ticket Details</h1>
+    <p style="color:#788990">Your booking information.</p>
+
+    <div class="td-card">
+        <h3>Ticket #@Model.TicketId</h3>
+
+        <div class="td-row"><span class="td-label">Trip</span><span class="td-value">@Model.TripId</span></div>
+        <div class="td-row"><span class="td-label">Seat</span><span class="td-value">@Model.SeatNumber</span></div>
+        <div class="td-row"><span class="td-label">From Station</span><span class="td-value">@Model.FromStationId</span></div>
+        <div class="td-row"><span class="td-label">To Station</span><span class="td-value">@Model.ToStationId</span></div>
+        <div class="td-row"><span class="td-label">Booking Date</span><span class="td-value">@Model.BookingDate.ToString("f")</span></div>
+        <div class="td-row"><span class="td-label">Price</span><span class="td-value">@Model.Price.ToString("N2")</span></div>
+        <div class="td-row"><span class="td-label">Status</span><span class="td-value">@Model.Status</span></div>
+
+        <a class="td-btn" asp-area="Customer" asp-controller="Tickets" asp-action="Index">← Back to My Tickets</a>
+    </div>
+</div>

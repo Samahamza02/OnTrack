@@ -1,0 +1,136 @@
+﻿@model IEnumerable<OnTrack.Models.Ticket>
+
+@{
+    ViewData["Title"] = "Manage Tickets";
+}
+
+<style>
+    .at-page {
+        background: #f2f6f5;
+        min-height: 80vh;
+        padding: 35px;
+        border-radius: 18px;
+        color: #183744;
+    }
+
+        .at-page h1 {
+            color: #102f3b;
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+    .at-card {
+        background: white;
+        border: 1px solid #e3ebe9;
+        border-radius: 18px;
+        padding: 24px;
+        margin-top: 25px;
+        box-shadow: 0 8px 28px #102f3b0c;
+    }
+
+    .at-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .at-table th {
+            background: #102f3b;
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .at-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e8efed;
+        }
+
+        .at-table tr:hover td {
+            background: #f0fbf8;
+        }
+
+    .at-btn {
+        display: inline-block;
+        padding: 9px 14px;
+        border-radius: 9px;
+        background: #102f3b;
+        color: white !important;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+        .at-btn:hover {
+            background: #43d6be;
+            color: #102f3b !important;
+        }
+
+    .at-pill {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 30px;
+        background: #dff8f1;
+        color: #087b6d;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    @@media(max-width:768px) {
+        .at-page {
+            padding: 18px;
+        }
+
+        .at-table {
+            min-width: 900px;
+        }
+    }
+</style>
+
+<div class="at-page">
+    <h1>Ticket Management</h1>
+    <p style="color:#788990">Monitor customer bookings and ticket statuses.</p>
+
+    <div class="at-card">
+        <div style="overflow-x:auto">
+            <table class="at-table">
+                <thead>
+                    <tr>
+                        <th>Ticket</th>
+                        <th>Customer ID</th>
+                        <th>Trip</th>
+                        <th>Seat</th>
+                        <th>Booking Date</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var ticket in Model)
+                        {
+                            <tr>
+                                <td><strong>#@ticket.TicketId</strong></td>
+                                <td>@ticket.UserId</td>
+                                <td>@ticket.TripId</td>
+                                <td>@ticket.SeatNumber</td>
+                                <td>@ticket.BookingDate.ToString("dd MMM yyyy")</td>
+                                <td>@ticket.Price.ToString("N2")</td>
+                                <td><span class="at-pill">@ticket.Status</span></td>
+                                <td>
+                                    <a class="at-btn" asp-area="Admin" asp-controller="Tickets" asp-action="Details" asp-route-id="@ticket.TicketId">Details</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="8" style="text-align:center;padding:30px">No tickets found.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

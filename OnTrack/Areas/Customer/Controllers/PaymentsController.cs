@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OnTrack.Interfaces;
 
-namespace OnTrack.Controllers
+namespace OnTrack.Areas.Customer.Controllers
 {
+    [Area("Customer")]
+
     public class PaymentsController : Controller
     {
         private readonly IPaymentService _paymentService;

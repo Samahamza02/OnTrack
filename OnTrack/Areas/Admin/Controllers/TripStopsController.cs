@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using OnTrack.Interfaces;
 using OnTrack.Models;
 
-namespace OnTrack.Controllers
+namespace OnTrack.Areas.Admin.Controllers
 {
+    [Area("Admin")]
+
     public class TripStopsController : Controller
     {
         private readonly ITripStopService _tripStopService;

@@ -1,0 +1,106 @@
+﻿@model OnTrack.Models.Notification
+
+@{
+    ViewData["Title"] = "Edit Notification";
+}
+
+<style>
+    .ne-page {
+        background: #f2f6f5;
+        padding: 35px;
+        min-height: 75vh;
+        border-radius: 18px;
+    }
+
+        .ne-page h1 {
+            color: #102f3b;
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+    .ne-card {
+        max-width: 800px;
+        background: white;
+        border: 1px solid #e3ebe9;
+        border-radius: 20px;
+        padding: 30px;
+        margin-top: 25px;
+        box-shadow: 0 8px 28px #102f3b0c;
+    }
+
+    .ne-label {
+        display: block;
+        color: #102f3b;
+        font-weight: 700;
+        margin: 17px 0 8px;
+    }
+
+    .ne-input {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 13px 14px;
+        border: 1px solid #dce6e4;
+        border-radius: 10px;
+        background: #f8fbfa;
+        color: #102f3b;
+    }
+
+        .ne-input:focus {
+            outline: 2px solid #43d6be;
+            border-color: #43d6be;
+        }
+
+    .ne-btn {
+        display: inline-block;
+        margin: 20px 7px 0 0;
+        padding: 11px 16px;
+        border: 0;
+        border-radius: 9px;
+        background: #102f3b;
+        color: white !important;
+        text-decoration: none;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+        .ne-btn:hover {
+            background: #43d6be;
+            color: #102f3b !important;
+        }
+
+    .ne-error {
+        color: #c94c4c;
+    }
+</style>
+
+<div class="ne-page">
+    <h1>Edit Notification</h1>
+    <p style="color:#788990">Update the notification message or recipient.</p>
+
+    <div class="ne-card">
+        <form asp-area="Admin" asp-controller="Notifications" asp-action="Edit" asp-route-id="@Model.NotificationId" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="NotificationId" />
+            <div asp-validation-summary="ModelOnly" class="ne-error"></div>
+
+            <label class="ne-label" asp-for="Message">Message</label>
+            <textarea asp-for="Message" class="ne-input" rows="4" required></textarea>
+            <span asp-validation-for="Message" class="ne-error"></span>
+
+            <label class="ne-label" asp-for="UserId">Recipient</label>
+            <select asp-for="UserId" asp-items="ViewBag.Users" class="ne-input" required>
+                <option value="">-- Select user --</option>
+            </select>
+            <span asp-validation-for="UserId" class="ne-error"></span>
+
+            <label class="ne-label" asp-for="TripId">Related Trip (optional)</label>
+            <select asp-for="TripId" asp-items="ViewBag.Trips" class="ne-input">
+                <option value="">-- No specific trip --</option>
+            </select>
+
+            <button type="submit" class="ne-btn">Save Changes</button>
+            <a class="ne-btn" style="background:#edf0f2;color:#102f3b!important" asp-area="Admin" asp-controller="Notifications" asp-action="Index">Cancel</a>
+        </form>
+    </div>
+</div>

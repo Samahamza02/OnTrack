@@ -1,0 +1,85 @@
+﻿@model OnTrack.Models.Ticket
+
+@{
+    ViewData["Title"] = "Ticket Details";
+}
+
+<style>
+    .ad-page {
+        background: #f2f6f5;
+        padding: 35px;
+        min-height: 75vh;
+        border-radius: 18px;
+        color: #183744;
+    }
+
+        .ad-page h1 {
+            color: #102f3b;
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+    .ad-card {
+        max-width: 800px;
+        background: white;
+        border: 1px solid #e3ebe9;
+        border-radius: 20px;
+        padding: 30px;
+        margin-top: 25px;
+        box-shadow: 0 8px 28px #102f3b0c;
+    }
+
+    .ad-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 14px 0;
+        border-bottom: 1px solid #e8efed;
+    }
+
+    .ad-label {
+        color: #788990;
+    }
+
+    .ad-value {
+        color: #102f3b;
+        font-weight: 700;
+        text-align: right;
+        overflow-wrap: anywhere;
+    }
+
+    .ad-btn {
+        display: inline-block;
+        margin-top: 25px;
+        padding: 11px 17px;
+        background: #102f3b;
+        color: white !important;
+        text-decoration: none;
+        border-radius: 9px;
+        font-weight: 700;
+    }
+
+        .ad-btn:hover {
+            background: #43d6be;
+            color: #102f3b !important;
+        }
+</style>
+
+<div class="ad-page">
+    <h1>Ticket Details</h1>
+    <p style="color:#788990">Review booking information.</p>
+
+    <div class="ad-card">
+        <div class="ad-row"><span class="ad-label">Ticket ID</span><span class="ad-value">#@Model.TicketId</span></div>
+        <div class="ad-row"><span class="ad-label">Customer ID</span><span class="ad-value">@Model.UserId</span></div>
+        <div class="ad-row"><span class="ad-label">Trip ID</span><span class="ad-value">@Model.TripId</span></div>
+        <div class="ad-row"><span class="ad-label">Seat</span><span class="ad-value">@Model.SeatNumber</span></div>
+        <div class="ad-row"><span class="ad-label">From Station</span><span class="ad-value">@Model.FromStationId</span></div>
+        <div class="ad-row"><span class="ad-label">To Station</span><span class="ad-value">@Model.ToStationId</span></div>
+        <div class="ad-row"><span class="ad-label">Booking Date</span><span class="ad-value">@Model.BookingDate.ToString("f")</span></div>
+        <div class="ad-row"><span class="ad-label">Price</span><span class="ad-value">@Model.Price.ToString("N2")</span></div>
+        <div class="ad-row"><span class="ad-label">Status</span><span class="ad-value">@Model.Status</span></div>
+
+        <a class="ad-btn" asp-area="Admin" asp-controller="Tickets" asp-action="Index">← Back to Tickets</a>
+    </div>
+</div>
