@@ -1,0 +1,173 @@
+﻿@model IEnumerable<OnTrack.Models.Ticket>
+
+@{
+    ViewData["Title"] = "My Tickets";
+}
+
+<style>
+    .ticket-page {
+        background: #f2f6f5;
+        min-height: 80vh;
+        padding: 35px;
+        border-radius: 18px;
+        color: #183744;
+    }
+
+        .ticket-page h1 {
+            color: #102f3b;
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+    .ticket-subtitle {
+        color: #788990;
+        margin-bottom: 28px;
+    }
+
+    .ticket-card {
+        background: white;
+        border: 1px solid #e3ebe9;
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 8px 28px #102f3b0c;
+    }
+
+    .ticket-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+        .ticket-table th {
+            background: #102f3b;
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .ticket-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e8efed;
+            vertical-align: middle;
+        }
+
+        .ticket-table tr:hover td {
+            background: #f0fbf8;
+        }
+
+    .ticket-pill {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 30px;
+        background: #dff8f1;
+        color: #087b6d;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .ticket-btn {
+        display: inline-block;
+        padding: 9px 14px;
+        border-radius: 9px;
+        background: #102f3b;
+        color: white !important;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+        .ticket-btn:hover {
+            background: #43d6be;
+            color: #102f3b !important;
+        }
+
+    .ticket-empty {
+        padding: 35px !important;
+        text-align: center;
+        color: #788990;
+    }
+
+    @@media(max-width:768px) {
+        .ticket-page {
+            padding: 18px;
+        }
+
+        .ticket-card {
+            padding: 12px;
+        }
+
+        .ticket-table {
+            min-width: 750px;
+        }
+    }
+</style>
+
+<div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:25px;">
+    <a asp-area="Customer"
+       asp-controller="Trips"
+       asp-action="Index"
+       style="display:inline-block; padding:13px 20px; border-radius:10px;
+        background:#43d6be; color:#102f3b; text-decoration:none;
+        font-weight:800;">
+        + Explore Available Trips
+    </a>
+
+    <a asp-area="Customer"
+       asp-controller="Tickets"
+       asp-action="Index"
+       style="display:inline-block; padding:13px 20px; border-radius:10px;
+        background:#102f3b; color:white; text-decoration:none;
+        font-weight:700;">
+        My Tickets
+    </a>
+</div>
+<div class="ticket-page">
+    <h1>My Tickets</h1>
+    <p class="ticket-subtitle">Your journeys, all in one place.</p>
+
+    <div class="ticket-card">
+        <div style="overflow-x:auto">
+            <table class="ticket-table">
+                <thead>
+                    <tr>
+                        <th>Ticket</th>
+                        <th>Trip</th>
+                        <th>Seat</th>
+                        <th>Booking Date</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var ticket in Model)
+                        {
+                            <tr>
+                                <td><strong>#@ticket.TicketId</strong></td>
+                                <td>@ticket.TripId</td>
+                                <td>@ticket.SeatNumber</td>
+                                <td>@ticket.BookingDate.ToString("dd MMM yyyy")</td>
+                                <td>@ticket.Price.ToString("N2")</td>
+                                <td><span class="ticket-pill">@ticket.Status</span></td>
+                                <td>
+                                    <a class="ticket-btn"
+                                       asp-area="Customer"
+                                       asp-controller="Tickets"
+                                       asp-action="Details"
+                                       asp-route-id="@ticket.TicketId">View</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="7" class="ticket-empty">You don't have any tickets yet.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

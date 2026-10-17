@@ -1,0 +1,154 @@
+﻿@model IEnumerable<OnTrack.Models.Notification>
+
+@{
+    ViewData["Title"] = "My Notifications";
+}
+
+<style>
+    .cn-page {
+        background: #f2f6f5;
+        padding: 35px;
+        min-height: 80vh;
+        border-radius: 18px;
+        color: #183744;
+    }
+
+        .cn-page h1 {
+            color: #102f3b;
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+    .cn-list {
+        max-width: 950px;
+        margin-top: 25px;
+    }
+
+    .cn-card {
+        background: white;
+        border: 1px solid #e3ebe9;
+        border-left: 5px solid #43d6be;
+        border-radius: 15px;
+        padding: 23px;
+        margin-bottom: 17px;
+        box-shadow: 0 7px 22px #102f3b09;
+    }
+
+    .cn-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+        .cn-top h3 {
+            color: #102f3b;
+            font-size: 18px;
+            font-weight: 800;
+            margin: 0;
+        }
+
+    .cn-message {
+        color: #405963;
+        line-height: 1.8;
+        margin: 17px 0;
+    }
+
+    .cn-date {
+        color: #849198;
+        font-size: 13px;
+    }
+
+    .cn-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .cn-read {
+        background: #edf0f2;
+        color: #5e6d74;
+    }
+
+    .cn-unread {
+        background: #d9f8f0;
+        color: #087966;
+    }
+
+    .cn-btn {
+        display: inline-block;
+        border: 0;
+        padding: 10px 14px;
+        border-radius: 9px;
+        background: #102f3b;
+        color: white !important;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+        .cn-btn:hover {
+            background: #43d6be;
+            color: #102f3b !important;
+        }
+
+    .cn-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 17px;
+    }
+</style>
+
+<div class="cn-page">
+    <h1>My Notifications</h1>
+    <p style="color:#788990">Stay updated with your journey.</p>
+
+    <div class="cn-list">
+        @if (Model.Any())
+        {
+            @foreach (var notification in Model)
+            {
+                <div class="cn-card">
+                    <div class="cn-top">
+                        <h3>OnTrack Update</h3>
+                        @if (notification.IsRead)
+                        {
+                            <span class="cn-badge cn-read">Read</span>
+                        }
+                        else
+                        {
+                            <span class="cn-badge cn-unread">Unread</span>
+                        }
+                    </div>
+
+                    <p class="cn-message">@notification.Message</p>
+                    <span class="cn-date">@notification.SentAt.ToString("dd MMM yyyy, hh:mm tt")</span>
+
+                    <div class="cn-actions">
+                        <a class="cn-btn" asp-area="Customer" asp-controller="Notifications" asp-action="Details" asp-route-id="@notification.NotificationId">View Details</a>
+
+                        @if (!notification.IsRead)
+                        {
+                            <form asp-area="Customer" asp-controller="Notifications" asp-action="MarkAsRead" asp-route-id="@notification.NotificationId" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="cn-btn" style="background:#43d6be;color:#102f3b!important">Mark as Read</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="cn-card" style="text-align:center;padding:40px">
+                <h3 style="color:#102f3b">You're all caught up!</h3>
+                <p style="color:#788990">You have no notifications right now.</p>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,66 @@
+﻿@model OnTrack.Models.Notification
+
+@{
+    ViewData["Title"] = "Notification Details";
+}
+
+<style>
+    .nd-page {
+        background: #f2f6f5;
+        padding: 35px;
+        min-height: 75vh;
+        border-radius: 18px;
+    }
+
+    .nd-card {
+        max-width: 800px;
+        background: white;
+        border: 1px solid #e3ebe9;
+        border-radius: 20px;
+        padding: 30px;
+        margin-top: 25px;
+        box-shadow: 0 8px 28px #102f3b0c;
+    }
+
+    .nd-page h1 {
+        color: #102f3b;
+        font-size: 32px;
+        font-weight: 800;
+    }
+
+    .nd-message {
+        font-size: 18px;
+        line-height: 1.9;
+        color: #405963;
+        padding: 20px 0;
+    }
+
+    .nd-btn {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 11px 17px;
+        background: #102f3b;
+        color: white !important;
+        text-decoration: none;
+        border-radius: 9px;
+        font-weight: 700;
+    }
+
+        .nd-btn:hover {
+            background: #43d6be;
+            color: #102f3b !important;
+        }
+</style>
+
+<div class="nd-page">
+    <h1>Notification Details</h1>
+
+    <div class="nd-card">
+        <span style="color:#137d74;font-weight:800">ONTRACK UPDATE</span>
+        <p class="nd-message">@Model.Message</p>
+        <p style="color:#788990">Sent: @Model.SentAt.ToString("f")</p>
+        <p style="color:#102f3b;font-weight:700">Status: @(Model.IsRead ? "Read" : "Unread")</p>
+
+        <a class="nd-btn" asp-area="Customer" asp-controller="Notifications" asp-action="Index">← Back to Notifications</a>
+    </div>
+</div>

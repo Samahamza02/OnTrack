@@ -1,0 +1,79 @@
+﻿@model OnTrack.Models.Notification
+
+@{
+    ViewData["Title"] = "Notification Details";
+}
+
+<style>
+    .adn-page {
+        background: #f2f6f5;
+        padding: 35px;
+        min-height: 75vh;
+        border-radius: 18px;
+    }
+
+        .adn-page h1 {
+            color: #102f3b;
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+    .adn-card {
+        max-width: 850px;
+        background: white;
+        border: 1px solid #e3ebe9;
+        border-radius: 20px;
+        padding: 30px;
+        margin-top: 25px;
+        box-shadow: 0 8px 28px #102f3b0c;
+    }
+
+    .adn-row {
+        padding: 14px 0;
+        border-bottom: 1px solid #e8efed;
+    }
+
+    .adn-label {
+        color: #788990;
+        font-size: 13px;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    .adn-value {
+        color: #102f3b;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    .adn-btn {
+        display: inline-block;
+        margin: 20px 6px 0 0;
+        padding: 11px 16px;
+        border-radius: 9px;
+        background: #102f3b;
+        color: white !important;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+        .adn-btn:hover {
+            background: #43d6be;
+            color: #102f3b !important;
+        }
+</style>
+
+<div class="adn-page">
+    <h1>Notification Details</h1>
+
+    <div class="adn-card">
+        <div class="adn-row"><span class="adn-label">Message</span><div class="adn-value">@Model.Message</div></div>
+        <div class="adn-row"><span class="adn-label">Recipient User ID</span><div class="adn-value">@Model.UserId</div></div>
+        <div class="adn-row"><span class="adn-label">Trip ID</span><div class="adn-value">@(Model.TripId?.ToString() ?? "Not specified")</div></div>
+        <div class="adn-row"><span class="adn-label">Sent At</span><div class="adn-value">@Model.SentAt.ToString("f")</div></div>
+        <div class="adn-row"><span class="adn-label">Read Status</span><div class="adn-value">@(Model.IsRead ? "Read" : "Unread")</div></div>
+
+        <a class="adn-btn" asp-area="Admin" asp-controller="Notifications" asp-action="Index">← Back</a>
+        <a class="adn-btn" asp-area="Admin" asp-controller="Notifications" asp-action="Edit" asp-route-id="@Model.NotificationId">Edit Notification</a>
+    </div>
+</div>

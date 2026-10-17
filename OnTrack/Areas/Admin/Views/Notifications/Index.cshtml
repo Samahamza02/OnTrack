@@ -1,0 +1,179 @@
+﻿@model IEnumerable<OnTrack.Models.Notification>
+
+@{
+    ViewData["Title"] = "Manage Notifications";
+}
+
+<style>
+    .an-page {
+        background: #f2f6f5;
+        padding: 35px;
+        min-height: 80vh;
+        border-radius: 18px;
+        color: #183744;
+    }
+
+        .an-page h1 {
+            color: #102f3b;
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+    .an-card {
+        background: white;
+        border: 1px solid #e3ebe9;
+        border-radius: 18px;
+        padding: 24px;
+        margin-top: 25px;
+        box-shadow: 0 8px 28px #102f3b0c;
+    }
+
+    .an-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .an-table th {
+            background: #102f3b;
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .an-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #e8efed;
+        }
+
+        .an-table tr:hover td {
+            background: #f0fbf8;
+        }
+
+    .an-btn {
+        display: inline-block;
+        padding: 9px 12px;
+        border-radius: 8px;
+        background: #102f3b;
+        color: white !important;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 700;
+        border: 0;
+        cursor: pointer;
+    }
+
+        .an-btn:hover {
+            background: #43d6be;
+            color: #102f3b !important;
+        }
+
+    .an-create {
+        display: inline-block;
+        padding: 11px 17px;
+        border-radius: 9px;
+        background: #43d6be;
+        color: #102f3b !important;
+        text-decoration: none;
+        font-weight: 800;
+    }
+
+    .an-delete {
+        background: #fff0ef;
+        color: #c94c4c !important;
+    }
+
+        .an-delete:hover {
+            background: #c94c4c;
+            color: white !important;
+        }
+
+    .an-badge {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 25px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .an-read {
+        background: #edf0f2;
+        color: #5e6d74;
+    }
+
+    .an-unread {
+        background: #d9f8f0;
+        color: #087966;
+    }
+
+    @@media(max-width:768px) {
+        .an-page {
+            padding: 18px;
+        }
+
+        .an-table {
+            min-width: 950px;
+        }
+    }
+</style>
+
+<div class="an-page">
+    <h1>Notification Management</h1>
+    <p style="color:#788990">Create and manage customer updates.</p>
+
+    <div class="an-card">
+        <p><a class="an-create" asp-area="Admin" asp-controller="Notifications" asp-action="Create">+ Create Notification</a></p>
+
+        <div style="overflow-x:auto">
+            <table class="an-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Message</th>
+                        <th>Recipient</th>
+                        <th>Trip</th>
+                        <th>Sent At</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var notification in Model)
+                        {
+                            <tr>
+                                <td>@notification.NotificationId</td>
+                                <td>@notification.Message</td>
+                                <td>@notification.UserId</td>
+                                <td>@(notification.TripId?.ToString() ?? "—")</td>
+                                <td>@notification.SentAt.ToString("dd MMM yyyy")</td>
+                                <td>
+                                    @if (notification.IsRead)
+                                    {
+                                        <span class="an-badge an-read">Read</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="an-badge an-unread">Unread</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                                        <a class="an-btn" asp-area="Admin" asp-controller="Notifications" asp-action="Details" asp-route-id="@notification.NotificationId">Details</a>
+                                        <a class="an-btn" asp-area="Admin" asp-controller="Notifications" asp-action="Edit" asp-route-id="@notification.NotificationId">Edit</a>
+                                        <a class="an-btn an-delete" asp-area="Admin" asp-controller="Notifications" asp-action="Delete" asp-route-id="@notification.NotificationId">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="7" style="text-align:center;padding:30px">No notifications found.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

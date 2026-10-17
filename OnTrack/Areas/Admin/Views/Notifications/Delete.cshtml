@@ -1,0 +1,84 @@
+﻿@model OnTrack.Models.Notification
+
+@{
+    ViewData["Title"] = "Delete Notification";
+}
+
+<style>
+    .ndel-page {
+        background: #f2f6f5;
+        padding: 35px;
+        min-height: 75vh;
+        border-radius: 18px;
+    }
+
+        .ndel-page h1 {
+            color: #102f3b;
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+    .ndel-card {
+        max-width: 750px;
+        background: white;
+        border: 1px solid #e3ebe9;
+        border-radius: 20px;
+        padding: 30px;
+        margin-top: 25px;
+        box-shadow: 0 8px 28px #102f3b0c;
+    }
+
+    .ndel-warning {
+        background: #fff4f2;
+        border: 1px solid #f5d5d0;
+        border-radius: 12px;
+        padding: 18px;
+        color: #9f3939;
+        line-height: 1.8;
+    }
+
+    .ndel-btn {
+        display: inline-block;
+        margin: 20px 7px 0 0;
+        padding: 11px 16px;
+        border: 0;
+        border-radius: 9px;
+        background: #c94c4c;
+        color: white !important;
+        text-decoration: none;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+        .ndel-btn:hover {
+            background: #a93636;
+        }
+
+    .ndel-cancel {
+        background: #edf0f2;
+        color: #102f3b !important;
+    }
+</style>
+
+<div class="ndel-page">
+    <h1>Delete Notification</h1>
+
+    <div class="ndel-card">
+        <div class="ndel-warning">
+            <strong>Are you sure?</strong>
+            <p>This action permanently deletes the notification.</p>
+        </div>
+
+        <p style="margin-top:22px;color:#102f3b"><strong>Message:</strong></p>
+        <p style="line-height:1.8;color:#405963">@Model.Message</p>
+        <p style="color:#788990"><strong>Recipient:</strong> @Model.UserId</p>
+
+        <form asp-area="Admin" asp-controller="Notifications" asp-action="Delete" asp-route-id="@Model.NotificationId" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="NotificationId" />
+
+            <button type="submit" class="ndel-btn">Confirm Delete</button>
+            <a class="ndel-btn ndel-cancel" asp-area="Admin" asp-controller="Notifications" asp-action="Index">Cancel</a>
+        </form>
+    </div>
+</div>

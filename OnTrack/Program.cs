@@ -100,9 +100,7 @@ namespace OnTrack
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
-            app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+            
 
             // NEW: create roles and the first admin
             using (var scope = app.Services.CreateScope())
