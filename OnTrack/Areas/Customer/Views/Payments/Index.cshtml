@@ -139,6 +139,14 @@
     </div>
 
     <div class="payments-card">
+        
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["Success"]
+    </div>
+}
+
 
         <h4>Payment Records</h4>
 

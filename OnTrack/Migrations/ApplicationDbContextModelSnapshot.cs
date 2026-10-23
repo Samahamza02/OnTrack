@@ -380,6 +380,10 @@ namespace OnTrack.Migrations
                     b.Property<int>("ToStationId")
                         .HasColumnType("int");
 
+                    b.Property<string>("TravelClass")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("TripId")
                         .HasColumnType("int");
 

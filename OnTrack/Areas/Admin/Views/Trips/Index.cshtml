@@ -1,93 +1,1104 @@
 ﻿@model IEnumerable<OnTrack.Models.Trip>
 
 @{
-    ViewData["Title"] = "Trips";
+    ViewData["Title"] = "Explore Trips";
+
+    var tripList = Model.ToList();
+
+    var scheduledCount = tripList.Count(t =>
+        t.Status == OnTrack.Models.TripStatus.Scheduled);
+
+    var delayedCount = tripList.Count(t =>
+        t.Status == OnTrack.Models.TripStatus.Delayed);
 }
 
-<div class="container mt-4">
+<style>
+    .trips-page {
+        background: #f4f7f8;
+        min-height: 80vh;
+        padding: 36px 0 60px;
+    }
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1>Trips</h1>
-            <p class="text-muted">
-                @(User.IsInRole("Admin") ? "Manage all trips in the system." : "Browse available trips and book your ticket.")
+    .trips-wrap {
+        max-width: 1250px;
+        margin: auto;
+        padding: 0 24px;
+    }
+
+    .trips-hero {
+        background: linear-gradient(125deg, #102b3a, #1c4654);
+        color: white;
+        padding: 38px;
+        border-radius: 22px;
+        margin-bottom: 30px;
+    }
+
+        .trips-hero h1 {
+            font-size: clamp(30px, 4vw, 42px);
+            font-weight: 750;
+            margin-bottom: 10px;
+        }
+
+        .trips-hero p {
+            color: #d5e5e8;
+            margin: 0;
+        }
+
+    .trips-label {
+        color: #42d6bd;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        margin-bottom: 12px;
+    }
+
+    .trips-summary {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .summary-item {
+        background: white;
+        border: 1px solid #e3eaed;
+        padding: 18px 22px;
+        border-radius: 14px;
+        color: #61727c;
+        font-size: 13px;
+        flex: 1;
+        min-width: 150px;
+    }
+
+        .summary-item strong {
+            display: block;
+            color: #142c3c;
+            font-size: 25px;
+            margin-top: 5px;
+        }
+
+    .trips-panel {
+        background: white;
+        border: 1px solid #e3eaed;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 28px rgba(16, 43, 58, .05);
+    }
+
+    .trips-panel-head {
+        padding: 23px 25px;
+        border-bottom: 1px solid #e8edef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+        .trips-panel-head h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #142c3c;
+            margin: 0;
+        }
+
+    .trips-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+        .trips-table thead th {
+            background: #f8fafb;
+            color: #74848c;
+            font-size: 11px;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+            font-weight: 800;
+            padding: 17px 20px;
+            white-space: nowrap;
+            border-bottom: 1px solid #e8edef;
+        }
+
+        .trips-table tbody td {
+            padding: 19px 20px;
+            vertical-align: middle;
+            border-bottom: 1px solid #edf1f3;
+            color: #344b58;
+        }
+
+        .trips-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .trips-table tbody tr:hover {
+            background: #f8fcfb;
+        }
+
+    .route-name {
+        color: #142c3c;
+        font-weight: 750;
+        font-size: 14px;
+    }
+
+    .route-sub {
+        color: #8a989f;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .train-badge {
+        display: inline-block;
+        background: #edf5f6;
+        color: #245361;
+        padding: 7px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .trip-status {
+        display: inline-block;
+        padding: 6px 11px;
+        border-radius: 30px;
+        background: #e7f8ef;
+        color: #24784d;
+        font-size: 12px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+        .trip-status.delayed {
+            background: #fff1dc;
+            color: #a65c08;
+        }
+
+        .trip-status.cancelled {
+            background: #ffebeb;
+            color: #b42318;
+        }
+
+        .trip-status.completed {
+            background: #edf0f5;
+            color: #536174;
+        }
+
+    .trip-price {
+        font-weight: 800;
+        color: #142c3c;
+        white-space: nowrap;
+    }
+
+    .ot-btn {
+        display: inline-block;
+        text-decoration: none;
+        border: none;
+        border-radius: 9px;
+        padding: 10px 14px;
+        background: #42d6bd;
+        color: #102b3a;
+        font-weight: 750;
+        font-size: 12px;
+        white-space: nowrap;
+        transition: .2s;
+    }
+
+        .ot-btn:hover {
+            background: #2dc4aa;
+            color: #102b3a;
+            transform: translateY(-1px);
+        }
+
+    .ot-btn-secondary {
+        background: #edf2f4;
+        color: #25404d;
+    }
+
+        .ot-btn-secondary:hover {
+            background: #dce7eb;
+            color: #142c3c;
+        }
+
+    .ot-btn-danger {
+        background: #fff0f0;
+        color: #b42318;
+    }
+
+        .ot-btn-danger:hover {
+            background: #ffe0e0;
+            color: #912018;
+        }
+
+    .admin-actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .trip-empty {
+        text-align: center;
+        padding: 55px 20px;
+        color: #74848c;
+    }
+
+        .trip-empty h3 {
+            color: #142c3c;
+            font-weight: 750;
+        }
+
+    @@media (max-width: 800px) {
+        .trips-wrap {
+            padding: 0 12px;
+        }
+
+        .trips-hero {
+            padding: 27px 22px;
+        }
+
+        .trips-table thead th,
+        .trips-table tbody td {
+            padding: 13px 12px;
+        }
+    }
+    .route-details {
+    margin-top: 10px;
+}
+
+.route-details summary {
+    color: #087f72;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.stop-list {
+    list-style: none;
+    padding: 10px 0 0 12px;
+    margin: 0;
+}
+
+.stop-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 9px 0 9px 12px;
+    border-left: 2px solid #42d6bd;
+}
+
+.stop-list li strong {
+    color: #142c3c;
+    font-size: 12px;
+}
+
+.stop-list li span,
+.stop-list li small {
+    color: #74848c;
+    font-size: 11px;
+}
+
+    .journey-list {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        padding: 24px;
+        background: #f8fafb;
+    }
+
+    .journey-card {
+        background: #fff;
+        border: 1px solid #e3eaed;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 5px 18px rgba(16, 43, 58, .05);
+    }
+
+    .journey-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        padding: 23px 26px;
+        border-bottom: 1px solid #edf1f3;
+    }
+
+    .journey-label,
+    .endpoint-label {
+        display: block;
+        color: #819099;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1.4px;
+        margin-bottom: 8px;
+    }
+
+    .journey-card-top h3 {
+        margin: 0 0 12px;
+        color: #142c3c;
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .journey-endpoints {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(110px, .8fr) minmax(0, 1fr);
+        gap: 18px;
+        align-items: center;
+        padding: 28px 26px;
+    }
+
+    .journey-end h4 {
+        margin: 0 0 7px;
+        color: #142c3c;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .journey-end p {
+        margin: 0 0 12px;
+        color: #819099;
+        font-size: 13px;
+    }
+
+    .journey-end strong {
+        display: block;
+        color: #087f72;
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+
+    .journey-end small {
+        color: #819099;
+        font-size: 12px;
+    }
+
+    .journey-end-right {
+        text-align: right;
+    }
+
+    .journey-connector {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .journey-train-icon {
+        font-size: 25px;
+    }
+
+    .journey-track {
+        width: 100%;
+        height: 3px;
+        background: #42d6bd;
+        position: relative;
+        border-radius: 10px;
+    }
+
+        .journey-track::before,
+        .journey-track::after {
+            content: "";
+            position: absolute;
+            top: -4px;
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border: 3px solid #42d6bd;
+            border-radius: 50%;
+        }
+
+        .journey-track::before {
+            left: 0;
+        }
+
+        .journey-track::after {
+            right: 0;
+        }
+
+    .journey-connector small {
+        color: #71838b;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    .journey-stops-section {
+        margin: 0 26px;
+        padding: 22px 0;
+        border-top: 1px solid #e8edef;
+    }
+
+    .journey-stops-heading {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+        .journey-stops-heading h4 {
+            margin: 0;
+            color: #142c3c;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+    .stops-heading-icon {
+        color: #159e8c;
+        font-size: 23px;
+    }
+
+    .stops-count {
+        margin-left: auto;
+        color: #087f72;
+        background: #e9f9f5;
+        padding: 6px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .journey-stops {
+        padding-left: 5px;
+    }
+
+    .journey-stop {
+        display: grid;
+        grid-template-columns: 20px minmax(0, 1fr) auto;
+        align-items: stretch;
+        gap: 13px;
+        min-height: 57px;
+    }
+
+    .stop-timeline {
+        display: flex;
+        justify-content: center;
+        position: relative;
+    }
+
+        .stop-timeline::after {
+            content: "";
+            position: absolute;
+            top: 13px;
+            bottom: -1px;
+            width: 2px;
+            background: #bdeee5;
+        }
+
+    .journey-stop:last-child .stop-timeline::after {
+        display: none;
+    }
+
+    .stop-dot {
+        z-index: 1;
+        width: 11px;
+        height: 11px;
+        margin-top: 4px;
+        border: 3px solid #159e8c;
+        background: #fff;
+        border-radius: 50%;
+    }
+
+    .journey-stop:first-child .stop-dot,
+    .journey-stop:last-child .stop-dot {
+        background: #42d6bd;
+        border-color: #159e8c;
+    }
+
+    .stop-information {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding-bottom: 17px;
+    }
+
+        .stop-information strong {
+            color: #263f4b;
+            font-size: 13px;
+        }
+
+        .stop-information span {
+            color: #89969d;
+            font-size: 12px;
+        }
+
+    .stop-time {
+        color: #087f72;
+        font-size: 12px;
+        font-weight: 700;
+        padding-top: 2px;
+        text-align: right;
+    }
+
+    .no-stops {
+        color: #819099;
+        font-size: 13px;
+    }
+
+    .journey-card-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 18px;
+        padding: 20px 26px;
+        background: #fbfcfc;
+        border-top: 1px solid #e8edef;
+    }
+
+    .journey-price span,
+    .journey-price small {
+        display: block;
+        color: #819099;
+        font-size: 11px;
+    }
+
+    .journey-price strong {
+        display: block;
+        color: #142c3c;
+        font-size: 23px;
+        margin: 4px 0;
+    }
+
+    .journey-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    @@media (max-width: 650px) {
+        .journey-list {
+            padding: 12px;
+        }
+
+        .journey-card-top,
+        .journey-card-bottom {
+            padding: 18px;
+        }
+
+        .journey-endpoints {
+            grid-template-columns: 1fr 1fr;
+            padding: 22px 18px;
+            gap: 20px 10px;
+        }
+
+        .journey-connector {
+            grid-column: 1 / -1;
+            grid-row: 2;
+        }
+
+        .journey-end-right {
+            text-align: right;
+        }
+
+        .journey-stops-section {
+            margin: 0 18px;
+        }
+
+        .journey-actions {
+            width: 100%;
+        }
+    }
+
+    .trip-filter-form {
+        display: flex;
+        align-items: end;
+        flex-wrap: wrap;
+        gap: 14px;
+        padding: 20px 25px;
+        background: #fff;
+        border-bottom: 1px solid #e8edef;
+    }
+
+    .filter-field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        min-width: 180px;
+    }
+
+        .filter-field label {
+            color: #526772;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .filter-field select,
+        .filter-field input {
+            min-height: 42px;
+            border-radius: 9px;
+            border-color: #dce5e8;
+        }
+
+    .destination-filter {
+        flex: 1;
+    }
+
+    .trip-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 24px;
+        border-top: 1px solid #e8edef;
+    }
+
+    .page-link-custom {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        min-height: 40px;
+        padding: 9px 13px;
+        border: 1px solid #dce5e8;
+        border-radius: 9px;
+        color: #25404d;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+        .page-link-custom:hover,
+        .page-link-custom.active {
+            background: #42d6bd;
+            border-color: #42d6bd;
+            color: #102b3a;
+        }
+
+    @@media (max-width: 650px) {
+        .trip-filter-form {
+            padding: 16px;
+        }
+
+        .filter-field,
+        .destination-filter {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .trip-filter-form .ot-btn {
+            text-align: center;
+        }
+    }
+
+</style>
+
+<div class="trips-page">
+    <div class="trips-wrap">
+
+        <section class="trips-hero">
+            <div class="trips-label">ONTRACK RAILWAYS</div>
+
+            <h1>
+                @(User.IsInRole("Admin")
+                    ? "Trip Management"
+                    : "Your next journey starts here.")
+            </h1>
+
+            <p>
+                @(User.IsInRole("Admin")
+                    ? "Manage train trips, routes and schedules."
+                    : "Explore destinations, choose your seat and travel in comfort.")
             </p>
+        </section>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["Error"]
+            </div>
+        }
+
+        <div class="trips-summary">
+            <div class="summary-item">
+                Total trips
+                <strong>@ViewBag.TotalTrips</strong>
+            </div>
+
+            <div class="summary-item">
+                Scheduled
+                <strong>@scheduledCount</strong>
+            </div>
+
+            <div class="summary-item">
+                Delayed
+                <strong>@delayedCount</strong>
+            </div>
         </div>
 
-        @if (User.IsInRole("Admin"))
-        {
-            <a asp-area="Admin"
-               asp-controller="Trips"
-               asp-action="Create"
-               class="btn btn-primary">
-                Create Trip
-            </a>
-        }
-    </div>
+        <section class="trips-panel">
+            <div class="trips-panel-head">
+                <div>
+                    <h2>
+                        @(User.IsInRole("Admin")
+                            ? "All Train Trips"
+                            : "Available Journeys")
+                    </h2>
 
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>Route Name</th>
-                <th>Train</th>
-                <th>Trip Date</th>
-                <th>Status</th>
-                <th>Price</th
-                <th>Actions</th>
-            </tr>
-        </thead>
+                    <div class="text-muted small mt-1">
+                        Check trip schedules, train numbers and ticket prices.
+                    </div>
+                </div>
 
-        <tbody>
-            @foreach (var trip in Model)
-            {
-                <tr>
-                    <td>@trip.RouteName</td>
-                    <td>@trip.Train?.TrainNumber</td>
-                    <td>@trip.TripDate.ToString("g")</td>
-                    <td>@trip.Status</td>
-                    <td>@trip.Price.ToString("C")</td>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-area="Admin"
+                       asp-controller="Trips"
+                       asp-action="Create"
+                       class="ot-btn">
+                        + Create Trip
+                    </a>
+                }
+            </div>
 
-                    <td>
-                        @if (User.IsInRole("Admin"))
+            
+            <form method="get" asp-area="Admin" asp-controller="Trips"
+                  asp-action="Index" class="trip-filter-form">
+
+                <div class="filter-field">
+                    <label for="status">Trip status</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="">All statuses</option>
+                        @if (ViewBag.StatusFilter == "Scheduled")
                         {
-                            <a asp-area="Admin"
-                               asp-controller="Trips"
-                               asp-action="Details"
-                               asp-route-id="@trip.TripId"
-                               class="btn btn-sm btn-info">
-                                Details
-                            </a>
-
-                            <a asp-area="Admin"
-                               asp-controller="Trips"
-                               asp-action="Edit"
-                               asp-route-id="@trip.TripId"
-                               class="btn btn-sm btn-warning">
-                                Edit
-                            </a>
-
-                            <a asp-area="Admin"
-                               asp-controller="Trips"
-                               asp-action="Delete"
-                               asp-route-id="@trip.TripId"
-                               class="btn btn-sm btn-danger">
-                                Delete
-                            </a>
+                            <option value="Scheduled" selected>Scheduled</option>
                         }
                         else
                         {
-                            <a asp-area="Admin"
-                               asp-controller="Trips"
-                               asp-action="Book"
-                               asp-route-id="@trip.TripId"
-                               class="btn btn-sm btn-primary">
-                                Book a Trip
-                            </a>
+                            <option value="Scheduled">Scheduled</option>
                         }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
 
+                        @if (ViewBag.StatusFilter == "Delayed")
+                        {
+                            <option value="Delayed" selected>Delayed</option>
+                        }
+                        else
+                        {
+                            <option value="Delayed">Delayed</option>
+                        }
+
+                        @if (ViewBag.StatusFilter == "Cancelled")
+                        {
+                            <option value="Cancelled" selected>Cancelled</option>
+                        }
+                        else
+                        {
+                            <option value="Cancelled">Cancelled</option>
+                        }
+
+                        @if (ViewBag.StatusFilter == "Completed")
+                        {
+                            <option value="Completed" selected>Completed</option>
+                        }
+                        else
+                        {
+                            <option value="Completed">Completed</option>
+                        }
+                    </select>
+                </div>
+                <div class="filter-field">
+                    <label for="availability">Availability</label>
+                    <select id="availability" name="availability" class="form-select">
+                        <option value="">All trips</option>
+                        <option value="available"
+                                selected="@(ViewBag.AvailabilityFilter as string == "available")">
+                            Available
+                        </option>
+                        <option value="unavailable"
+                                selected="@(ViewBag.AvailabilityFilter as string == "unavailable")">
+                            Not available
+                        </option>
+                    </select>
+                </div>
+
+                <div class="filter-field destination-filter">
+                    <label for="destination">Destination or station</label>
+                    <input id="destination"
+                           name="destination"
+                           class="form-control"
+                           placeholder="e.g. Alexandria, Luxor..."
+                           value="@ViewBag.DestinationFilter" />
+                </div>
+
+                <button type="submit" class="ot-btn">Search trips</button>
+
+                <a asp-area="Admin"
+                   asp-controller="Trips"
+                   asp-action="Index"
+                   class="ot-btn ot-btn-secondary">
+                    Clear
+                </a>
+            </form>
+
+           
+            <div class="journey-list">
+                @if (!tripList.Any())
+                {
+                    <div class="trip-empty">
+                        <h3>No trips available</h3>
+                        <p>Check again later for upcoming journeys.</p>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var trip in tripList)
+                    {
+                        var stops = trip.TripStops?
+                            .OrderBy(s => s.StopOrder)
+                            .ToList()
+                            ?? new List<OnTrack.Models.TripStop>();
+
+                        var firstStop = stops.FirstOrDefault();
+                        var lastStop = stops.LastOrDefault();
+
+                        var statusClass = trip.Status switch
+                        {
+                            OnTrack.Models.TripStatus.Delayed => "delayed",
+                            OnTrack.Models.TripStatus.Cancelled => "cancelled",
+                            OnTrack.Models.TripStatus.Completed => "completed",
+                            _ => ""
+                        };
+
+                        <article class="journey-card">
+
+                            <div class="journey-card-top">
+                                <div>
+                                    <span class="journey-label">YOUR JOURNEY</span>
+                                    <h3>
+                                        @trip.RouteName
+                                    </h3>
+                                    <span class="train-badge">
+                                        Train @(trip.Train?.TrainNumber ?? "N/A")
+                                    </span>
+                                </div>
+
+                                <span class="trip-status @statusClass">
+                                    @trip.Status
+                                </span>
+                            </div>
+
+                            <div class="journey-endpoints">
+
+                                <div class="journey-end">
+                                    <span class="endpoint-label">DEPARTURE</span>
+
+                                    <h4>
+                                        @(firstStop?.Station?.StationName
+                                            ?? trip.RouteName)
+                                    </h4>
+
+                                    <p>
+                                        @(firstStop?.Station?.City ?? "Starting station")
+                                    </p>
+
+                                    <strong>
+                                        @(firstStop?.ScheduledTime?.ToString("hh:mm tt")
+                                            ?? trip.TripDate.ToString("hh:mm tt"))
+                                    </strong>
+
+                                    <small>
+                                        @trip.TripDate.ToString("dd MMM yyyy")
+                                    </small>
+                                </div>
+
+                                <div class="journey-connector">
+                                    <span class="journey-train-icon">🚆</span>
+                                    <div class="journey-track">
+                                        <span></span>
+                                    </div>
+                                    <small>
+                                        @(stops.Count > 0
+                                            ? $"{stops.Count} stations"
+                                            : "Route information")
+                                    </small>
+                                </div>
+
+                                <div class="journey-end journey-end-right">
+                                    <span class="endpoint-label">DESTINATION</span>
+
+                                    <h4>
+                                        @(lastStop?.Station?.StationName
+                                            ?? "Not specified")
+                                    </h4>
+
+                                    <p>
+                                        @(lastStop?.Station?.City ?? "")
+                                    </p>
+
+                                    <strong>
+                                        @(lastStop?.ScheduledTime?.ToString("hh:mm tt")
+                                            ?? "Arrival time N/A")
+                                    </strong>
+
+                                    <small>Final stop</small>
+                                </div>
+
+                            </div>
+
+                            <div class="journey-stops-section">
+                                <div class="journey-stops-heading">
+                                    <span class="stops-heading-icon">◎</span>
+                                    <h4>Journey stops</h4>
+                                    <span class="stops-count">
+                                        @stops.Count stops
+                                    </span>
+                                </div>
+
+                                @if (stops.Any())
+                                {
+                                    <div class="journey-stops">
+                                        @foreach (var stop in stops)
+                                        {
+                                            <div class="journey-stop">
+                                                <div class="stop-timeline">
+                                                    <span class="stop-dot"></span>
+                                                </div>
+
+                                                <div class="stop-information">
+                                                    <strong>
+                                                        @(stop.Station?.StationName
+                                                            ?? "Unknown station")
+                                                    </strong>
+
+                                                    <span>
+                                                        @(stop.Station?.City ?? "")
+                                                    </span>
+                                                </div>
+
+                                                <div class="stop-time">
+                                                    @(stop.ScheduledTime?.ToString("hh:mm tt")
+                                                        ?? "Time N/A")
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p class="no-stops">
+                                        No station stops have been added to this trip yet.
+                                    </p>
+                                }
+                            </div>
+
+                            <div class="journey-card-bottom">
+                                <div class="journey-price">
+                                    <span>Ticket price</span>
+                                    <strong>@trip.Price.ToString("N2") EGP</strong>
+                                    <small>Per passenger</small>
+                                </div>
+
+                                <div class="journey-actions">
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <a asp-area="Admin"
+                                           asp-controller="Trips"
+                                           asp-action="Details"
+                                           asp-route-id="@trip.TripId"
+                                           class="ot-btn ot-btn-secondary">
+                                            Details
+                                        </a>
+
+                                        <a asp-area="Admin"
+                                           asp-controller="Trips"
+                                           asp-action="Edit"
+                                           asp-route-id="@trip.TripId"
+                                           class="ot-btn ot-btn-secondary">
+                                            Edit
+                                        </a>
+
+                                        <a asp-area="Admin"
+                                           asp-controller="Trips"
+                                           asp-action="Delete"
+                                           asp-route-id="@trip.TripId"
+                                           class="ot-btn ot-btn-danger">
+                                            Delete
+                                        </a>
+                                    }
+                                    else if (
+                                        trip.Status != OnTrack.Models.TripStatus.Cancelled
+                                        && trip.Status != OnTrack.Models.TripStatus.Completed
+                                        && trip.TripDate > DateTime.Now)
+                                    {
+                                        <a asp-area="Admin"
+                                           asp-controller="Trips"
+                                           asp-action="Book"
+                                           asp-route-id="@trip.TripId"
+                                           class="ot-btn">
+                                            Book this journey →
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">
+                                            Not available
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+
+                        </article>
+                    }
+                }
+            </div>
+
+            @if ((int)ViewBag.TotalPages > 1)
+            {
+                <nav class="trip-pagination" aria-label="Trip pages">
+
+                    @if ((int)ViewBag.CurrentPage > 1)
+                    {
+                        <a asp-area="Admin"
+                           asp-controller="Trips"
+                           asp-action="Index"
+                           asp-route-page="@((int)ViewBag.CurrentPage - 1)"
+                           asp-route-status="@ViewBag.StatusFilter"
+                           asp-route-destination="@ViewBag.DestinationFilter"
+                           asp-route-availability="@ViewBag.AvailabilityFilter"
+                           class="page-link-custom">
+                            ← Previous
+                        </a>
+                    }
+
+                    @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                    {
+                        <a asp-area="Admin"
+                           asp-controller="Trips"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-status="@ViewBag.StatusFilter"
+                           asp-route-destination="@ViewBag.DestinationFilter"
+                           asp-route-availability="@ViewBag.AvailabilityFilter"
+                           class="page-link-custom @(i == (int)ViewBag.CurrentPage ? "active" : "")">
+                            @i
+                        </a>
+                    }
+
+                    @if ((int)ViewBag.CurrentPage < (int)ViewBag.TotalPages)
+                    {
+                        <a asp-area="Admin"
+                           asp-controller="Trips"
+                           asp-action="Index"
+                           asp-route-page="@((int)ViewBag.CurrentPage + 1)"
+                           asp-route-status="@ViewBag.StatusFilter"
+                           asp-route-destination="@ViewBag.DestinationFilter"
+                           asp-route-availability="@ViewBag.AvailabilityFilter"
+                           class="page-link-custom">
+                            Next →
+                        </a>
+                    }
+
+                </nav>
+            }
+
+
+        </section>
+
+    </div>
 </div>

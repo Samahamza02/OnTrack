@@ -1,77 +1,290 @@
 ﻿
-@model OnTrack.Models.Trip
+@model OnTrack.Models.ViewModels.CreateTripViewModel
+@using OnTrack.Models
 
 @{
     ViewData["Title"] = "Create Trip";
+    var stations = ViewBag.Stations as List<SelectListItem>
+        ?? new List<SelectListItem>();
 }
 
-<div class="container mt-4">
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+<div class="container mt-4 mb-5">
     <h1>Create Trip</h1>
+    <p class="text-muted">Choose an existing route, then customize its stops.</p>
 
-    <form asp-area="Admin" asp-controller="Trips" asp-action="Create" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <form asp-area="Admin" asp-controller="Trips"
+          asp-action="Create" method="post" id="createTripForm">
 
-        <div class="mb-3">
-            <label asp-for="RouteName" class="form-label"></label>
-            <input asp-for="RouteName" class="form-control" />
-            <span asp-validation-for="RouteName"
-                  class="text-danger"></span>
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4>Route and Trip Information</h4>
+
+                <div class="mb-3">
+                    <label asp-for="TemplateTripId" class="form-label">
+                        Existing Route
+                    </label>
+                    <select asp-for="TemplateTripId"
+                            asp-items="ViewBag.RouteOptions"
+                            class="form-select" id="routeSelect">
+                        <option value="">-- Select an existing route --</option>
+                    </select>
+                    <span asp-validation-for="TemplateTripId"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TripDate" class="form-label">Trip Date</label>
+                    <input asp-for="TripDate" type="datetime-local"
+                           class="form-control" />
+                    <span asp-validation-for="TripDate" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Status" class="form-label"></label>
+                    <select asp-for="Status"
+                            asp-items="Html.GetEnumSelectList<TripStatus>()"
+                            class="form-select"></select>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TrainId" class="form-label">Train</label>
+                    <select asp-for="TrainId" asp-items="ViewBag.TrainId"
+                            class="form-select">
+                        <option value="">-- Select Train --</option>
+                    </select>
+                    <span asp-validation-for="TrainId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Price" class="form-label">Base Ticket Price</label>
+                    <input asp-for="Price" type="number" min="0.01" step="0.01"
+                           class="form-control" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="TripDate" class="form-label"></label>
-            <input asp-for="TripDate"
-                   class="form-control"
-                   type="datetime-local" />
-            <span asp-validation-for="TripDate"
-                  class="text-danger"></span>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h4>Stations and Stops</h4>
+                <p class="text-muted mb-0">
+                    Stops are loaded from the selected route. You can remove
+                    stops or add existing stations.
+                </p>
+            </div>
+            <button type="button" id="addStopButton"
+                    class="btn btn-outline-primary">
+                + Add Stop
+            </button>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="Status" class="form-label"></label>
-            <select asp-for="Status" class="form-select">
-                <option value="Scheduled">Scheduled</option>
-                <option value="OnTime">OnTime</option>
-                <option value="Delayed">Delayed</option>
-                <option value="Completed">Completed</option>
-                <option value="Cancelled">Cancelled</option>
-            </select>
-            <span asp-validation-for="Status"
-                  class="text-danger"></span>
+        <div id="stopsContainer">
+            @for (int i = 0; i < Model.Stops.Count; i++)
+            {
+                <div class="card mb-3 stop-row">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="stop-title">Stop @(i + 1)</h5>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger remove-stop">
+                                Remove
+                            </button>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Station</label>
+                            <select name="Stops[@i].StationId"
+                                    class="form-select station-select">
+                                <option value="">-- Select Station --</option>
+                                @foreach (var station in stations)
+                                {
+                                    <option value="@station.Value"
+                                            selected="@(Model.Stops[i].StationId?.ToString() == station.Value)">
+                                        @station.Text
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Scheduled Time</label>
+                            <input name="Stops[@i].ScheduledTime"
+                                   type="datetime-local"
+                                   value="@(Model.Stops[i].ScheduledTime?.ToString("yyyy-MM-ddTHH:mm"))"
+                                   class="form-control scheduled-time" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Platform</label>
+                            <input name="Stops[@i].Platform"
+                                   value="@Model.Stops[i].Platform"
+                                   class="form-control platform-input" />
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
 
-        <div class="mb-3">
-            <label asp-for="TrainId" class="form-label"></label>
-            <select asp-for="TrainId" class="form-select" asp-items="ViewBag.TrainId">
-                <option value="">-- Select Train --</option>
-            </select>
-            <span asp-validation-for="TrainId"
-                  class="text-danger"></span>
-        </div>
+        <div id="stopsError" class="text-danger mb-3"></div>
 
-        <div class="mb-3">
-            <label asp-for="Price" class="form-label"></label>
-            <input asp-for="Price" class="form-control" />
-            <span asp-validation-for="Price"
-                  class="text-danger"></span>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Create
-        </button>
-
-        <a asp-area="Admin"
-           asp-controller="Trips"
-           asp-action="Index"
-           class="btn btn-secondary">
-            Cancel
-        </a>
-
+        <button type="submit" class="btn btn-primary">Create Trip</button>
+        <a asp-area="Admin" asp-controller="Trips" asp-action="Index"
+           class="btn btn-secondary">Cancel</a>
     </form>
-
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const routeSelect = document.getElementById("routeSelect");
+        const stopsContainer = document.getElementById("stopsContainer");
+        const addStopButton = document.getElementById("addStopButton");
+        const stopsError = document.getElementById("stopsError");
+
+        const stations = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            stations.Select(s => new { value = s.Value, text = s.Text })));
+
+        const getStopsUrl = '@Url.Action("GetRouteStops", "Trips", new { area = "Admin" })';
+
+        function reindexStops() {
+            const rows = stopsContainer.querySelectorAll(".stop-row");
+
+            rows.forEach((row, index) => {
+                row.querySelector(".stop-title").textContent = `Stop ${index + 1}`;
+
+                row.querySelector(".station-select").name =
+                    `Stops[${index}].StationId`;
+
+                row.querySelector(".scheduled-time").name =
+                    `Stops[${index}].ScheduledTime`;
+
+                row.querySelector(".platform-input").name =
+                    `Stops[${index}].Platform`;
+            });
+        }
+
+        function createStopRow(stop = {}) {
+            const row = document.createElement("div");
+            row.className = "card mb-3 stop-row";
+
+            const stationOptions = stations.map(s => {
+                const selected =
+                    String(stop.stationId ?? "") === String(s.value)
+                        ? "selected"
+                        : "";
+
+                return `<option value="${s.value}" ${selected}>${s.text}</option>`;
+            }).join("");
+
+            row.innerHTML = `
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="stop-title"></h5>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger remove-stop">
+                            Remove
+                        </button>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Station</label>
+                        <select class="form-select station-select">
+                            <option value="">-- Select Station --</option>
+                            ${stationOptions}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Scheduled Time</label>
+                        <input type="datetime-local"
+                               class="form-control scheduled-time"
+                               value="${stop.scheduledTime ?? ""}" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Platform</label>
+                        <input class="form-control platform-input"
+                               value="${stop.platform ?? ""}" />
+                    </div>
+                </div>`;
+
+            stopsContainer.appendChild(row);
+            reindexStops();
+        }
+
+        function clearStops() {
+            stopsContainer.innerHTML = "";
+        }
+
+        routeSelect.addEventListener("change", async function () {
+            clearStops();
+            stopsError.textContent = "";
+
+            if (!this.value) return;
+
+            try {
+                const response = await fetch(
+                    `${getStopsUrl}?id=${encodeURIComponent(this.value)}`);
+
+                if (!response.ok) {
+                    throw new Error("Could not load stations for this route.");
+                }
+
+                const data = await response.json();
+
+                data.stops.forEach(stop => createStopRow(stop));
+
+                if (data.stops.length < 2) {
+                    stopsError.textContent =
+                        "This route needs at least two stations.";
+                }
+            } catch (error) {
+                stopsError.textContent = error.message;
+            }
+        });
+
+        addStopButton.addEventListener("click", function () {
+            createStopRow();
+        });
+
+        stopsContainer.addEventListener("click", function (event) {
+            if (event.target.classList.contains("remove-stop")) {
+                event.target.closest(".stop-row").remove();
+                reindexStops();
+            }
+        });
+
+        document.getElementById("createTripForm")
+            .addEventListener("submit", function (event) {
+                const selected = [
+                    ...stopsContainer.querySelectorAll(".station-select")
+                ].map(select => select.value).filter(Boolean);
+
+                if (!routeSelect.value) {
+                    event.preventDefault();
+                    stopsError.textContent = "Please select an existing route.";
+                } else if (selected.length < 2) {
+                    event.preventDefault();
+                    stopsError.textContent =
+                        "Please select at least two stations.";
+                } else if (new Set(selected).size !== selected.length) {
+                    event.preventDefault();
+                    stopsError.textContent =
+                        "A station cannot appear more than once.";
+                } else {
+                    stopsError.textContent = "";
+                }
+            });
+
+        // When the page is redisplayed after validation errors,
+        // preserve the submitted stops rather than loading a fresh template.
+        if (routeSelect.value && stopsContainer.children.length === 0) {
+            routeSelect.dispatchEvent(new Event("change"));
+        }
+    </script>
 }
-```

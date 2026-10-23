@@ -1,0 +1,402 @@
+﻿@model OnTrack.Models.ViewModels.PaymentViewModel
+
+@{
+    ViewData["Title"] = "Secure Checkout";
+}
+
+<style>
+    .ot-checkout {
+        --ot-navy: #102b3a;
+        --ot-teal: #42d6bd;
+        --ot-muted: #75838c;
+        min-height: 75vh;
+        padding: 42px 16px 60px;
+        background: #f4f7f8;
+        color: var(--ot-navy);
+    }
+
+    .ot-checkout * {
+        box-sizing: border-box;
+    }
+
+    .ot-checkout-wrap {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .ot-checkout-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 30px;
+    }
+
+    .ot-checkout-logo {
+        display: grid;
+        place-items: center;
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        background: var(--ot-navy);
+        color: var(--ot-teal);
+        font-size: 23px;
+        font-weight: 800;
+    }
+
+    .ot-checkout-brand strong {
+        display: block;
+        letter-spacing: 2px;
+        font-size: 15px;
+    }
+
+    .ot-checkout-brand span {
+        color: var(--ot-muted);
+        font-size: 12px;
+    }
+
+    .ot-checkout-heading {
+        margin-bottom: 26px;
+    }
+
+    .ot-checkout-eyebrow {
+        color: #168c7c;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .ot-checkout-heading h1 {
+        margin: 8px 0;
+        font-size: clamp(28px, 4vw, 38px);
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+
+    .ot-checkout-heading p {
+        color: var(--ot-muted);
+        margin: 0;
+    }
+
+    .ot-checkout-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(260px, .8fr);
+        gap: 22px;
+        align-items: start;
+    }
+
+    .ot-panel {
+        background: #fff;
+        border: 1px solid #e4eaed;
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 12px 35px rgba(16, 43, 58, .045);
+    }
+
+    .ot-panel h2 {
+        font-size: 19px;
+        font-weight: 800;
+        margin: 0 0 7px;
+    }
+
+    .ot-panel-subtitle {
+        color: var(--ot-muted);
+        font-size: 13px;
+        margin-bottom: 23px;
+    }
+
+    .ot-payment-option {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 17px;
+        margin-bottom: 13px;
+        border: 1px solid #dfe7e9;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: border-color .2s, background .2s;
+    }
+
+    .ot-payment-option:has(input:checked) {
+        border: 2px solid #25bba5;
+        background: #f0fcf9;
+        padding: 16px;
+    }
+
+    .ot-payment-option input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #159c8a;
+        flex-shrink: 0;
+        cursor: pointer;
+    }
+
+    .ot-payment-icon {
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        border-radius: 12px;
+        background: #edf5f6;
+        font-size: 21px;
+    }
+
+    .ot-payment-copy {
+        flex: 1;
+    }
+
+    .ot-payment-copy strong {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .ot-payment-copy span {
+        color: var(--ot-muted);
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .ot-demo-note {
+        padding: 12px 14px;
+        background: #fff8e8;
+        border-radius: 10px;
+        color: #79591c;
+        font-size: 12px;
+        line-height: 1.6;
+        margin: 18px 0;
+    }
+
+    .ot-checkout-submit {
+        width: 100%;
+        border: 0;
+        border-radius: 12px;
+        background: var(--ot-teal);
+        color: var(--ot-navy);
+        padding: 15px 18px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform .2s, background .2s;
+    }
+
+    .ot-checkout-submit:hover {
+        background: #2bc7ae;
+        transform: translateY(-1px);
+    }
+
+    .ot-checkout-back {
+        display: block;
+        text-align: center;
+        margin-top: 17px;
+        color: var(--ot-muted);
+        font-size: 13px;
+        text-decoration: none;
+    }
+
+    .ot-checkout-back:hover {
+        color: var(--ot-navy);
+    }
+
+    .ot-summary {
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .ot-summary-top {
+        padding: 25px;
+        background: var(--ot-navy);
+        color: #fff;
+    }
+
+    .ot-summary-top span {
+        color: #b8cbd1;
+        font-size: 12px;
+    }
+
+    .ot-summary-top h2 {
+        margin: 10px 0 0;
+        font-size: 17px;
+        color: #fff;
+    }
+
+    .ot-summary-body {
+        padding: 25px;
+    }
+
+    .ot-summary-label {
+        color: var(--ot-muted);
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .ot-summary-route {
+        font-size: 15px;
+        font-weight: 750;
+        overflow-wrap: anywhere;
+    }
+
+    .ot-summary-divider {
+        border: 0;
+        border-top: 1px solid #e7edef;
+        margin: 22px 0;
+    }
+
+    .ot-summary-total {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: end;
+    }
+
+    .ot-summary-total span {
+        color: var(--ot-muted);
+        font-size: 13px;
+    }
+
+    .ot-summary-total strong {
+        font-size: 23px;
+        white-space: nowrap;
+    }
+
+    .ot-summary-footnote {
+        margin-top: 18px;
+        color: var(--ot-muted);
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+    .ot-checkout .text-danger {
+        font-size: 13px;
+    }
+
+    @@media (max-width: 720px) {
+        .ot-checkout-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .ot-checkout {
+            padding-top: 25px;
+        }
+
+        .ot-panel {
+            padding: 22px;
+        }
+    }
+</style>
+
+<div class="ot-checkout">
+    <div class="ot-checkout-wrap">
+
+
+
+        <div class="ot-checkout-heading">
+            <div class="ot-checkout-eyebrow">Booking checkout</div>
+            <h1>One last step.</h1>
+            <p>Choose one payment method to continue.</p>
+        </div>
+
+        <div class="ot-checkout-grid">
+
+            <section class="ot-panel">
+                <h2>Payment method</h2>
+                <div class="ot-panel-subtitle">
+                    Select either cash or card for this booking.
+                </div>
+
+                <form asp-area="Customer"
+                      asp-controller="Payments"
+                      asp-action="ChooseMethod"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" asp-for="TripId" />
+
+                    @foreach (var ticketId in Model.TicketIds)
+                    {
+                        <input type="hidden"
+                               name="TicketIds"
+                               value="@ticketId" />
+                    }
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger mb-3"></div>
+
+                  
+<label class="ot-payment-option" for="cash">
+    <input type="radio"
+           id="cash"
+           name="PaymentMethod"
+           value="Cash"
+           required />
+
+    <span class="ot-payment-icon">💵</span>
+    <span class="ot-payment-copy">
+        <strong>Cash at the station</strong>
+        <span>Pay at the station.</span>
+    </span>
+</label>
+
+<label class="ot-payment-option" for="card">
+    <input type="radio"
+           id="card"
+           name="PaymentMethod"
+           value="Card"
+           required />
+
+    <span class="ot-payment-icon">💳</span>
+    <span class="ot-payment-copy">
+        <strong>Credit or debit card</strong>
+    </span>
+</label>
+
+
+
+                    <button type="submit" class="ot-checkout-submit">
+                        Confirm payment method →
+                    </button>
+
+                    
+                  <a href="@Url.Action("Index", "Trips", new { area = "Admin" })"
+                       class="ot-checkout-back">
+                       ← Return to trips
+                   </a>
+
+                </form>
+            </section>
+
+            <aside class="ot-panel ot-summary">
+                <div class="ot-summary-top">
+                    <span>YOUR BOOKING</span>
+                    <h2>Journey summary</h2>
+                </div>
+
+                <div class="ot-summary-body">
+                    <div class="ot-summary-label">Route</div>
+                    <div class="ot-summary-route">@Model.RouteName</div>
+
+                    <hr class="ot-summary-divider" />
+
+                    <div class="ot-summary-label">Tickets selected</div>
+                    <div class="ot-summary-route">
+                        @Model.TicketIds.Count ticket(s)
+                    </div>
+
+                    <hr class="ot-summary-divider" />
+
+                    <div class="ot-summary-total">
+                        <span>Total amount</span>
+                        <strong>@Model.TotalAmount.ToString("N2")</strong>
+                    </div>
+
+                    <div class="ot-summary-footnote">
+                        Your payment status will remain pending until the
+                        payment process is completed.
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </div>
+</div>
