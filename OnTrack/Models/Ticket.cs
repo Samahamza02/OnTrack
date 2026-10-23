@@ -29,5 +29,7 @@ namespace OnTrack.Models
             = new List<Payment>();
 
         public Evaluation? Evaluation { get; set; }
+
+        public string TravelClass { get; set; } = "Economy";
     }
 }

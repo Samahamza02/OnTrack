@@ -1,68 +1,756 @@
 ﻿@model OnTrack.Models.ViewModels.BookTripViewModel
 
 @{
-    ViewData["Title"] = "Book a Trip";
+    ViewData["Title"] = "Book Your Journey";
 }
 
-<div class="container mt-4">
+<style>
+    .booking-page {
+        background: #f4f7f8;
+        min-height: 85vh;
+        padding: 38px 0 60px;
+    }
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Book a Trip</h1>
-        <a asp-area="Admin" asp-controller="Trip" asp-action="Index" class="btn btn-secondary">
-            Back to List
-        </a>
-    </div>
+    .booking-wrap {
+        max-width: 1050px;
+        margin: auto;
+        padding: 0 20px;
+    }
 
-    <dl class="row mb-4">
-        <dt class="col-sm-3">Route</dt>
-        <dd class="col-sm-9">@Model.RouteName</dd>
+    .booking-header {
+        background: linear-gradient(125deg, #102b3a, #1c4654);
+        padding: 30px;
+        border-radius: 20px;
+        color: white;
+        margin-bottom: 25px;
+    }
 
-        <dt class="col-sm-3">Train</dt>
-        <dd class="col-sm-9">@Model.TrainNumber</dd>
-
-        <dt class="col-sm-3">Date</dt>
-        <dd class="col-sm-9">@Model.TripDate.ToString("g")</dd>
-        <dt class="col-sm-3">Price</dt>
-        <dd class="col-sm-9">@Model.Price.ToString("C")</dd>
-    </dl>
-
-    <form asp-area="Admin" asp-controller="Trips" asp-action="Book" asp-route-id="@Model.TripId" method="post">
-        <div asp-validation-summary="All" class="text-danger"></div>
-        <input type="hidden" asp-for="TripId" />
-
-        <div class="mb-3">
-            <label asp-for="FromStationId" class="form-label">From Station</label>
-            <select asp-for="FromStationId" class="form-select">
-                <option value=""> Choose Boarding Station </option>
-                @foreach (var stop in Model.Stops)
-                {
-                    <option value="@stop.StationId">@stop.Station.StationName (@stop.Station.City)</option>
-                }
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="ToStationId" class="form-label">To Station</label>
-            <select asp-for="ToStationId" class="form-select">
-                <option value="">Choose Destination Station</option>
-                @foreach (var stop in Model.Stops)
-                {
-                    <option value="@stop.StationId">@stop.Station.StationName (@stop.Station.City)</option>
-                }
-            </select>
-        </div>
-
-      <div class="mb-3">
-    <label asp-for="SeatNumber" class="form-label">Seat Number</label>
-    <select asp-for="SeatNumber" class="form-select">
-        <option value="">Choose Seat Number</option>
-        @foreach (var seat in Model.AvailableSeats)
-        {
-            <option value="@seat">@seat</option>
+        .booking-header .eyebrow {
+            color: #42d6bd;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2px;
         }
-    </select>
-</div>
-        <button type="submit" class="btn btn-primary">Confirm Booking</button>
-    </form>
 
+        .booking-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 12px 0;
+        }
+
+        .booking-header p {
+            color: #d5e5e8;
+            margin: 0;
+        }
+
+    .booking-card {
+        background: white;
+        border: 1px solid #e4ebed;
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: 0 8px 28px rgba(16, 43, 58, .04);
+        margin-bottom: 20px;
+    }
+
+        .booking-card h2 {
+            color: #142c3c;
+            font-size: 19px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+    .journey-info {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .info-item {
+        background: #f6f9fa;
+        border: 1px solid #e8edef;
+        padding: 16px;
+        border-radius: 12px;
+        min-width: 0;
+    }
+
+    .info-label {
+        color: #7c8b93;
+        font-size: 11px;
+        font-weight: 750;
+        text-transform: uppercase;
+        letter-spacing: .7px;
+        margin-bottom: 7px;
+    }
+
+    .info-value {
+        color: #142c3c;
+        font-size: 15px;
+        font-weight: 750;
+        overflow-wrap: anywhere;
+    }
+
+    .class-options {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 13px;
+    }
+
+    .class-option {
+        display: block;
+        cursor: pointer;
+        position: relative;
+    }
+
+        .class-option input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+    .class-content {
+        height: 100%;
+        border: 2px solid #e5ecee;
+        border-radius: 14px;
+        padding: 17px;
+        transition: .2s;
+    }
+
+    .class-option input:checked + .class-content {
+        border-color: #42d6bd;
+        background: #effcf9;
+        box-shadow: 0 0 0 2px rgba(66, 214, 189, .12);
+    }
+
+    .class-option input:focus-visible + .class-content {
+        outline: 3px solid #78cfc0;
+        outline-offset: 3px;
+    }
+
+    .class-name {
+        color: #142c3c;
+        font-weight: 800;
+        font-size: 16px;
+    }
+
+    .class-description {
+        color: #7c8b93;
+        font-size: 12px;
+        margin: 8px 0 14px;
+        min-height: 34px;
+    }
+
+    .class-price {
+        color: #167e6c;
+        font-size: 20px;
+        font-weight: 850;
+    }
+
+    .booking-page .form-label {
+        color: #344b58;
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    .booking-page .form-select,
+    .booking-page .form-control {
+        min-height: 46px;
+        border-color: #dce5e8;
+        border-radius: 10px;
+    }
+
+        .booking-page .form-select:focus,
+        .booking-page .form-control:focus {
+            border-color: #42d6bd;
+            box-shadow: 0 0 0 .2rem rgba(66, 214, 189, .15);
+        }
+
+    /* Compact seat selector */
+    .seat-picker {
+        border: 1px solid #dce5e9;
+        border-radius: 14px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .seat-picker-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: #102b3a;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    #seatCount {
+        color: #42d6bd;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .seat-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 14px;
+        max-height: 220px;
+        overflow-y: auto;
+    }
+
+    .seat-option {
+        position: relative;
+        cursor: pointer;
+        margin: 0;
+    }
+
+        .seat-option input {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+        }
+
+        .seat-option span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 76px;
+            padding: 10px 12px;
+            border: 1px solid #dce5e9;
+            border-radius: 9px;
+            background: #fff;
+            color: #102b3a;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background .15s ease, border-color .15s ease;
+        }
+
+        .seat-option:hover span {
+            border-color: #42d6bd;
+        }
+
+        .seat-option input:checked + span {
+            background: #42d6bd;
+            border-color: #42d6bd;
+            color: #102b3a;
+            font-weight: 800;
+        }
+
+        .seat-option input:focus-visible + span {
+            outline: 2px solid #102b3a;
+            outline-offset: 3px;
+        }
+
+        .seat-option.seat-hidden {
+            display: none;
+        }
+
+        .seat-option.seat-disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+    .selected-seat-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .selected-seat-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 11px;
+        border-radius: 8px;
+        background: #e5faf6;
+        color: #102b3a;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .booking-total {
+        background: #effcf9;
+        border: 1px solid #ccefe7;
+        padding: 20px;
+        border-radius: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        margin: 22px 0;
+    }
+
+    .total-label {
+        color: #4f706c;
+        font-size: 13px;
+    }
+
+    .total-price {
+        color: #102b3a;
+        font-size: 27px;
+        font-weight: 850;
+        text-align: right;
+    }
+
+    .booking-submit {
+        background: #42d6bd;
+        color: #102b3a;
+        border: none;
+        border-radius: 10px;
+        padding: 14px 22px;
+        font-weight: 800;
+        width: 100%;
+        transition: .2s;
+    }
+
+        .booking-submit:hover:not(:disabled) {
+            background: #2dc4aa;
+        }
+
+        .booking-submit:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+    .back-link {
+        color: #42d6bd;
+        font-weight: 750;
+        text-decoration: none;
+    }
+
+        .back-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+    @@media (max-width: 700px) {
+        .journey-info,
+        .class-options {
+            grid-template-columns: 1fr;
+        }
+
+        .booking-card {
+            padding: 20px;
+        }
+
+        .booking-header {
+            padding: 24px;
+        }
+
+        .seat-option span {
+            min-width: 66px;
+            padding: 9px 8px;
+        }
+
+        .seat-picker-header {
+            padding: 12px;
+        }
+
+        .total-price {
+            font-size: 21px;
+        }
+    }
+</style>
+
+<div class="booking-page">
+    <div class="booking-wrap">
+
+        <div class="booking-header">
+            <div class="eyebrow">ONTRACK RAILWAYS</div>
+            <h1>Book your journey</h1>
+            <p>Choose your travel class, select your stations and reserve your seats.</p>
+
+            <div class="mt-3">
+                <a asp-area="Admin"
+                   asp-controller="Trips"
+                   asp-action="Index"
+                   class="back-link">
+                    ← Back to trips
+                </a>
+            </div>
+        </div>
+
+        <form asp-area="Admin"
+              asp-controller="Trips"
+              asp-action="Book"
+              asp-route-id="@Model.TripId"
+              method="post">
+
+            <input type="hidden" asp-for="TripId" />
+
+            <!-- Journey details -->
+            <section class="booking-card">
+                <h2>Journey details</h2>
+
+                <div class="journey-info">
+                    <div class="info-item">
+                        <div class="info-label">Route</div>
+                        <div class="info-value">@Model.RouteName</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Train</div>
+                        <div class="info-value">@Model.TrainNumber</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Departure</div>
+                        <div class="info-value">
+                            @Model.TripDate.ToString("dd MMM yyyy")
+                            <div class="small mt-1">
+                                @Model.TripDate.ToString("hh:mm tt")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ticket class -->
+            <section class="booking-card">
+                <h2>1. Choose your ticket class</h2>
+
+                <div class="class-options">
+                    <label class="class-option">
+                        <input type="radio"
+                               name="TravelClass"
+                               value="Economy"
+                               checked="@(Model.TravelClass == "Economy")" />
+
+                        <div class="class-content">
+                            <div class="class-name">Economy</div>
+                            <div class="class-description">
+                                Comfortable standard seating.
+                            </div>
+                            <div class="class-price">
+                                @Model.Price.ToString("N2") EGP
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="class-option">
+                        <input type="radio"
+                               name="TravelClass"
+                               value="Business"
+                               checked="@(Model.TravelClass == "Business")" />
+
+                        <div class="class-content">
+                            <div class="class-name">Business</div>
+                            <div class="class-description">
+                                Extra comfort for your journey.
+                            </div>
+                            <div class="class-price">
+                                @((Model.Price * 1.5m).ToString("N2")) EGP
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="class-option">
+                        <input type="radio"
+                               name="TravelClass"
+                               value="VIP"
+                               checked="@(Model.TravelClass == "VIP")" />
+
+                        <div class="class-content">
+                            <div class="class-name">VIP</div>
+                            <div class="class-description">
+                                A premium travel experience.
+                            </div>
+                            <div class="class-price">
+                                @((Model.Price * 2m).ToString("N2")) EGP
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Stations and seat selection -->
+            <section class="booking-card">
+                <h2>2. Your route and seats</h2>
+
+                <div class="mb-3">
+                    <label asp-for="FromStationId" class="form-label">
+                        Boarding station
+                    </label>
+
+                    <select asp-for="FromStationId" class="form-select">
+                        <option value="">Choose boarding station</option>
+
+                        @foreach (var stop in Model.Stops.OrderBy(s => s.StopOrder))
+                        {
+                            <option value="@stop.StationId">
+                                @stop.Station.StationName (@stop.Station.City)
+                            </option>
+                        }
+                    </select>
+
+                    <span asp-validation-for="FromStationId"
+                          class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="ToStationId" class="form-label">
+                        Destination station
+                    </label>
+
+                    <select asp-for="ToStationId" class="form-select">
+                        <option value="">Choose destination station</option>
+
+                        @foreach (var stop in Model.Stops.OrderBy(s => s.StopOrder))
+                        {
+                            <option value="@stop.StationId">
+                                @stop.Station.StationName (@stop.Station.City)
+                            </option>
+                        }
+                    </select>
+
+                    <span asp-validation-for="ToStationId"
+                          class="text-danger small"></span>
+                </div>
+
+                <!-- Searchable multi-seat selector -->
+                <div class="mb-3">
+                    <label class="form-label">Choose your seats</label>
+
+                    @if (Model.AvailableSeats != null && Model.AvailableSeats.Any())
+                    {
+                        <div class="small text-muted mb-3">
+                            Search for a seat and select up to 6 seats.
+                        </div>
+
+                        <input type="search"
+                               id="seatSearch"
+                               class="form-control mb-3"
+                               placeholder="Search seat number, e.g. 12"
+                               autocomplete="off"
+                               aria-label="Search available seats" />
+
+                        <div class="seat-picker">
+                            <div class="seat-picker-header">
+                                <span>Available seats</span>
+                                <span id="seatCount">0 / 6 selected</span>
+                            </div>
+
+                            <div id="seatOptions" class="seat-options">
+                                @foreach (var seat in Model.AvailableSeats)
+                                {
+                                    <label class="seat-option" data-seat="@seat">
+                                        <input type="checkbox"
+                                               name="SeatNumbers"
+                                               value="@seat"
+                                               checked="@(Model.SeatNumbers != null && Model.SeatNumbers.Contains(seat))" />
+                                        <span>Seat @seat</span>
+                                    </label>
+                                }
+                            </div>
+
+                            <div id="noSeatsFound"
+                                 class="text-muted small py-3 text-center"
+                                 style="display:none;">
+                                No matching seats found.
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <div class="small text-muted mb-2">
+                                Your selected seats
+                            </div>
+
+                            <div id="selectedSeatList" class="selected-seat-list">
+                                <span class="text-muted small">
+                                    No seats selected yet.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div id="seatLimitMessage"
+                             class="text-danger small mt-2"
+                             style="display:none;">
+                            You can select a maximum of 6 seats.
+                        </div>
+
+                        <span asp-validation-for="SeatNumbers"
+                              class="text-danger small"></span>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mb-0">
+                            <strong>Fully booked</strong>
+                            <p class="mb-0">
+                                Sorry, there are no seats available on this trip.
+                                Please choose another journey.
+                            </p>
+                        </div>
+                    }
+                </div>
+
+                <!-- Booking total -->
+                <div class="booking-total">
+                    <div>
+                        <div class="total-label">Your booking total</div>
+                        <div class="fw-bold" id="selectedClass">
+                            Economy class · 0 seats
+                        </div>
+                    </div>
+
+                    <div class="total-price" id="totalPrice">0.00 EGP</div>
+                </div>
+
+                @if (Model.AvailableSeats != null && Model.AvailableSeats.Any())
+                {
+                    <button type="submit" class="booking-submit">
+                        Confirm Booking →
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="booking-submit" disabled>
+                        No Seats Available
+                    </button>
+                }
+            </section>
+        </form>
+    </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (() => {
+            const basePrice = @Model.Price.ToString(
+                            System.Globalization.CultureInfo.InvariantCulture);
+
+            const maxSeats = 6;
+
+            const priceElement = document.getElementById("totalPrice");
+            const classElement = document.getElementById("selectedClass");
+            const searchInput = document.getElementById("seatSearch");
+            const seatCountElement = document.getElementById("seatCount");
+            const selectedSeatList = document.getElementById("selectedSeatList");
+            const noSeatsFound = document.getElementById("noSeatsFound");
+            const seatLimitMessage = document.getElementById("seatLimitMessage");
+
+            const radios = document.querySelectorAll(
+                'input[name="TravelClass"]'
+            );
+
+            const seatCheckboxes = Array.from(document.querySelectorAll(
+                'input[name="SeatNumbers"]'
+            ));
+
+            function getSelectedSeats() {
+                return seatCheckboxes.filter(seat => seat.checked);
+            }
+
+            function updatePrice() {
+                const selectedClass = document.querySelector(
+                    'input[name="TravelClass"]:checked'
+                );
+
+                const travelClass = selectedClass
+                    ? selectedClass.value
+                    : "Economy";
+
+                const multiplier =
+                    travelClass === "VIP" ? 2 :
+                    travelClass === "Business" ? 1.5 : 1;
+
+                const count = getSelectedSeats().length;
+                const total = basePrice * multiplier * count;
+
+                priceElement.textContent = new Intl.NumberFormat("en-EG", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(total) + " EGP";
+
+                classElement.textContent =
+                    `${travelClass} class · ${count} ${count === 1 ? "seat" : "seats"}`;
+            }
+
+            function updateSelectedSeats() {
+                const selected = getSelectedSeats();
+
+                seatCountElement.textContent =
+                    `${selected.length} / ${maxSeats} selected`;
+
+                selectedSeatList.replaceChildren();
+
+                if (selected.length === 0) {
+                    const emptyMessage = document.createElement("span");
+                    emptyMessage.className = "text-muted small";
+                    emptyMessage.textContent = "No seats selected yet.";
+                    selectedSeatList.appendChild(emptyMessage);
+                } else {
+                    selected.forEach(seat => {
+                        const tag = document.createElement("span");
+                        tag.className = "selected-seat-tag";
+                        tag.textContent = `Seat ${seat.value}`;
+                        selectedSeatList.appendChild(tag);
+                    });
+                }
+
+                seatCheckboxes.forEach(seat => {
+                    const label = seat.closest(".seat-option");
+                    const limitReached =
+                        selected.length >= maxSeats && !seat.checked;
+
+                    seat.disabled = limitReached;
+
+                    if (label) {
+                        label.classList.toggle("seat-disabled", limitReached);
+                    }
+                });
+
+                seatLimitMessage.style.display =
+                    selected.length >= maxSeats ? "block" : "none";
+
+                updatePrice();
+            }
+
+            function filterSeats() {
+                const search = searchInput.value.trim().toLowerCase();
+                let visibleCount = 0;
+
+                seatCheckboxes.forEach(seat => {
+                    const label = seat.closest(".seat-option");
+                    const matches = seat.value.toLowerCase().includes(search);
+
+                    label.classList.toggle("seat-hidden", !matches);
+
+                    if (matches) {
+                        visibleCount++;
+                    }
+                });
+
+                noSeatsFound.style.display =
+                    visibleCount === 0 ? "block" : "none";
+            }
+
+            seatCheckboxes.forEach(seat => {
+                seat.addEventListener("change", () => {
+                    if (getSelectedSeats().length > maxSeats) {
+                        seat.checked = false;
+                    }
+
+                    updateSelectedSeats();
+                });
+            });
+
+            radios.forEach(radio => {
+                radio.addEventListener("change", updatePrice);
+            });
+
+            if (searchInput) {
+                searchInput.addEventListener("input", filterSeats);
+            }
+
+            // Restore selected seats if the page returns with validation errors.
+            updateSelectedSeats();
+
+            if (searchInput) {
+                filterSeats();
+            }
+        })();
+    </script>
+}

@@ -21,12 +21,87 @@ namespace OnTrack.Areas.Admin.Controllers
         }
 
         // GET: Admin/Trip
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+     string? status,
+     string? destination,
+     string? availability,
+
+     int page = 1)
         {
-            var trips = await _context.Trips
+            int pageSize = 6;
+
+            var query = _context.Trips
                 .AsNoTracking()
+                .AsQueryable();
+
+            // Filter by status
+            if (!string.IsNullOrWhiteSpace(status)
+                && Enum.TryParse<TripStatus>(status, true, out var selectedStatus))
+            {
+                query = query.Where(t => t.Status == selectedStatus);
+            }
+
+            // Filter by destination station name or city
+            if (!string.IsNullOrWhiteSpace(destination))
+            {
+                query = query.Where(t =>
+                    t.TripStops.Any(s =>
+                        s.Station.StationName.Contains(destination) ||
+                        s.Station.City.Contains(destination)));
+            }
+            // Filter by available 
+
+            var now = DateTime.Now;
+
+            if (availability == "available")
+            {
+                query = query.Where(t =>
+                    t.TripDate > now &&
+                    t.Status != TripStatus.Cancelled &&
+                    t.Status != TripStatus.Completed &&
+                    t.Train != null &&
+                    t.Train.Capacity >
+                        t.Tickets.Count(ticket => ticket.Status != "Cancelled"));
+            }
+            else if (availability == "unavailable")
+            {
+                query = query.Where(t =>
+                    t.TripDate <= now ||
+                    t.Status == TripStatus.Cancelled ||
+                    t.Status == TripStatus.Completed ||
+                    (t.Train != null &&
+                     t.Train.Capacity <=
+                        t.Tickets.Count(ticket => ticket.Status != "Cancelled")));
+            }
+
+            ViewBag.AvailabilityFilter = availability ?? "";
+
+            // Count filtered results before pagination
+            int totalTrips = await query.CountAsync();
+
+            int totalPages = (int)Math.Ceiling(totalTrips / (double)pageSize);
+
+            // Keep the requested page within valid bounds
+            page = Math.Max(1, page);
+            if (totalPages > 0)
+            {
+                page = Math.Min(page, totalPages);
+            }
+
+            var trips = await query
                 .Include(t => t.Train)
+                .Include(t => t.TripStops)
+                    .ThenInclude(s => s.Station)
+                .OrderBy(t => t.TripDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            ViewBag.TotalTrips = totalTrips;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.StatusFilter = status ?? "";
+            ViewBag.DestinationFilter = destination ?? "";
 
             return View(trips);
         }
@@ -176,32 +251,194 @@ namespace OnTrack.Areas.Admin.Controllers
 
 
         // GET: /Admin/Trips/Create
+
+
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            LoadTrains();
-            return View();
+            await LoadCreateLists();
+            return View(new CreateTripViewModel());
         }
-
         // POST: /Admin/Trips/Create
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create(Trip trip)
+        public async Task<IActionResult> Create(CreateTripViewModel vm)
         {
-            if (!ModelState.IsValid)
+            var template = vm.TemplateTripId.HasValue
+                ? await _context.Trips
+                    .Include(t => t.TripStops)
+                    .FirstOrDefaultAsync(t => t.TripId == vm.TemplateTripId.Value)
+                : null;
+
+            if (template == null)
             {
-                LoadTrains(trip.TrainId);
-                return View(trip);
+                ModelState.AddModelError(
+                    nameof(vm.TemplateTripId),
+                    "Please select a valid existing route.");
             }
 
-            _context.Trips.Add(trip);
+            var stops = (vm.Stops ?? new List<CreateTripStopInput>())
+                .Where(s => s.StationId.HasValue)
+                .ToList();
+
+            if (stops.Count < 2)
+            {
+                ModelState.AddModelError(
+                    nameof(vm.Stops),
+                    "A trip must have at least two stations.");
+            }
+
+            var stationIds = stops
+                .Select(s => s.StationId!.Value)
+                .ToList();
+
+            if (stationIds.Distinct().Count() != stationIds.Count)
+            {
+                ModelState.AddModelError(
+                    nameof(vm.Stops),
+                    "A station cannot appear more than once in this trip.");
+            }
+
+            var existingStationIds = await _context.Stations
+                .Where(s => stationIds.Contains(s.StationId))
+                .Select(s => s.StationId)
+                .ToListAsync();
+
+            if (existingStationIds.Count != stationIds.Count)
+            {
+                ModelState.AddModelError(
+                    nameof(vm.Stops),
+                    "One or more selected stations do not exist.");
+            }
+
+            if (template != null && vm.TemplateTripId.HasValue)
+            {
+                var templateHasStops = await _context.TripStops
+                    .AnyAsync(s => s.TripId == template.TripId);
+
+                if (!templateHasStops)
+                {
+                    ModelState.AddModelError(
+                        nameof(vm.TemplateTripId),
+                        "The selected route has no stations assigned.");
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await LoadCreateLists(vm.TemplateTripId, vm.TrainId);
+                return View(vm);
+            }
+
+            var newTrip = new Trip
+            {
+                RouteName = template!.RouteName,
+                TripDate = vm.TripDate!.Value,
+                TrainId = vm.TrainId!.Value,
+                Price = vm.Price,
+                Status = vm.Status,
+                TripStops = stops
+                    .Select((stop, index) => new TripStop
+                    {
+                        StationId = stop.StationId!.Value,
+                        StopOrder = index + 1,
+                        ScheduledTime = stop.ScheduledTime,
+                        Platform = stop.Platform ?? string.Empty
+                    })
+                    .ToList()
+            };
+
+            _context.Trips.Add(newTrip);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Trip created successfully.";
+            TempData["Success"] = "Trip created successfully with its assigned stations.";
             return RedirectToAction(nameof(Index));
         }
+
+        private async Task LoadCreateLists(
+            int? selectedTemplateTripId = null,
+            int? selectedTrainId = null)
+        {
+            var tripsWithStops = await _context.Trips
+                .AsNoTracking()
+                .Where(t => t.RouteName != null && t.RouteName != ""
+                            && t.TripStops.Any())
+                .OrderBy(t => t.RouteName)
+                .ThenBy(t => t.TripId)
+                .Select(t => new
+                {
+                    t.TripId,
+                    t.RouteName
+                })
+                .ToListAsync();
+
+            // Show one template trip per route name.
+            var routeOptions = tripsWithStops
+                .GroupBy(t => t.RouteName!)
+                .Select(g => g.First())
+                .Select(t => new SelectListItem
+                {
+                    Value = t.TripId.ToString(),
+                    Text = t.RouteName,
+                    Selected = t.TripId == selectedTemplateTripId
+                })
+                .ToList();
+
+            ViewBag.RouteOptions = routeOptions;
+
+            ViewBag.TrainId = new SelectList(
+                await _context.Trains.AsNoTracking().ToListAsync(),
+                "TrainId",
+                "TrainNumber",
+                selectedTrainId);
+
+            ViewBag.Stations = await _context.Stations
+                .AsNoTracking()
+                .OrderBy(s => s.StationName)
+                .Select(s => new SelectListItem
+                {
+                    Value = s.StationId.ToString(),
+                    Text = s.StationName
+                })
+                .ToListAsync();
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetRouteStops(int id)
+        {
+            var trip = await _context.Trips
+                .AsNoTracking()
+                .Include(t => t.TripStops)
+                    .ThenInclude(s => s.Station)
+                .FirstOrDefaultAsync(t => t.TripId == id);
+
+            if (trip == null)
+                return NotFound();
+
+            var stops = trip.TripStops
+                .OrderBy(s => s.StopOrder)
+                .Select(s => new
+                {
+                    stationId = s.StationId,
+                    stationName = s.Station.StationName,
+                    scheduledTime = s.ScheduledTime.HasValue
+                        ? s.ScheduledTime.Value.ToString("yyyy-MM-ddTHH:mm")
+                        : "",
+                    platform = s.Platform ?? ""
+                });
+
+            return Json(new
+            {
+                routeName = trip.RouteName,
+                stops
+            });
+        }
+
+
 
         // GET: /Admin/Trips/Edit/5
         [HttpGet]
@@ -331,12 +568,12 @@ namespace OnTrack.Areas.Admin.Controllers
 
 
         // GET: Admin/Trip/Book/5
+
+        [HttpGet]
         public async Task<IActionResult> Book(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var trip = await _context.Trips
                 .AsNoTracking()
@@ -346,15 +583,37 @@ namespace OnTrack.Areas.Admin.Controllers
                 .FirstOrDefaultAsync(t => t.TripId == id);
 
             if (trip == null)
-            {
                 return NotFound();
+
+            // Do not allow booking cancelled, completed, or past trips.
+            if (trip.Status == TripStatus.Cancelled ||
+                trip.Status == TripStatus.Completed ||
+                trip.TripDate <= DateTime.Now)
+            {
+                TempData["Error"] = "This trip is no longer available for booking.";
+                return RedirectToAction(nameof(Index));
             }
+
+            var stops = trip.TripStops
+                .OrderBy(ts => ts.StopOrder)
+                .ToList();
+
+            if (stops.Count < 2)
+            {
+                TempData["Error"] =
+                    "This trip does not have enough stations assigned yet.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
             var bookedSeats = await _context.Tickets
                 .Where(t => t.TripId == id && t.Status != "Cancelled")
                 .Select(t => t.SeatNumber)
                 .ToListAsync();
 
-            var availableSeats = Enumerable.Range(1, trip.Train.Capacity)
+            int capacity = trip.Train?.Capacity ?? 0;
+
+            var availableSeats = Enumerable.Range(1, Math.Max(0, capacity))
                 .Select(n => n.ToString())
                 .Except(bookedSeats)
                 .ToList();
@@ -366,22 +625,24 @@ namespace OnTrack.Areas.Admin.Controllers
                 TripDate = trip.TripDate,
                 TrainNumber = trip.Train?.TrainNumber,
                 Price = trip.Price,
-                Stops = trip.TripStops.OrderBy(ts => ts.StopOrder).ToList(),
+                Stops = stops,
                 AvailableSeats = availableSeats
             };
 
             return View(vm);
         }
 
+
+
         // POST: Admin/Trip/Book/5
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Book(int id, BookTripViewModel vm)
         {
             if (id != vm.TripId)
-            {
                 return NotFound();
-            }
 
             var trip = await _context.Trips
                 .Include(t => t.Train)
@@ -390,71 +651,168 @@ namespace OnTrack.Areas.Admin.Controllers
                 .FirstOrDefaultAsync(t => t.TripId == id);
 
             if (trip == null)
-            {
                 return NotFound();
+
+            // Check whether the trip can still be booked.
+            if (trip.Status == TripStatus.Cancelled ||
+                trip.Status == TripStatus.Completed ||
+                trip.TripDate <= DateTime.Now)
+            {
+                TempData["Error"] =
+                    "This trip is no longer available for booking.";
+
+                return RedirectToAction(nameof(Index));
             }
 
-            var fromStop = trip.TripStops.FirstOrDefault(ts => ts.StationId == vm.FromStationId);
-            var toStop = trip.TripStops.FirstOrDefault(ts => ts.StationId == vm.ToStationId);
+            // Validate the ticket class.
+            var validClasses = new[] { "Economy", "Business", "VIP" };
+
+            if (string.IsNullOrWhiteSpace(vm.TravelClass) ||
+                !validClasses.Contains(vm.TravelClass))
+            {
+                ModelState.AddModelError(
+                    nameof(vm.TravelClass),
+                    "Please choose a valid ticket class.");
+            }
+
+            // Validate boarding and destination stations.
+            var fromStop = trip.TripStops
+                .FirstOrDefault(s => s.StationId == vm.FromStationId);
+
+            var toStop = trip.TripStops
+                .FirstOrDefault(s => s.StationId == vm.ToStationId);
 
             if (fromStop == null || toStop == null)
             {
-                ModelState.AddModelError("", "The selected station isn’t part of this trip route.");
+                ModelState.AddModelError(
+                    "",
+                    "Choose stations that belong to this trip.");
             }
             else if (fromStop.StopOrder >= toStop.StopOrder)
             {
-                ModelState.AddModelError("", "The boarding station must be before the destination station in the trip route.");
+                ModelState.AddModelError(
+                    "",
+                    "The boarding station must come before the destination station.");
             }
 
-            var seatTaken = await _context.Tickets
-                .AnyAsync(t => t.TripId == id
-                            && t.SeatNumber == vm.SeatNumber
-                            && t.Status != "Cancelled");
+            // Find seats already booked on this trip.
+            var bookedSeats = await _context.Tickets
+                .Where(t => t.TripId == id && t.Status != "Cancelled")
+                .Select(t => t.SeatNumber)
+                .ToListAsync();
 
-            if (seatTaken)
+            int capacity = trip.Train?.Capacity ?? 0;
+
+            var availableSeats = Enumerable
+                .Range(1, Math.Max(0, capacity))
+                .Select(n => n.ToString())
+                .Except(bookedSeats)
+                .ToList();
+
+            // Clean up the selected seats and remove duplicates.
+            vm.SeatNumbers = (vm.SeatNumbers ?? new List<string>())
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Distinct()
+                .ToList();
+
+            if (vm.SeatNumbers.Count > 6)
             {
-                ModelState.AddModelError("", "The seat is already booked for this trip.");
+                ModelState.AddModelError(
+                    nameof(vm.SeatNumbers),
+                    "You can book a maximum of 6 seats at a time.");
             }
 
+            // Validate all selected seats.
+            if (vm.SeatNumbers.Count == 0)
+            {
+                ModelState.AddModelError(
+                    nameof(vm.SeatNumbers),
+                    "Please choose at least one seat.");
+            }
+            else if (vm.SeatNumbers.Any(s => !availableSeats.Contains(s)))
+            {
+                ModelState.AddModelError(
+                    nameof(vm.SeatNumbers),
+                    "One or more selected seats are unavailable. Please choose again.");
+            }
+
+            // If validation fails, return to the booking page.
             if (!ModelState.IsValid)
             {
                 vm.RouteName = trip.RouteName;
                 vm.TripDate = trip.TripDate;
                 vm.TrainNumber = trip.Train?.TrainNumber;
                 vm.Price = trip.Price;
-                vm.Stops = trip.TripStops.OrderBy(ts => ts.StopOrder).ToList();
 
-                var bookedSeats = await _context.Tickets
-                    .Where(t => t.TripId == id && t.Status != "Cancelled")
-                    .Select(t => t.SeatNumber)
-                    .ToListAsync();
-
-                vm.AvailableSeats = Enumerable.Range(1, trip.Train.Capacity)
-                    .Select(n => n.ToString())
-                    .Except(bookedSeats)
+                vm.Stops = trip.TripStops
+                    .OrderBy(s => s.StopOrder)
                     .ToList();
 
-                return View(vm);
+                vm.AvailableSeats = availableSeats;
+
+                return View("BookTrip", vm);
             }
 
+            // Get the logged-in user's ID.
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var ticket = new Ticket
+            if (string.IsNullOrEmpty(userId))
+                return Challenge();
+
+            // Calculate the price for each ticket.
+            decimal multiplier = vm.TravelClass switch
             {
-                TripId = vm.TripId,
-                FromStationId = vm.FromStationId,
-                ToStationId = vm.ToStationId,
-                SeatNumber = vm.SeatNumber,
-                Status = "Booked",
-                BookingDate = DateTime.Now,
-                Price = trip.Price,
-                UserId = userId!
+                "Business" => 1.5m,
+                "VIP" => 2.0m,
+                _ => 1.0m
             };
 
-            _context.Tickets.Add(ticket);
+            decimal ticketPrice = trip.Price * multiplier;
+
+
+            // Create tickets and keep their IDs for the payment page.
+            var tickets = new List<Ticket>();
+
+            foreach (var seat in vm.SeatNumbers)
+            {
+                var ticket = new Ticket
+                {
+                    TripId = trip.TripId,
+                    FromStationId = vm.FromStationId,
+                    ToStationId = vm.ToStationId,
+                    SeatNumber = seat,
+                    TravelClass = vm.TravelClass,
+                    Status = "PendingPayment",
+                    BookingDate = DateTime.Now,
+                    Price = ticketPrice,
+                    UserId = userId
+                };
+
+                tickets.Add(ticket);
+            }
+
+            _context.Tickets.AddRange(tickets);
+
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            // The database has now generated the TicketIds.
+            var ticketIds = tickets
+                .Select(t => t.TicketId)
+                .ToArray();
+
+            // Redirect to the customer payment page.
+            return RedirectToAction(
+                "ChooseMethod",
+                "Payments",
+                new
+                {
+                    area = "Customer",
+                    tripId = trip.TripId,
+                    ticketIds = ticketIds
+                });
+
         }
+
+
     }
 }

@@ -5,7 +5,7 @@ using OnTrack.Models;
 using OnTrack.Services;
 using OnTrack.Repositories;
 using OnTrack.Interfaces;
-
+using Stripe;
 
 namespace OnTrack
 {
@@ -15,6 +15,9 @@ namespace OnTrack
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            //for payment
+            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
             // Add services
             builder.Services.AddControllersWithViews();
@@ -69,6 +72,15 @@ namespace OnTrack
 
             builder.Services.AddScoped<OnTrack.Services.IDashboardService,
                            OnTrack.Services.DashboardService>();
+            //location
+            //allows the server and the browser to communicate in real time.
+            builder.Services.AddSignalR();
+
+            builder.Services.AddSingleton<TripSimulationService>();
+
+            builder.Services.AddHostedService<TripSimulationService>(
+                services => services.GetRequiredService<TripSimulationService>());
+
             var app = builder.Build();
 
             // Configure middleware
@@ -80,6 +92,9 @@ namespace OnTrack
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            //loctaion
+            app.MapHub<OnTrack.Hubs.TripTrackingHub>("/tripTrackingHub");
 
             app.UseRouting();
 

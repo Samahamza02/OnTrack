@@ -104,7 +104,7 @@
 </style>
 
 <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:25px;">
-    <a asp-area="Customer"
+    <a asp-area="Admin"
        asp-controller="Trips"
        asp-action="Index"
        style="display:inline-block; padding:13px 20px; border-radius:10px;
@@ -137,7 +137,7 @@
                         <th>Booking Date</th>
                         <th>Price</th>
                         <th>Status</th>
-                        <th>Details</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -152,13 +152,28 @@
                                 <td>@ticket.BookingDate.ToString("dd MMM yyyy")</td>
                                 <td>@ticket.Price.ToString("N2")</td>
                                 <td><span class="ticket-pill">@ticket.Status</span></td>
-                                <td>
-                                    <a class="ticket-btn"
-                                       asp-area="Customer"
-                                       asp-controller="Tickets"
-                                       asp-action="Details"
-                                       asp-route-id="@ticket.TicketId">View</a>
-                                </td>
+                                
+<td>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <a class="ticket-btn"
+           asp-area="Customer"
+           asp-controller="Tickets"
+           asp-action="Details"
+           asp-route-id="@ticket.TicketId">
+            View
+        </a>
+
+        <a class="ticket-btn"
+           asp-area="Customer"
+           asp-controller="Tracking"
+           asp-action="Track"
+           asp-route-id="@ticket.TripId"
+           style="background:#43d6be; color:#102f3b !important;">
+            Track Train
+        </a>
+    </div>
+</td>
+
                             </tr>
                         }
                     }

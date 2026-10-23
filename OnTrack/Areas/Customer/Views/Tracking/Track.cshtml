@@ -1,0 +1,343 @@
+﻿@model OnTrack.Models.Trip
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Track Train";
+
+    var stations = Model.TripStops
+        .Where(s => s.Station != null)
+        .OrderBy(s => s.StopOrder)
+        .Select(s => new
+        {
+            name = s.Station!.StationName,
+            latitude = (double)s.Station.Latitude,
+            longitude = (double)s.Station.Longitude
+        })
+        .ToList();
+
+    var stationsJson = JsonSerializer.Serialize(stations);
+}
+
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<style>
+    .tracking-page {
+        max-width: 1200px;
+        margin: 35px auto;
+        padding: 0 20px;
+        color: #102f3b;
+    }
+
+    .tracking-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 24px;
+    }
+
+        .tracking-header h1 {
+            font-weight: 750;
+            margin-bottom: 6px;
+        }
+
+    .tracking-subtitle {
+        color: #71808a;
+        margin: 0;
+    }
+
+    .tracking-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 22px;
+    }
+
+    .tracking-card {
+        background: #fff;
+        border: 1px solid #e3e9eb;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 5px 18px rgba(16, 47, 59, .04);
+    }
+
+    .tracking-label {
+        font-size: 13px;
+        color: #71808a;
+        margin-bottom: 10px;
+    }
+
+    .tracking-value {
+        font-size: 20px;
+        font-weight: 750;
+        overflow-wrap: anywhere;
+    }
+
+    .tracking-layout {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+    }
+
+    #trackingMap {
+        height: 480px;
+        width: 100%;
+        border-radius: 12px;
+        z-index: 1;
+    }
+
+    .map-card h3,
+    .stations-card h3 {
+        font-size: 19px;
+        font-weight: 750;
+        margin-bottom: 18px;
+    }
+
+    .station-row {
+        padding: 13px 0;
+        border-bottom: 1px solid #edf0f1;
+        font-size: 14px;
+    }
+
+        .station-row:last-child {
+            border-bottom: none;
+        }
+
+    .station-dot {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        background: #43d6be;
+        border-radius: 50%;
+        margin-right: 9px;
+    }
+
+    .tracking-message {
+        padding: 12px 15px;
+        border-radius: 10px;
+        background: #edf9f6;
+        color: #102f3b;
+        margin-bottom: 18px;
+    }
+
+    .tracking-btn {
+        display: inline-block;
+        background: #43d6be;
+        color: #102f3b;
+        padding: 10px 17px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    @@media (max-width: 850px) {
+        .tracking-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .tracking-layout {
+            grid-template-columns: 1fr;
+        }
+
+        #trackingMap {
+            height: 360px;
+        }
+    }
+</style>
+
+<div class="tracking-page">
+    <div class="tracking-header">
+        <div>
+            <h1>Track Your Train</h1>
+            <p class="tracking-subtitle">
+                @Model.RouteName
+            </p>
+        </div>
+
+        <a asp-area="Customer"
+           asp-controller="Tickets"
+           asp-action="Index"
+           class="tracking-btn">
+            Back to My Tickets
+        </a>
+    </div>
+
+    <div id="trackingMessage" class="tracking-message">
+        Connecting to train tracking...
+    </div>
+
+    <div class="tracking-grid">
+        <div class="tracking-card">
+            <div class="tracking-label">Next Station</div>
+            <div class="tracking-value" id="nextStation">Waiting...</div>
+        </div>
+
+        <div class="tracking-card">
+            <div class="tracking-label">Scheduled Arrival</div>
+            <div class="tracking-value" id="scheduledArrival">--</div>
+        </div>
+
+        <div class="tracking-card">
+            <div class="tracking-label">Estimated Speed</div>
+            <div class="tracking-value">
+                <span id="trainSpeed">0</span> km/h
+            </div>
+        </div>
+
+        <div class="tracking-card">
+            <div class="tracking-label">Trip Status</div>
+            <div class="tracking-value" id="tripStatus">
+                @Model.Status
+            </div>
+        </div>
+    </div>
+
+    <div class="tracking-layout">
+        <div class="tracking-card map-card">
+            <h3>Train Route</h3>
+            <div id="trackingMap"></div>
+            <p class="tracking-subtitle" style="margin-top: 12px">
+                Last update: <span id="lastUpdate">Waiting for update...</span>
+            </p>
+        </div>
+
+        <div class="tracking-card stations-card">
+            <h3>Stations on This Trip</h3>
+
+            <div id="stationList">
+                @foreach (var stop in Model.TripStops.OrderBy(s => s.StopOrder))
+                {
+                    if (stop.Station != null)
+                    {
+                        <div class="station-row">
+                            <span class="station-dot"></span>
+                            @stop.Station.StationName
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+
+<script>
+    const tripId = @Model.TripId;
+    const stations = @Html.Raw(stationsJson);
+
+    const trackingMessage = document.getElementById("trackingMessage");
+    const nextStationElement = document.getElementById("nextStation");
+    const arrivalElement = document.getElementById("scheduledArrival");
+    const speedElement = document.getElementById("trainSpeed");
+    const statusElement = document.getElementById("tripStatus");
+    const updateElement = document.getElementById("lastUpdate");
+
+    if (stations.length === 0) {
+        trackingMessage.textContent =
+            "No station coordinates are available for this trip.";
+    } else {
+        const map = L.map("trackingMap");
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap contributors"
+        }).addTo(map);
+
+        const routePoints = stations.map(s => [s.latitude, s.longitude]);
+
+        L.polyline(routePoints, {
+            color: "#168d81",
+            weight: 5
+        }).addTo(map);
+
+        stations.forEach(station => {
+            L.marker([station.latitude, station.longitude])
+                .addTo(map)
+                .bindPopup(station.name);
+        });
+
+        map.fitBounds(routePoints, { padding: [30, 30] });
+
+        const trainIcon = L.divIcon({
+            className: "",
+            html: '<div style="font-size:28px">🚆</div>',
+            iconSize: [34, 34],
+            iconAnchor: [17, 17]
+        });
+
+        let trainMarker = null;
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/tripTrackingHub")
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on("ReceiveLocation", function (data) {
+            if (data.tripId !== tripId) return;
+
+            const position = [data.latitude, data.longitude];
+
+            if (!trainMarker) {
+                trainMarker = L.marker(position, { icon: trainIcon })
+                    .addTo(map)
+                    .bindPopup("Estimated train position");
+            } else {
+                trainMarker.setLatLng(position);
+            }
+
+            speedElement.textContent =
+                Number(data.speed).toFixed(1);
+
+            nextStationElement.textContent =
+                data.nextStation || "Not available";
+
+            statusElement.textContent =
+                data.status || "Scheduled";
+
+            if (data.scheduledArrival) {
+                arrivalElement.textContent =
+                    new Date(data.scheduledArrival).toLocaleString();
+            }
+
+            if (data.recordedAt) {
+                updateElement.textContent =
+                    new Date(data.recordedAt).toLocaleTimeString();
+            }
+
+            if (data.status === "Completed") {
+                trackingMessage.textContent =
+                    "The train has reached its scheduled destination.";
+            } else {
+                trackingMessage.textContent =
+                    "Receiving simulated position updates based on the timetable.";
+            }
+        });
+
+        async function connectToTracking() {
+            try {
+                await connection.start();
+                await connection.invoke("JoinTrip", tripId);
+
+                trackingMessage.textContent =
+                    "Connected. Waiting for the next position update...";
+            } catch (error) {
+                console.error(error);
+                trackingMessage.textContent =
+                    "Could not connect to tracking. Refresh the page to try again.";
+            }
+        }
+
+        connection.onreconnected(async function () {
+            try {
+                await connection.invoke("JoinTrip", tripId);
+            } catch (error) {
+                console.error(error);
+            }
+        });
+
+        connectToTracking();
+    }
+</script>
