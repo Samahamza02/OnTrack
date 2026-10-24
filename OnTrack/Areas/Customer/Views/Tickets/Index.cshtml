@@ -2,187 +2,534 @@
 
 @{
     ViewData["Title"] = "My Tickets";
+
+    var totalTickets = ViewBag.TotalTickets ?? 0;
+    var pendingPayment = ViewBag.PendingPayment ?? 0;
+    var confirmedTickets = ViewBag.ConfirmedTickets ?? 0;
+    var selectedStatus = ViewBag.SelectedStatus as string ?? "";
+    var search = ViewBag.Search as string ?? "";
 }
 
 <style>
-    .ticket-page {
-        background: #f2f6f5;
+    .ct-page {
+        background: #f2f6f6;
+        color: #153746;
+        padding: 28px;
+        border-radius: 20px;
         min-height: 80vh;
-        padding: 35px;
-        border-radius: 18px;
-        color: #183744;
+        font-family: Arial, sans-serif;
     }
 
-        .ticket-page h1 {
-            color: #102f3b;
-            font-size: 32px;
+    .ct-hero {
+        background: linear-gradient(115deg, #10313f, #1b4858);
+        color: white;
+        padding: 36px;
+        border-radius: 24px;
+        margin-bottom: 22px;
+    }
+
+    .ct-eyebrow {
+        color: #43d6be;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .ct-hero h1 {
+        color: white;
+        font-size: clamp(26px, 4vw, 38px);
+        font-weight: 800;
+        margin: 10px 0 6px;
+    }
+
+    .ct-hero p {
+        color: #e0e9ec;
+        margin: 0;
+        line-height: 1.7;
+    }
+
+    .ct-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 22px;
+    }
+
+    .ct-stat {
+        background: white;
+        border: 1px solid #e3ebeb;
+        border-radius: 18px;
+        padding: 21px 24px;
+        box-shadow: 0 8px 24px #15374608;
+    }
+
+        .ct-stat span {
+            display: block;
+            color: #71858e;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .ct-stat strong {
+            color: #10313f;
+            font-size: 29px;
             font-weight: 800;
         }
 
-    .ticket-subtitle {
-        color: #788990;
-        margin-bottom: 28px;
-    }
-
-    .ticket-card {
+    .ct-main {
         background: white;
-        border: 1px solid #e3ebe9;
-        border-radius: 18px;
-        padding: 24px;
-        box-shadow: 0 8px 28px #102f3b0c;
+        border: 1px solid #e2ebeb;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 10px 28px #15374608;
     }
 
-    .ticket-table {
-        width: 100%;
-        border-collapse: collapse;
-        background: white;
+    .ct-main-heading {
+        padding: 23px 26px 17px;
+        border-bottom: 1px solid #e8eeee;
     }
 
-        .ticket-table th {
-            background: #102f3b;
-            color: white;
-            padding: 15px 12px;
-            text-align: left;
-            white-space: nowrap;
+        .ct-main-heading h2 {
+            color: #153746;
+            font-size: 22px;
+            font-weight: 800;
+            margin: 0 0 5px;
         }
 
-        .ticket-table td {
-            padding: 15px 12px;
-            border-bottom: 1px solid #e8efed;
-            vertical-align: middle;
+        .ct-main-heading p {
+            color: #71858e;
+            font-size: 13px;
+            margin: 0;
         }
 
-        .ticket-table tr:hover td {
-            background: #f0fbf8;
-        }
+    .ct-filter {
+        display: grid;
+        grid-template-columns: 175px minmax(180px, 1fr) auto auto;
+        gap: 12px;
+        align-items: end;
+        padding: 18px 26px;
+        border-bottom: 1px solid #e8eeee;
+    }
 
-    .ticket-pill {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 30px;
-        background: #dff8f1;
-        color: #087b6d;
+    .ct-field label {
+        display: block;
         font-size: 12px;
         font-weight: 700;
+        color: #385563;
+        margin-bottom: 8px;
     }
 
-    .ticket-btn {
-        display: inline-block;
-        padding: 9px 14px;
-        border-radius: 9px;
-        background: #102f3b;
-        color: white !important;
-        text-decoration: none;
-        font-weight: 700;
-        font-size: 13px;
+    .ct-input {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 44px;
+        padding: 10px 13px;
+        border: 1px solid #dce6e7;
+        border-radius: 11px;
+        background: white;
+        color: #153746;
+        font-size: 14px;
     }
 
-        .ticket-btn:hover {
-            background: #43d6be;
-            color: #102f3b !important;
+        .ct-input:focus {
+            outline: 2px solid #43d6be;
+            border-color: #43d6be;
         }
 
-    .ticket-empty {
-        padding: 35px !important;
-        text-align: center;
-        color: #788990;
+    .ct-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        min-height: 42px;
+        box-sizing: border-box;
+        padding: 10px 15px;
+        border: 0;
+        border-radius: 10px;
+        background: #10313f;
+        color: white !important;
+        text-decoration: none !important;
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+        cursor: pointer;
     }
 
-    @@media(max-width:768px) {
-        .ticket-page {
+        .ct-btn:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+        }
+
+    .ct-btn-teal {
+        background: #43d6be;
+        color: #10313f !important;
+    }
+
+    .ct-btn-light {
+        background: #eaf0f1;
+        color: #153746 !important;
+    }
+
+    .ct-btn-red {
+        background: #ffebea;
+        color: #bd3939 !important;
+    }
+
+    .ct-btn-purple {
+        background: #e7edff;
+        color: #3454ae !important;
+    }
+
+    .ct-list {
+        background: #f4f8f8;
+        padding: 20px;
+    }
+
+    .ct-ticket {
+        display: flex;
+        justify-content: space-between;
+        gap: 22px;
+        align-items: center;
+        background: white;
+        border: 1px solid #e2ebeb;
+        border-radius: 18px;
+        padding: 23px;
+        margin-bottom: 15px;
+    }
+
+        .ct-ticket:last-child {
+            margin-bottom: 0;
+        }
+
+    .ct-ticket-info {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .ct-ticket-number {
+        color: #138c80;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        margin-bottom: 6px;
+    }
+
+    .ct-route {
+        color: #10313f;
+        font-size: 22px;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+        margin-bottom: 10px;
+    }
+
+    .ct-arrow {
+        color: #24bfa9;
+    }
+
+    .ct-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+    }
+
+    .ct-tag {
+        display: inline-block;
+        padding: 6px 11px;
+        background: #edf3f3;
+        color: #45616d;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .ct-ticket-right {
+        min-width: 120px;
+        text-align: right;
+    }
+
+    .ct-status {
+        display: inline-block;
+        border-radius: 30px;
+        padding: 6px 11px;
+        font-size: 11px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .ct-status-pending {
+        background: #fff3db;
+        color: #a66a00;
+    }
+
+    .ct-status-confirmed {
+        background: #d9faf2;
+        color: #07816f;
+    }
+
+    .ct-status-completed {
+        background: #e7edff;
+        color: #3454ae;
+    }
+
+    .ct-status-cancelled {
+        background: #ffebea;
+        color: #bd3939;
+    }
+
+    .ct-status-other {
+        background: #edf0f2;
+        color: #52666e;
+    }
+
+    .ct-price {
+        color: #10313f;
+        font-size: 25px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .ct-currency {
+        color: #71858e;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .ct-ticket-footer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        border-top: 1px solid #edf1f1;
+        margin-top: 16px;
+        padding-top: 14px;
+    }
+
+    .ct-empty {
+        background: white;
+        padding: 45px 20px;
+        text-align: center;
+        border-radius: 15px;
+        color: #71858e;
+    }
+
+        .ct-empty h3 {
+            color: #10313f;
+            margin-bottom: 8px;
+        }
+
+    @@media (max-width: 800px) {
+        .ct-page {
+            padding: 14px;
+        }
+
+        .ct-hero {
+            padding: 25px 20px;
+        }
+
+        .ct-stats {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .ct-stat {
+            padding: 16px 20px;
+        }
+
+        .ct-filter {
+            grid-template-columns: 1fr;
+            padding: 17px;
+        }
+
+        .ct-ticket {
+            align-items: flex-start;
+            flex-direction: column;
             padding: 18px;
         }
 
-        .ticket-card {
-            padding: 12px;
+        .ct-ticket-right {
+            text-align: left;
         }
 
-        .ticket-table {
-            min-width: 750px;
+        .ct-route {
+            font-size: 20px;
+        }
+
+        .ct-list {
+            padding: 12px;
         }
     }
 </style>
 
-<div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:25px;">
-    <a asp-area="Admin"
-       asp-controller="Trips"
-       asp-action="Index"
-       style="display:inline-block; padding:13px 20px; border-radius:10px;
-        background:#43d6be; color:#102f3b; text-decoration:none;
-        font-weight:800;">
-        + Explore Available Trips
-    </a>
+<div class="ct-page">
 
-    <a asp-area="Customer"
-       asp-controller="Tickets"
-       asp-action="Index"
-       style="display:inline-block; padding:13px 20px; border-radius:10px;
-        background:#102f3b; color:white; text-decoration:none;
-        font-weight:700;">
-        My Tickets
-    </a>
-</div>
-<div class="ticket-page">
-    <h1>My Tickets</h1>
-    <p class="ticket-subtitle">Your journeys, all in one place.</p>
+    <section class="ct-hero">
+        <div class="ct-eyebrow">OnTrack Railways</div>
+        <h1>Your journeys, all in one place.</h1>
+        <p>Track your bookings, pay for pending tickets and rate your completed trips.</p>
+    </section>
 
-    <div class="ticket-card">
-        <div style="overflow-x:auto">
-            <table class="ticket-table">
-                <thead>
-                    <tr>
-                        <th>Ticket</th>
-                        <th>Trip</th>
-                        <th>Seat</th>
-                        <th>Booking Date</th>
-                        <th>Price</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.Any())
-                    {
-                        @foreach (var ticket in Model)
-                        {
-                            <tr>
-                                <td><strong>#@ticket.TicketId</strong></td>
-                                <td>@ticket.TripId</td>
-                                <td>@ticket.SeatNumber</td>
-                                <td>@ticket.BookingDate.ToString("dd MMM yyyy")</td>
-                                <td>@ticket.Price.ToString("N2")</td>
-                                <td><span class="ticket-pill">@ticket.Status</span></td>
-                                
-<td>
-    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <a class="ticket-btn"
-           asp-area="Customer"
-           asp-controller="Tickets"
-           asp-action="Details"
-           asp-route-id="@ticket.TicketId">
-            View
-        </a>
-
-        <a class="ticket-btn"
-           asp-area="Customer"
-           asp-controller="Tracking"
-           asp-action="Track"
-           asp-route-id="@ticket.TripId"
-           style="background:#43d6be; color:#102f3b !important;">
-            Track Train
-        </a>
-    </div>
-</td>
-
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr><td colspan="7" class="ticket-empty">You don't have any tickets yet.</td></tr>
-                    }
-                </tbody>
-            </table>
+    <section class="ct-stats">
+        <div class="ct-stat">
+            <span>Total tickets</span>
+            <strong>@totalTickets</strong>
         </div>
-    </div>
+        <div class="ct-stat">
+            <span>Pending payment</span>
+            <strong>@pendingPayment</strong>
+        </div>
+        <div class="ct-stat">
+            <span>Confirmed</span>
+            <strong>@confirmedTickets</strong>
+        </div>
+    </section>
+
+    <section class="ct-main">
+        <div class="ct-main-heading">
+            <h2>My Tickets</h2>
+            <p>Check your trip details, seat numbers and ticket prices.</p>
+        </div>
+
+        <form method="get"
+              asp-area="Customer"
+              asp-controller="Tickets"
+              asp-action="Index"
+              class="ct-filter">
+
+            <div class="ct-field">
+                <label for="status">Ticket status</label>
+                <select id="status" name="status" class="ct-input">
+                    <option value="" selected="@(selectedStatus == "")">All statuses</option>
+                    <option value="Pending" selected="@(selectedStatus == "Pending")">Pending payment</option>
+                    <option value="Confirmed" selected="@(selectedStatus == "Confirmed")">Confirmed</option>
+                    <option value="Completed" selected="@(selectedStatus == "Completed")">Completed</option>
+                    <option value="Cancelled" selected="@(selectedStatus == "Cancelled")">Cancelled</option>
+                </select>
+            </div>
+
+            <div class="ct-field">
+                <label for="search">Ticket, trip, station ID or seat</label>
+                <input id="search"
+                       name="search"
+                       value="@search"
+                       class="ct-input"
+                       placeholder="e.g. 12A, 5, 2..." />
+            </div>
+
+            <button type="submit" class="ct-btn ct-btn-teal">Search tickets</button>
+
+            <a asp-area="Customer"
+               asp-controller="Tickets"
+               asp-action="Index"
+               class="ct-btn ct-btn-light">Clear</a>
+        </form>
+
+        <div class="ct-list">
+            @if (Model.Any())
+            {
+                @foreach (var ticket in Model)
+                {
+                    var currentStatus = (ticket.Status ?? "").Trim();
+                    var normalizedStatus = currentStatus.ToLowerInvariant();
+
+                    var isPending = normalizedStatus == "pending"
+                        || normalizedStatus == "pending payment";
+
+                    var isConfirmed = normalizedStatus == "confirmed";
+                    var isCompleted = normalizedStatus == "completed";
+                    var isCancelled = normalizedStatus == "cancelled"
+                        || normalizedStatus == "canceled";
+
+                    var statusClass = isPending ? "ct-status-pending"
+                        : isConfirmed ? "ct-status-confirmed"
+                        : isCompleted ? "ct-status-completed"
+                        : isCancelled ? "ct-status-cancelled"
+                        : "ct-status-other";
+
+                    <article class="ct-ticket">
+                        <div class="ct-ticket-info">
+                            <div class="ct-ticket-number">
+                                TICKET #@ticket.TicketId
+                            </div>
+
+                            <div class="ct-route">
+                                Station @ticket.FromStationId
+                                <span class="ct-arrow">→</span>
+                                Station @ticket.ToStationId
+                            </div>
+
+                            <div class="ct-tags">
+                                <span class="ct-tag">🚆 Trip @ticket.TripId</span>
+                                <span class="ct-tag">📅 @ticket.BookingDate.ToString("dd MMM yyyy")</span>
+                                <span class="ct-tag">💺 Seat @ticket.SeatNumber</span>
+                            </div>
+
+                            <div class="ct-ticket-footer">
+                                <a asp-area="Customer"
+                                   asp-controller="Tickets"
+                                   asp-action="Details"
+                                   asp-route-id="@ticket.TicketId"
+                                   class="ct-btn">View details</a>
+
+                                @if (isPending)
+                                {
+                                    <a asp-area="Customer"
+                                       asp-controller="Payments"
+                                       asp-action="Create"
+                                       asp-route-ticketId="@ticket.TicketId"
+                                       class="ct-btn ct-btn-teal">Pay now →</a>
+                                }
+
+                                @if (isConfirmed || isPending)
+                                {
+                                    <a asp-area="Customer"
+                                       asp-controller="Tickets"
+                                       asp-action="Cancel"
+                                       asp-route-id="@ticket.TicketId"
+                                       class="ct-btn ct-btn-red">Cancel ticket</a>
+                                }
+
+                                @if (isCompleted)
+                                {
+                                    <a asp-area="Customer"
+                                       asp-controller="Evaluations"
+                                       asp-action="Create"
+                                       asp-route-ticketId="@ticket.TicketId"
+                                       class="ct-btn ct-btn-teal">★ Rate trip</a>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="ct-ticket-right">
+                            <div>
+                                <span class="ct-status @statusClass">
+                                    @(string.IsNullOrWhiteSpace(currentStatus) ? "Unknown" : currentStatus)
+                                </span>
+                            </div>
+
+                            <div class="ct-price">
+                                @ticket.Price.ToString("N2")
+                                <span class="ct-currency">EGP</span>
+                            </div>
+                        </div>
+                    </article>
+                }
+            }
+            else
+            {
+                <div class="ct-empty">
+                    <h3>No tickets found</h3>
+                    <p>Try changing your search or status filter.</p>
+                    <a asp-area="Customer"
+                       asp-controller="Tickets"
+                       asp-action="Index"
+                       class="ct-btn ct-btn-teal">Show all tickets</a>
+                    <a asp-area="Customer"
+                       asp-controller="Trips"
+                       asp-action="Index"
+                       class="ct-btn">Explore trips</a>
+                </div>
+            }
+        </div>
+    </section>
 </div>

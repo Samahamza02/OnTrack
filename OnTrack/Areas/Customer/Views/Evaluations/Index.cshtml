@@ -1,194 +1,456 @@
-﻿@model IEnumerable<OnTrack.Models.Evaluation>
+﻿@model OnTrack.Controllers.EvaluationDashboardViewModel
 
 @{
-    ViewData["Title"] = "Evaluations";
+    ViewData["Title"] = "My Evaluations";
 }
 
 <style>
-    .ontrack-page {
-        background: #f2f5f6;
+    .evaluation-page {
+        background: #f2f6f7;
         min-height: 100vh;
-        padding: 30px;
-        color: #173440;
-        font-family: Arial, sans-serif;
+        padding: 30px 0;
+        color: #123747;
     }
 
-    .ontrack-header {
-        background: linear-gradient(135deg, #10313d, #174b56);
+    .evaluation-container {
+        width: 94%;
+        max-width: 1400px;
+        margin: auto;
+    }
+
+    .evaluation-hero {
+        background: linear-gradient(110deg, #103342, #1b4b5b);
         color: white;
-        padding: 30px;
-        border-radius: 18px;
-        margin-bottom: 25px;
+        padding: 36px 40px;
+        border-radius: 24px;
+        margin-bottom: 20px;
     }
 
-    .ontrack-brand {
-        color: #43d3be;
-        font-weight: bold;
-        letter-spacing: 2px;
-        font-size: 13px;
+    .evaluation-eyebrow {
+        color: #37d7c0;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 3px;
     }
 
-    .ontrack-header h1 {
-        margin-top: 18px;
-        font-size: 32px;
-        font-weight: bold;
+    .evaluation-hero h1 {
+        font-size: 38px;
+        font-weight: 800;
+        margin: 8px 0 4px;
     }
 
-    .ontrack-header p {
-        color: #d0dee2;
-        margin-bottom: 0;
+    .evaluation-hero p {
+        color: #e1edf1;
+        margin: 0;
     }
 
-    .ontrack-card {
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
         background: white;
-        border-radius: 16px;
-        padding: 25px;
-        box-shadow: 0 5px 20px rgba(16, 49, 61, 0.06);
+        padding: 22px 24px;
+        border: 1px solid #e3ebed;
+        border-radius: 18px;
+        box-shadow: 0 6px 20px rgba(16, 51, 66, .04);
     }
 
-    .ontrack-table-wrapper {
-        overflow-x: auto;
-    }
-
-    .ontrack-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-
-        .ontrack-table th {
-            background: #edf4f5;
-            color: #31515b;
-            font-size: 12px;
-            text-transform: uppercase;
-            padding: 15px 12px;
-            text-align: left;
-            white-space: nowrap;
-        }
-
-        .ontrack-table td {
-            padding: 16px 12px;
-            border-bottom: 1px solid #edf0f1;
-            color: #425761;
-            font-size: 14px;
-            vertical-align: middle;
-        }
-
-        .ontrack-table tbody tr:hover {
-            background: #f7fbfb;
-        }
-
-    .rating-badge {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 20px;
-        background: #e4f7f3;
-        color: #168777;
-        font-weight: bold;
-        white-space: nowrap;
-    }
-
-    .ontrack-count {
-        color: #71828a;
+    .stat-label {
+        color: #728591;
         font-size: 14px;
     }
 
-    .ontrack-empty {
-        text-align: center;
-        padding: 35px;
-        color: #71828a;
+    .stat-number {
+        font-size: 30px;
+        font-weight: 800;
+        margin-top: 4px;
+        color: #103342;
     }
 
-    @@media (max-width: 768px) {
-        .ontrack-page {
-            padding: 15px;
+    .evaluation-panel {
+        background: white;
+        border: 1px solid #e3ebed;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(16, 51, 66, .05);
+    }
+
+    .panel-heading {
+        padding: 22px 28px 16px;
+        border-bottom: 1px solid #edf1f2;
+    }
+
+        .panel-heading h2 {
+            font-size: 23px;
+            font-weight: 800;
+            margin: 0 0 4px;
         }
 
-        .ontrack-header {
-            padding: 22px;
+        .panel-heading p {
+            color: #728591;
+            margin: 0;
+            font-size: 14px;
         }
 
-            .ontrack-header h1 {
-                font-size: 26px;
+    .filter-area {
+        padding: 18px 28px;
+        display: flex;
+        align-items: end;
+        gap: 12px;
+        border-bottom: 1px solid #edf1f2;
+        flex-wrap: wrap;
+    }
+
+    .filter-field {
+        flex: 1;
+        min-width: 150px;
+    }
+
+        .filter-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .filter-field input,
+        .filter-field select {
+            width: 100%;
+            height: 44px;
+            padding: 0 13px;
+            border: 1px solid #dce6e9;
+            border-radius: 11px;
+            background: white;
+            color: #123747;
+        }
+
+    .btn-dashboard {
+        min-height: 42px;
+        border: 0;
+        border-radius: 11px;
+        padding: 10px 17px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+    }
+
+    .btn-search {
+        background: #38d3bd;
+        color: #103342;
+    }
+
+    .btn-clear {
+        background: #edf2f3;
+        color: #123747;
+    }
+
+    .btn-delete {
+        background: #fde8e7;
+        color: #c62828;
+    }
+
+    .reviews-area {
+        background: #f6f9f9;
+        padding: 20px 22px;
+    }
+
+    .review-card {
+        background: white;
+        border: 1px solid #e2ebed;
+        border-radius: 17px;
+        padding: 22px 24px;
+        margin-bottom: 15px;
+    }
+
+        .review-card:last-child {
+            margin-bottom: 0;
+        }
+
+    .review-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .review-ticket {
+        color: #078b8b;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .review-route {
+        font-size: 20px;
+        font-weight: 800;
+        margin: 5px 0;
+        color: #103342;
+    }
+
+    .review-stars {
+        color: #efa52b;
+        font-size: 20px;
+        letter-spacing: 1px;
+    }
+
+    .empty-star {
+        color: #dce5e8;
+    }
+
+    .rating-pill {
+        background: #d9faf4;
+        color: #008b80;
+        border-radius: 30px;
+        padding: 5px 12px;
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .rating-low {
+        background: #fde8e7;
+        color: #c62828;
+    }
+
+    .review-comment {
+        color: #355366;
+        margin: 12px 0 18px;
+        overflow-wrap: anywhere;
+    }
+
+    .review-footer {
+        border-top: 1px solid #edf1f2;
+        padding-top: 15px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .empty-state {
+        background: white;
+        border: 1px dashed #cfdddf;
+        border-radius: 16px;
+        padding: 40px 20px;
+        text-align: center;
+        color: #728591;
+    }
+
+        .empty-state h3 {
+            color: #103342;
+            font-weight: 800;
+        }
+
+    @@media (max-width: 700px) {
+        .evaluation-page {
+            padding: 16px 0;
+        }
+
+        .evaluation-container {
+            width: 95%;
+        }
+
+        .evaluation-hero {
+            padding: 26px 22px;
+            border-radius: 18px;
+        }
+
+            .evaluation-hero h1 {
+                font-size: 29px;
             }
 
-        .ontrack-card {
-            padding: 15px;
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-area {
+            padding: 16px;
+        }
+
+        .panel-heading {
+            padding: 20px 18px;
+        }
+
+        .reviews-area {
+            padding: 12px;
+        }
+
+        .review-card {
+            padding: 17px;
         }
     }
 </style>
 
-<div class="ontrack-page">
+<div class="evaluation-page">
+    <div class="evaluation-container">
 
-    <div class="ontrack-header">
-        <div class="ontrack-brand">
-            ONTRACK · TRAIN TRIPS TRACKING
-        </div>
+        <section class="evaluation-hero">
+            <div class="evaluation-eyebrow">YOUR FEEDBACK</div>
+            <h1>How was your journey?</h1>
+            <p>
+                Your ratings help OnTrack improve every trip.
+                Review and manage what you have shared.
+            </p>
+        </section>
 
-        <h1>Evaluations</h1>
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total reviews</div>
+                <div class="stat-number">@Model.TotalReviews</div>
+            </div>
 
-        <p>Review passenger ratings and feedback.</p>
-    </div>
+            <div class="stat-card">
+                <div class="stat-label">Average rating</div>
+                <div class="stat-number">
+                    @Model.AverageRating.ToString("0.0")
+                    <span style="font-size:14px;color:#728591">/ 5</span>
+                </div>
+            </div>
 
-    <div class="ontrack-card">
+            <div class="stat-card">
+                <div class="stat-label">5-star reviews</div>
+                <div class="stat-number">@Model.FiveStarReviews</div>
+            </div>
+        </section>
 
-        <h4>Evaluation Records</h4>
+        <section class="evaluation-panel">
+            <div class="panel-heading">
+                <h2>My Evaluations</h2>
+                <p>
+                    Review your completed journeys and manage your feedback.
+                </p>
+            </div>
 
-        <p class="ontrack-count">
-            View ratings and comments submitted for tickets.
-        </p>
+            <form asp-controller="Evaluations"
+                  asp-action="Index"
+                  method="get"
+                  class="filter-area">
 
-        <div class="ontrack-table-wrapper">
-            <table class="ontrack-table">
-                <thead>
-                    <tr>
-                        <th>Evaluation ID</th>
-                        <th>Ticket ID</th>
-                        <th>Rating</th>
-                        <th>Comment</th>
-                        <th>Created At</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @if (Model != null && Model.Any())
-                    {
-                        foreach (var evaluation in Model)
+                <div class="filter-field" style="max-width:180px">
+                    <label for="rating">Rating</label>
+                    <select id="rating" name="rating">
+                        <option value="">All ratings</option>
+                        @for (int i = 5; i >= 1; i--)
                         {
-                            <tr>
-                                <td>#@evaluation.EvaluationId</td>
-                                <td>#@evaluation.TicketId</td>
-
-                                <td>
-                                    <span class="rating-badge">
-                                        @evaluation.rating / 5
-                                    </span>
-                                </td>
-
-                                <td>
-                                    @(string.IsNullOrWhiteSpace(evaluation.comment)
-                                        ? "No comment"
-                                        : evaluation.comment)
-                                </td>
-
-                                <td>
-                                    @evaluation.CreatedAt.ToString("dd/MM/yyyy HH:mm")
-                                </td>
-                            </tr>
+                            if (Model.SelectedRating == i)
+                            {
+                                <option value="@i" selected>
+                                    @i stars
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@i">@i stars</option>
+                            }
                         }
-                    }
-                    else
+                    </select>
+                </div>
+
+                <div class="filter-field">
+                    <label for="search">Comment or ticket</label>
+                    <input id="search"
+                           name="search"
+                           type="text"
+                           value="@Model.Search"
+                           placeholder="e.g. comfortable, ticket 103..." />
+                </div>
+
+                <button type="submit"
+                        class="btn-dashboard btn-search">
+                    Search reviews
+                </button>
+
+                <a asp-action="Index"
+                   class="btn-dashboard btn-clear">
+                    Clear
+                </a>
+            </form>
+
+            <div class="reviews-area">
+                @if (Model.Evaluations.Any())
+                {
+                    @foreach (var item in Model.Evaluations)
                     {
-                        <tr>
-                            <td colspan="5" class="ontrack-empty">
-                                No evaluations found.
-                            </td>
-                        </tr>
+                        <article class="review-card">
+                            <div class="review-top">
+                                <div>
+                                    <div class="review-ticket">
+                                        TICKET #@item.TicketId
+                                        · @item.CreatedAt.ToString("dd MMM yyyy")
+                                    </div>
+
+                                    <div class="review-route">
+                                        Station @item.Ticket.FromStationId
+                                        → Station @item.Ticket.ToStationId
+                                    </div>
+
+                                    <div class="review-stars"
+                                         aria-label="@item.rating out of 5 stars">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= item.rating)
+                                            {
+                                                <span>★</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="empty-star">★</span>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+
+                                <span class="rating-pill @(item.rating <= 2 ? "rating-low" : "")">
+                                    @item.rating / 5
+                                </span>
+                            </div>
+
+                            <p class="review-comment">
+                                @(string.IsNullOrWhiteSpace(item.comment)
+                                    ? "No comment added."
+                                    : "“" + item.comment + "”")
+                            </p>
+
+                            <div class="review-footer">
+                                <form asp-action="Delete"
+                                      asp-route-id="@item.EvaluationId"
+                                      method="post"
+                                      onsubmit="return confirm('Are you sure you want to delete this evaluation?');">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="btn-dashboard btn-delete">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </article>
                     }
-                </tbody>
-            </table>
-        </div>
-
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <h3>No evaluations found</h3>
+                        <p>
+                            You have no reviews matching your search.
+                            Try changing the filter or clearing the search.
+                        </p>
+                        <a asp-action="Index"
+                           class="btn-dashboard btn-search">
+                            Show all reviews
+                        </a>
+                    </div>
+                }
+            </div>
+        </section>
     </div>
-
 </div>
