@@ -11,11 +11,11 @@ namespace OnTrack.Models
         public bool IsRead { get; set; }
 
         [ForeignKey(nameof(ApplicationUser))]
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
 
         [ForeignKey(nameof(Trip))]
         public int? TripId { get; set; }
-        public ApplicationUser User { get; set; }
+        public ApplicationUser? User { get; set; } 
 
         public Trip? Trip { get; set; }
     }

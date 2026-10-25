@@ -1,4 +1,5 @@
-﻿@using System.Text.Json
+﻿
+@using System.Text.Json
 @model OnTrack.ViewModels.DashboardViewModel
 
 @{
@@ -96,6 +97,7 @@
     <!-- Statistics -->
     <section class="ot-stats-grid">
 
+        <!-- Users Card -->
         <article class="ot-stat-card ot-users-card">
             <div class="ot-stat-top">
                 <div class="ot-stat-icon ot-users-icon">
@@ -105,6 +107,7 @@
                         <path d="M16 4.8a3.5 3.5 0 0 1 0 6.5M18 13.5a5.5 5.5 0 0 1 3.5 5V20h-4" />
                     </svg>
                 </div>
+
                 <span class="ot-stat-index">01</span>
             </div>
 
@@ -127,7 +130,7 @@
             </div>
         </article>
 
-
+        <!-- Other Statistics Cards -->
         @for (var i = 0; i < Model.Statistics.Count; i++)
         {
             var statistic = Model.Statistics[i];
@@ -143,29 +146,41 @@
                                     <path d="M5 12h14M8 7h8M8 16h1m6 0h1M3 22l4-3m14 3-4-3" />
                                 </svg>
                                 break;
+
                             case "Tickets":
                                 <svg viewBox="0 0 24 24" aria-hidden="true">
                                     <path d="M4 5h16v5a2 2 0 0 0 0 4v5H4v-5a2 2 0 0 0 0-4Z" />
                                     <path d="M14 8v2m0 4v2" />
                                 </svg>
                                 break;
+
                             case "Trains":
                                 <svg viewBox="0 0 24 24" aria-hidden="true">
                                     <rect x="5" y="2" width="14" height="17" rx="4" />
                                     <path d="M8 6h8v5H8Zm-3 4h14M8 15h.01M16 15h.01M8 22l2-3m6 3-2-3" />
                                 </svg>
                                 break;
+
                             case "Stations":
                                 <svg viewBox="0 0 24 24" aria-hidden="true">
                                     <path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-7h6v7M9 9h.01M15 9h.01" />
                                 </svg>
                                 break;
+
                             case "Payments":
                                 <svg viewBox="0 0 24 24" aria-hidden="true">
                                     <rect x="3" y="5" width="18" height="14" rx="3" />
                                     <path d="M3 10h18M7 15h4" />
                                 </svg>
                                 break;
+
+                            case "Notifications":
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+                                    <path d="M10 21h4" />
+                                </svg>
+                                break;
+
                             default:
                                 <svg viewBox="0 0 24 24" aria-hidden="true">
                                     <ellipse cx="12" cy="5" rx="8" ry="3" />
@@ -187,21 +202,34 @@
                     <span class="ot-stat-marker"></span>
                     Total @statistic.Name.ToLowerInvariant()
                 </div>
+
                 @if (statistic.Name == "Stations")
-{
-    <div class="ot-users-action">
-        <a asp-area="Admin"
-           asp-controller="Stations"
-           asp-action="Index"
-           class="ot-view-users-link">
-            View Stations
-            <span aria-hidden="true">&rarr;</span>
-        </a>
-    </div>
-}
+                {
+                    <div class="ot-users-action">
+                        <a asp-area="Admin"
+                           asp-controller="Stations"
+                           asp-action="Index"
+                           class="ot-view-users-link">
+                            View Stations
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
+                    </div>
+                }
+
+                @if (statistic.Name == "Notifications")
+                {
+                    <div class="ot-users-action">
+                        <a asp-area="Admin"
+                           asp-controller="Notifications"
+                           asp-action="Index"
+                           class="ot-view-users-link">
+                            View Notifications
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
+                    </div>
+                }
             </article>
         }
-
     </section>
 
     <!-- Analytics -->
@@ -222,6 +250,7 @@
                         <h3>Records by entity</h3>
                         <p>Compare the number of records in each category.</p>
                     </div>
+
                     <span class="ot-chart-tag">OVERVIEW</span>
                 </div>
 
@@ -272,157 +301,157 @@
 
     <script>
         (() => {
-        const labels = @Html.Raw(jsonLabels);
-        const counts = @Html.Raw(jsonCounts);
+            const labels = @Html.Raw(jsonLabels);
+            const counts = @Html.Raw(jsonCounts);
 
-        if (typeof Chart === 'undefined') {
-        return;
-        }
+            if (typeof Chart === 'undefined') {
+                return;
+            }
 
-        const colors = [
-        '#42D6BD',
-        '#142C3C',
-        '#FFB36B',
-        '#6D91B7',
-        '#9CD9CE',
-        '#D58E91',
-        '#B6A3D7',
-        '#D6C66F',
-        '#80A5AC'
-        ];
+            const colors = [
+                '#42D6BD',
+                '#142C3C',
+                '#FFB36B',
+                '#6D91B7',
+                '#9CD9CE',
+                '#D58E91',
+                '#B6A3D7',
+                '#D6C66F',
+                '#80A5AC'
+            ];
 
-        const commonScales = {
-        x: {
-        grid: { display: false },
-        border: { display: false },
-        ticks: {
-        color: '#74838B',
-        font: { size: 11 }
-        }
-        },
-        y: {
-        beginAtZero: true,
-        border: { display: false, dash: [4, 4] },
-        grid: { color: '#EDF1F2' },
-        ticks: {
-        precision: 0,
-        color: '#74838B',
-        font: { size: 11 },
-        padding: 10
-        }
-        }
-        };
+            const commonScales = {
+                x: {
+                    grid: { display: false },
+                    border: { display: false },
+                    ticks: {
+                        color: '#74838B',
+                        font: { size: 11 }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    border: { display: false, dash: [4, 4] },
+                    grid: { color: '#EDF1F2' },
+                    ticks: {
+                        precision: 0,
+                        color: '#74838B',
+                        font: { size: 11 },
+                        padding: 10
+                    }
+                }
+            };
 
-        const barCanvas = document.getElementById('recordsBarChart');
+            const barCanvas = document.getElementById('recordsBarChart');
 
-        if (barCanvas) {
-        new Chart(barCanvas, {
-        type: 'bar',
-        data: {
-        labels,
-        datasets: [{
-        label: 'Records',
-        data: counts,
-        backgroundColor: colors,
-        borderRadius: 6,
-        borderSkipped: false,
-        maxBarThickness: 42
-        }]
-        },
-        options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-        legend: { display: false },
-        tooltip: {
-        backgroundColor: '#142C3C',
-        padding: 12,
-        displayColors: false
-        }
-        },
-        scales: commonScales
-        }
-        });
-        }
+            if (barCanvas) {
+                new Chart(barCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Records',
+                            data: counts,
+                            backgroundColor: colors,
+                            borderRadius: 6,
+                            borderSkipped: false,
+                            maxBarThickness: 42
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#142C3C',
+                                padding: 12,
+                                displayColors: false
+                            }
+                        },
+                        scales: commonScales
+                    }
+                });
+            }
 
-        const doughnutCanvas =
-        document.getElementById('recordsDoughnutChart');
+            const doughnutCanvas =
+                document.getElementById('recordsDoughnutChart');
 
-        if (doughnutCanvas) {
-        new Chart(doughnutCanvas, {
-        type: 'doughnut',
-        data: {
-        labels,
-        datasets: [{
-        data: counts,
-        backgroundColor: colors,
-        borderColor: '#FFFFFF',
-        borderWidth: 4,
-        hoverOffset: 7
-        }]
-        },
-        options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '70%',
-        plugins: {
-        legend: {
-        position: 'bottom',
-        labels: {
-        color: '#536670',
-        padding: 14,
-        usePointStyle: true,
-        pointStyle: 'circle',
-        boxWidth: 8,
-        font: { size: 11 }
-        }
-        },
-        tooltip: {
-        backgroundColor: '#142C3C',
-        padding: 12
-        }
-        }
-        }
-        });
-        }
+            if (doughnutCanvas) {
+                new Chart(doughnutCanvas, {
+                    type: 'doughnut',
+                    data: {
+                        labels,
+                        datasets: [{
+                            data: counts,
+                            backgroundColor: colors,
+                            borderColor: '#FFFFFF',
+                            borderWidth: 4,
+                            hoverOffset: 7
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#536670',
+                                    padding: 14,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle',
+                                    boxWidth: 8,
+                                    font: { size: 11 }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: '#142C3C',
+                                padding: 12
+                            }
+                        }
+                    }
+                });
+            }
 
-        const lineCanvas =
-        document.getElementById('recordsLineChart');
+            const lineCanvas =
+                document.getElementById('recordsLineChart');
 
-        if (lineCanvas) {
-        new Chart(lineCanvas, {
-        type: 'line',
-        data: {
-        labels,
-        datasets: [{
-        label: 'Records',
-        data: counts,
-        borderColor: '#42BDA8',
-        backgroundColor: 'rgba(66, 214, 189, 0.13)',
-        pointBackgroundColor: '#142C3C',
-        pointBorderColor: '#FFFFFF',
-        pointBorderWidth: 2,
-        pointRadius: 5,
-        pointHoverRadius: 7,
-        borderWidth: 3,
-        tension: 0.35,
-        fill: true
-        }]
-        },
-        options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-        legend: { display: false },
-        tooltip: {
-        backgroundColor: '#142C3C',
-        padding: 12
-        }
-        },
-        scales: commonScales
-        }
-        });
-        }
+            if (lineCanvas) {
+                new Chart(lineCanvas, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Records',
+                            data: counts,
+                            borderColor: '#42BDA8',
+                            backgroundColor: 'rgba(66, 214, 189, 0.13)',
+                            pointBackgroundColor: '#142C3C',
+                            pointBorderColor: '#FFFFFF',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            borderWidth: 3,
+                            tension: 0.35,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#142C3C',
+                                padding: 12
+                            }
+                        },
+                        scales: commonScales
+                    }
+                });
+            }
         })();
     </script>
 }

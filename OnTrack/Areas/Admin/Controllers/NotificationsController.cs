@@ -117,6 +117,7 @@ namespace OnTrack.Areas.Admin.Controllers
                 return NotFound();
 
             // Preserve fields managed by the application.
+            existing.Title = notification.Title;
             existing.Message = notification.Message;
             existing.UserId = notification.UserId;
             existing.TripId = notification.TripId;
@@ -160,6 +161,7 @@ namespace OnTrack.Areas.Admin.Controllers
         }
 
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Notification notification)
@@ -196,28 +198,52 @@ namespace OnTrack.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
+                var errors = ModelState
+                    .Where(x => x.Value != null && x.Value.Errors.Count > 0)
+                    .SelectMany(x => x.Value!.Errors.Select(e =>
+                        $"{x.Key}: {e.ErrorMessage}"));
+
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"Notification validation error: {error}");
+                }
+
                 await LoadDropdownsAsync();
                 return View(notification);
             }
 
-            notification.SentAt = DateTime.Now;
-            notification.IsRead = false;
-
-            var created =
-                await _notificationService.CreateAsync(notification);
-
-            if (!created)
+            try
             {
+                notification.SentAt = DateTime.Now;
+                notification.IsRead = false;
+
+                var created = await _notificationService.CreateAsync(notification);
+
+                if (!created)
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "The notification service failed to save the notification.");
+
+                    await LoadDropdownsAsync();
+                    return View(notification);
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Notification save failed: {ex}");
+
                 ModelState.AddModelError(
                     string.Empty,
-                    "The notification could not be created.");
+                    "Failed to save notification. Check the application output for details.");
 
                 await LoadDropdownsAsync();
                 return View(notification);
             }
-
-            return RedirectToAction(nameof(Index));
         }
+
 
         private async Task LoadDropdownsAsync()
         {

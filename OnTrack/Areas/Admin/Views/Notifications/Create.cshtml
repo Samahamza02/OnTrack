@@ -1,4 +1,5 @@
-﻿@model OnTrack.Models.Notification
+﻿
+@model OnTrack.Models.Notification
 
 @{
     ViewData["Title"] = "Create Notification";
@@ -12,11 +13,11 @@
         border-radius: 18px;
     }
 
-        .nf-page h1 {
-            color: #102f3b;
-            font-size: 32px;
-            font-weight: 800;
-        }
+    .nf-page h1 {
+        color: #102f3b;
+        font-size: 32px;
+        font-weight: 800;
+    }
 
     .nf-card {
         max-width: 800px;
@@ -46,10 +47,10 @@
         color: #102f3b;
     }
 
-        .nf-input:focus {
-            outline: 2px solid #43d6be;
-            border-color: #43d6be;
-        }
+    .nf-input:focus {
+        outline: 2px solid #43d6be;
+        border-color: #43d6be;
+    }
 
     .nf-btn {
         display: inline-block;
@@ -64,13 +65,19 @@
         cursor: pointer;
     }
 
-        .nf-btn:hover {
-            background: #43d6be;
-            color: #102f3b !important;
-        }
+    .nf-btn:hover {
+        background: #43d6be;
+        color: #102f3b !important;
+    }
 
     .nf-error {
         color: #c94c4c;
+        display: block;
+        margin-top: 5px;
+    }
+
+    .nf-validation-summary:empty {
+        display: none;
     }
 </style>
 
@@ -79,27 +86,65 @@
     <p style="color:#788990">Send an update to a selected user.</p>
 
     <div class="nf-card">
-        <form asp-area="Admin" asp-controller="Notifications" asp-action="Create" method="post">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="nf-error"></div>
+        <form asp-area="Admin"
+              asp-controller="Notifications"
+              asp-action="Create"
+              method="post">
 
-            <label class="nf-label" asp-for="Message">Message</label>
-            <textarea asp-for="Message" class="nf-input" rows="4" required></textarea>
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="All"
+                 class="nf-error nf-validation-summary"></div>
+
+            <label asp-for="Title" class="nf-label">Title</label>
+            <input asp-for="Title"
+                   class="nf-input"
+                   placeholder="Enter notification title"
+                   required />
+            <span asp-validation-for="Title" class="nf-error"></span>
+
+            <label asp-for="Message" class="nf-label">Message</label>
+            <textarea asp-for="Message"
+                      class="nf-input"
+                      rows="4"
+                      placeholder="Enter notification message"
+                      required></textarea>
             <span asp-validation-for="Message" class="nf-error"></span>
 
-            <label class="nf-label" asp-for="UserId">Recipient</label>
-            <select asp-for="UserId" asp-items="ViewBag.Users" class="nf-input" required>
+            <label asp-for="UserId" class="nf-label">Recipient</label>
+            <select asp-for="UserId"
+                    asp-items="ViewBag.Users"
+                    class="nf-input"
+                    required>
                 <option value="">-- Select user --</option>
             </select>
             <span asp-validation-for="UserId" class="nf-error"></span>
 
-            <label class="nf-label" asp-for="TripId">Related Trip (optional)</label>
-            <select asp-for="TripId" asp-items="ViewBag.Trips" class="nf-input">
+            <label asp-for="TripId" class="nf-label">
+                Related Trip (optional)
+            </label>
+            <select asp-for="TripId"
+                    asp-items="ViewBag.Trips"
+                    class="nf-input">
                 <option value="">-- No specific trip --</option>
             </select>
+            <span asp-validation-for="TripId" class="nf-error"></span>
 
-            <button type="submit" class="nf-btn">Create Notification</button>
-            <a class="nf-btn" style="background:#edf0f2;color:#102f3b!important" asp-area="Admin" asp-controller="Notifications" asp-action="Index">Cancel</a>
+            <button type="submit" class="nf-btn">
+                Create Notification
+            </button>
+
+            <a class="nf-btn"
+               style="background:#edf0f2;color:#102f3b!important"
+               asp-area="Admin"
+               asp-controller="Notifications"
+               asp-action="Index">
+                Cancel
+            </a>
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

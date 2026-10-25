@@ -279,7 +279,6 @@ namespace OnTrack.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("NotificationId");
@@ -602,9 +601,7 @@ namespace OnTrack.Migrations
 
                     b.HasOne("OnTrack.Models.ApplicationUser", "User")
                         .WithMany("Notifications")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Trip");
 
