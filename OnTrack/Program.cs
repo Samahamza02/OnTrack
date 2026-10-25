@@ -67,7 +67,6 @@ namespace OnTrack
             builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<ITripStopService, TripStopService>();
 
-            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IStationService, StationService>();   // NEW
 
             builder.Services.AddScoped<OnTrack.Services.IDashboardService,

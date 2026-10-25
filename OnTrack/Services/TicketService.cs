@@ -8,11 +8,13 @@ namespace OnTrack.Services
     public class TicketService : ITicketService
     {
         private readonly IGenericRepository<Ticket> _repository;
-
+        private readonly INotificationService _notificationService;
         public TicketService(
-            IGenericRepository<Ticket> repository)
+      IGenericRepository<Ticket> repository,
+      INotificationService notificationService)
         {
             _repository = repository;
+            _notificationService = notificationService;
         }
 
         public async Task<IEnumerable<Ticket>> GetAllAsync()
@@ -29,7 +31,23 @@ namespace OnTrack.Services
         {
             await _repository.AddAsync(ticket);
 
-            return await _repository.SaveChangesAsync() > 0;
+            var result = await _repository.SaveChangesAsync();
+
+            if (result > 0)
+            {
+                await _notificationService.CreateAsync(new Notification
+                {
+                    Message = "Your ticket has been booked successfully.",
+                    SentAt = DateTime.Now,
+                    IsRead = false,
+                    UserId = ticket.UserId,
+                    TripId = ticket.TripId
+                });
+
+                return true;
+            }
+
+            return false;
         }
 
         public async Task<bool> UpdateAsync(Ticket ticket)

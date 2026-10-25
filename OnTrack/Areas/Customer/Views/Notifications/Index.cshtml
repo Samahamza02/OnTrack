@@ -1,154 +1,434 @@
 ﻿@model IEnumerable<OnTrack.Models.Notification>
 
 @{
-    ViewData["Title"] = "My Notifications";
+    ViewData["Title"] = "Notifications";
 }
 
-<style>
-    .cn-page {
-        background: #f2f6f5;
-        padding: 35px;
-        min-height: 80vh;
-        border-radius: 18px;
-        color: #183744;
-    }
+<div class="container py-4">
 
-        .cn-page h1 {
-            color: #102f3b;
-            font-size: 32px;
-            font-weight: 800;
-        }
+    <!-- Header -->
+    <div class="hero-section mb-4">
+        <div>
+            <span class="hero-label">ONTRACK RAILWAYS</span>
 
-    .cn-list {
-        max-width: 950px;
-        margin-top: 25px;
-    }
+            <h1>Notifications</h1>
 
-    .cn-card {
-        background: white;
-        border: 1px solid #e3ebe9;
-        border-left: 5px solid #43d6be;
-        border-radius: 15px;
-        padding: 23px;
-        margin-bottom: 17px;
-        box-shadow: 0 7px 22px #102f3b09;
-    }
+            <p>
+                Stay updated with your trips, tickets, and important travel information.
+            </p>
+        </div>
+    </div>
 
-    .cn-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
+    <!-- Notifications Card -->
+    <div class="notifications-card">
 
-        .cn-top h3 {
-            color: #102f3b;
-            font-size: 18px;
-            font-weight: 800;
-            margin: 0;
-        }
+        <div class="notifications-header">
 
-    .cn-message {
-        color: #405963;
-        line-height: 1.8;
-        margin: 17px 0;
-    }
+            <div>
+                <h2>Your Notifications</h2>
+                <p>
+                    View your latest updates and important messages.
+                </p>
+            </div>
 
-    .cn-date {
-        color: #849198;
-        font-size: 13px;
-    }
-
-    .cn-badge {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 30px;
-        font-size: 12px;
-        font-weight: 800;
-    }
-
-    .cn-read {
-        background: #edf0f2;
-        color: #5e6d74;
-    }
-
-    .cn-unread {
-        background: #d9f8f0;
-        color: #087966;
-    }
-
-    .cn-btn {
-        display: inline-block;
-        border: 0;
-        padding: 10px 14px;
-        border-radius: 9px;
-        background: #102f3b;
-        color: white !important;
-        text-decoration: none;
-        font-weight: 700;
-        font-size: 13px;
-        cursor: pointer;
-    }
-
-        .cn-btn:hover {
-            background: #43d6be;
-            color: #102f3b !important;
-        }
-
-    .cn-actions {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-top: 17px;
-    }
-</style>
-
-<div class="cn-page">
-    <h1>My Notifications</h1>
-    <p style="color:#788990">Stay updated with your journey.</p>
-
-    <div class="cn-list">
-        @if (Model.Any())
-        {
-            @foreach (var notification in Model)
+            @if (Model.Any(n => !n.IsRead))
             {
-                <div class="cn-card">
-                    <div class="cn-top">
-                        <h3>OnTrack Update</h3>
-                        @if (notification.IsRead)
-                        {
-                            <span class="cn-badge cn-read">Read</span>
-                        }
-                        else
-                        {
-                            <span class="cn-badge cn-unread">Unread</span>
-                        }
+                <form asp-action="MarkAllAsRead" method="post">
+                    <button type="submit" class="mark-all-btn">
+                        Mark All as Read
+                    </button>
+                </form>
+            }
+
+        </div>
+
+        <div class="notifications-list">
+
+            @if (!Model.Any())
+            {
+                <div class="empty-notifications">
+
+                    <div class="empty-icon">
+                        <span>!</span>
                     </div>
 
-                    <p class="cn-message">@notification.Message</p>
-                    <span class="cn-date">@notification.SentAt.ToString("dd MMM yyyy, hh:mm tt")</span>
+                    <h3>No notifications yet</h3>
 
-                    <div class="cn-actions">
-                        <a class="cn-btn" asp-area="Customer" asp-controller="Notifications" asp-action="Details" asp-route-id="@notification.NotificationId">View Details</a>
+                    <p>
+                        You don't have any notifications at the moment.
+                        We'll let you know when something important happens.
+                    </p>
+
+                </div>
+            }
+            else
+            {
+                @foreach (var notification in Model)
+                {
+                    <div class="notification-item @(notification.IsRead ? "read" : "unread")">
+
+                        <div class="notification-icon">
+                            <span>!</span>
+                        </div>
+
+                        <div class="notification-content">
+
+                            <div class="notification-top">
+
+                                <h3>
+                                    @if (notification.IsRead)
+                                    {
+                                        @:Notification
+                                    }
+                                    else
+                                    {
+                                        @:New Notification
+                                    }
+                                </h3>
+
+                                @if (!notification.IsRead)
+                                {
+                                    <span class="unread-badge">
+                                        New
+                                    </span>
+                                }
+
+                            </div>
+
+                            <p>
+                                @notification.Message
+                            </p>
+
+                            <span class="notification-date">
+                                @notification.SentAt.ToString("dd MMM yyyy, hh:mm tt")
+                            </span>
+
+                        </div>
 
                         @if (!notification.IsRead)
                         {
-                            <form asp-area="Customer" asp-controller="Notifications" asp-action="MarkAsRead" asp-route-id="@notification.NotificationId" method="post">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="cn-btn" style="background:#43d6be;color:#102f3b!important">Mark as Read</button>
-                            </form>
+                            <div class="notification-action">
+
+                                <form asp-action="MarkAsRead"
+                                      asp-route-id="@notification.NotificationId"
+                                      method="post">
+
+                                    <button type="submit" class="read-btn">
+                                        Mark as Read
+                                    </button>
+
+                                </form>
+
+                            </div>
                         }
+
                     </div>
-                </div>
+                }
             }
-        }
-        else
-        {
-            <div class="cn-card" style="text-align:center;padding:40px">
-                <h3 style="color:#102f3b">You're all caught up!</h3>
-                <p style="color:#788990">You have no notifications right now.</p>
-            </div>
-        }
+
+        </div>
+
     </div>
+
 </div>
+
+<style>
+
+    body {
+        background-color: #f4f7f8;
+    }
+
+    .container {
+        max-width: 1030px;
+    }
+
+    /* Hero */
+
+    .hero-section {
+        background: #142c3c;
+        border-radius: 18px;
+        padding: 34px 38px;
+        color: white;
+    }
+
+    .hero-label {
+        color: #42d6bd;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+    }
+
+    .hero-section h1 {
+        margin: 8px 0 8px;
+        font-size: 34px;
+        font-weight: 700;
+    }
+
+    .hero-section p {
+        margin: 0;
+        color: #e3eaed;
+        font-size: 15px;
+    }
+
+    /* Main Card */
+
+    .notifications-card {
+        background: #ffffff;
+        border: 1px solid #e0e7ea;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .notifications-header {
+        padding: 25px 28px;
+        border-bottom: 1px solid #e5eaed;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .notifications-header h2 {
+        margin: 0 0 5px;
+        color: #142c3c;
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .notifications-header p {
+        margin: 0;
+        color: #71808a;
+        font-size: 14px;
+    }
+
+    /* Mark All */
+
+    .mark-all-btn {
+        border: 1px solid #42d6bd;
+        background: #ffffff;
+        color: #0c796f;
+
+        padding: 10px 16px;
+        border-radius: 8px;
+
+        font-size: 13px;
+        font-weight: 600;
+
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .mark-all-btn:hover {
+        background: #42d6bd;
+        color: #ffffff;
+    }
+
+    /* Notifications List */
+
+    .notifications-list {
+        padding: 0;
+    }
+
+    .notification-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 18px;
+
+        padding: 23px 28px;
+
+        border-bottom: 1px solid #e8edef;
+
+        transition: background-color 0.2s;
+    }
+
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+
+    .notification-item:hover {
+        background-color: #fafcfc;
+    }
+
+    /* Unread */
+
+    .notification-item.unread {
+        background-color: #f1fbf9;
+    }
+
+    .notification-item.unread:hover {
+        background-color: #eaf8f5;
+    }
+
+    /* Icon */
+
+    .notification-icon {
+        width: 44px;
+        height: 44px;
+
+        min-width: 44px;
+
+        border-radius: 50%;
+
+        background: #e7f8f5;
+        color: #0c796f;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .notification-item.read .notification-icon {
+        background: #edf1f3;
+        color: #71808a;
+    }
+
+    /* Content */
+
+    .notification-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .notification-top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 5px;
+    }
+
+    .notification-top h3 {
+        margin: 0;
+        color: #142c3c;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .notification-item.read .notification-top h3 {
+        font-weight: 600;
+    }
+
+    .notification-content p {
+        margin: 0 0 7px;
+        color: #4f606a;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .notification-date {
+        color: #89969d;
+        font-size: 12px;
+    }
+
+    /* New Badge */
+
+    .unread-badge {
+        background: #42d6bd;
+        color: #ffffff;
+
+        padding: 3px 8px;
+        border-radius: 20px;
+
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    /* Action */
+
+    .notification-action {
+        display: flex;
+        align-items: center;
+    }
+
+    .read-btn {
+        border: none;
+        background: transparent;
+        color: #0c796f;
+
+        font-size: 12px;
+        font-weight: 600;
+
+        cursor: pointer;
+        white-space: nowrap;
+
+        padding: 8px 0;
+    }
+
+    .read-btn:hover {
+        text-decoration: underline;
+    }
+
+    /* Empty */
+
+    .empty-notifications {
+        text-align: center;
+        padding: 70px 30px;
+    }
+
+    .empty-icon {
+        width: 60px;
+        height: 60px;
+
+        margin: 0 auto 18px;
+
+        border-radius: 50%;
+
+        background: #edf1f3;
+        color: #71808a;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .empty-icon span {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .empty-notifications h3 {
+        margin: 0 0 8px;
+
+        color: #142c3c;
+        font-size: 20px;
+    }
+
+    .empty-notifications p {
+        max-width: 500px;
+        margin: 0 auto;
+
+        color: #71808a;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* Responsive */
+
+   @@media (max-width: 768px) {
+
+        .hero-section {
+            padding: 28px 24px;
+        }
+
+        .hero-section h1 {
+            font-size: 28px;
+        }
+
+        .notifications-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .notification-item {
+            padding: 20px;
+        }
+
+        .notification-action {
+            display: none;
+        }
+    }
+
+</style>

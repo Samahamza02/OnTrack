@@ -1,0 +1,163 @@
+﻿
+@{
+    var isAccountPage = string.Equals(
+        ViewContext.RouteData.Values["controller"]?.ToString(),
+        "Account",
+        StringComparison.OrdinalIgnoreCase);
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - OnTrack</title>
+
+    <script type="importmap"></script>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/OnTrack.styles.css" asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+</head>
+
+<body class="@(isAccountPage ? "auth-route" : "")">
+
+    @if (!isAccountPage)
+    {
+        <header>
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow ontrack-navbar">
+                <div class="container-fluid">
+
+                    <a class="navbar-brand ontrack-nav-brand"
+                       asp-area=""
+                       asp-controller="Home"
+                       asp-action="Index">
+                        <span class="brand-mark">OT</span>
+                        <span>OnTrack</span>
+                    </a>
+
+                    <button class="navbar-toggler"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#ontrackNavbar"
+                            aria-controls="ontrackNavbar"
+                            aria-expanded="false"
+                            aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="navbar-collapse collapse justify-content-end"
+                         id="ontrackNavbar">
+
+                        <ul class="navbar-nav align-items-sm-center gap-sm-2">
+
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link admin-dashboard-link"
+                                           asp-area="Admin"
+                                           asp-controller="Dashboard"
+                                           asp-action="Index">
+                                            <i class="bi bi-speedometer2"></i>
+                                            Admin Dashboard
+                                        </a>
+                                    </li>
+                                }
+
+                                <li class="nav-item">
+                                    <span class="nav-link small text-secondary">
+                                        Hello, @(User.Identity.Name ?? "traveller")
+                                    </span>
+                                </li>
+
+                                <li class="nav-item">
+                                    <form asp-area=""
+                                          asp-controller="Account"
+                                          asp-action="Logout"
+                                          method="post"
+                                          class="d-inline">
+                                        <button type="submit" class="nav-link btn btn-link">
+                                            Sign out
+                                        </button>
+                                    </form>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link"
+                                       asp-area=""
+                                       asp-controller="Account"
+                                       asp-action="Login">
+                                        Sign in
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link nav-join-link"
+                                       asp-area=""
+                                       asp-controller="Account"
+                                       asp-action="Register">
+                                        Create account
+                                    </a>
+                                </li>
+                            }
+
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+    }
+
+    <main role="main" class="@(isAccountPage ? "auth-main" : "pb-3")">
+
+        @if (TempData["Successful_Notification"] != null)
+        {
+            <div class="container mt-3">
+                <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    @TempData["Successful_Notification"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        }
+
+        @if (TempData["Error_Notification"] != null)
+        {
+            <div class="container mt-3">
+                <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    @TempData["Error_Notification"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        }
+
+        @RenderBody()
+    </main>
+
+    @if (!isAccountPage)
+    {
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2026 - OnTrack
+            </div>
+        </footer>
+    }
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>
