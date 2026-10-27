@@ -145,7 +145,7 @@
                             <tr>
                                 <td>@notification.NotificationId</td>
                                 <td>@notification.Message</td>
-                                <td>@notification.UserId</td>
+                                <td>@(notification.User?.Email ?? "N/A")</td>
                                 <td>@(notification.TripId?.ToString() ?? "—")</td>
                                 <td>@notification.SentAt.ToString("dd MMM yyyy")</td>
                                 <td>

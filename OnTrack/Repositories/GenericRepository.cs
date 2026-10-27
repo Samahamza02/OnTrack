@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 using OnTrack.Data;
+using OnTrack.Models;
+using System.Linq.Expressions;
 
 namespace OnTrack.Repositories
 {
@@ -15,10 +16,19 @@ namespace OnTrack.Repositories
             _dbSet = _context.Set<T>();
         }
 
+
         public async Task<IEnumerable<T>> GetAllAsync()
         {
+            if (typeof(T) == typeof(Notification))
+            {
+                return (IEnumerable<T>)await _context.Notifications
+                    .Include(n => n.User)
+                    .ToListAsync();
+            }
+
             return await _dbSet.ToListAsync();
         }
+
 
         public async Task<T?> GetByIdAsync(object id)
         {

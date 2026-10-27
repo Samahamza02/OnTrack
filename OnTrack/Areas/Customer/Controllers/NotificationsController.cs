@@ -25,49 +25,45 @@ namespace OnTrack.Areas.Customer.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            var notifications =
-                await _notificationService.GetAllAsync();
+            var notifications = await _notificationService.GetAllAsync();
 
             var myNotifications = notifications
                 .Where(n => n.UserId == userId)
-                .OrderByDescending(n => n.SentAt);
+                .OrderByDescending(n => n.SentAt)
+                .ToList();
 
             return View(myNotifications);
         }
 
-        public async Task<IActionResult> Details(int id)
-        {
-            var userId = _userManager.GetUserId(User);
-
-            var notification =
-                await _notificationService.GetByIdAsync(id);
-
-            if (notification == null ||
-                notification.UserId != userId)
-            {
-                return NotFound();
-            }
-
-            return View(notification);
-        }
-
-
-
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkAsRead(int id)
         {
             var userId = _userManager.GetUserId(User);
 
-            var notification =
-                await _notificationService.GetByIdAsync(id);
+            var notification = await _notificationService.GetByIdAsync(id);
 
             if (notification == null || notification.UserId != userId)
-            {
                 return NotFound();
-            }
 
-            if (!notification.IsRead)
+            notification.IsRead = true;
+
+            await _notificationService.UpdateAsync(notification);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MarkAllAsRead()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            var notifications = await _notificationService.GetAllAsync();
+
+            var myNotifications = notifications
+                .Where(n => n.UserId == userId && !n.IsRead)
+                .ToList();
+
+            foreach (var notification in myNotifications)
             {
                 notification.IsRead = true;
                 await _notificationService.UpdateAsync(notification);
@@ -75,6 +71,5 @@ namespace OnTrack.Areas.Customer.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
     }
 }
