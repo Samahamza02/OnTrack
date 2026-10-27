@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnTrack.Interfaces;
@@ -21,25 +22,88 @@ namespace OnTrack.Areas.Customer.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+            string? status,
+            string? search)
         {
             var userId = _userManager.GetUserId(User);
 
-            var tickets = await _ticketService.GetAllAsync();
+            if (userId == null)
+                return Challenge();
 
-            var myTickets = tickets
-                .Where(t => t.UserId == userId);
+            var allTickets = await _ticketService.GetAllAsync();
 
-            return View(myTickets);
+            var myTickets = allTickets
+                .Where(t => t.UserId == userId)
+                .ToList();
+
+            ViewBag.TotalTickets = myTickets.Count;
+
+            ViewBag.PendingPayment = myTickets.Count(t =>
+                string.Equals(t.Status, "Pending",
+                    StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(t.Status, "Pending Payment",
+                    StringComparison.OrdinalIgnoreCase));
+
+            ViewBag.ConfirmedTickets = myTickets.Count(t =>
+                string.Equals(t.Status, "Confirmed",
+                    StringComparison.OrdinalIgnoreCase));
+
+            ViewBag.SelectedStatus = status ?? "";
+            ViewBag.Search = search ?? "";
+
+            var filteredTickets = myTickets.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                if (status == "Pending")
+                {
+                    filteredTickets = filteredTickets.Where(t =>
+                        string.Equals(t.Status, "Pending",
+                            StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(t.Status, "Pending Payment",
+                            StringComparison.OrdinalIgnoreCase));
+                }
+                else
+                {
+                    filteredTickets = filteredTickets.Where(t =>
+                        string.Equals(t.Status, status,
+                            StringComparison.OrdinalIgnoreCase));
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+
+                filteredTickets = filteredTickets.Where(t =>
+                    t.TicketId.ToString().Contains(search,
+                        StringComparison.OrdinalIgnoreCase) ||
+                    t.TripId.ToString().Contains(search,
+                        StringComparison.OrdinalIgnoreCase) ||
+                    t.SeatNumber.Contains(search,
+                        StringComparison.OrdinalIgnoreCase) ||
+                    t.FromStationId.ToString().Contains(search,
+                        StringComparison.OrdinalIgnoreCase) ||
+                    t.ToStationId.ToString().Contains(search,
+                        StringComparison.OrdinalIgnoreCase));
+            }
+
+            return View(filteredTickets
+                .OrderByDescending(t => t.BookingDate)
+                .ToList());
         }
 
         public async Task<IActionResult> Details(int id)
         {
             var userId = _userManager.GetUserId(User);
 
-            var ticket = await _ticketService.GetByIdAsync(id);
+            var tickets = await _ticketService.GetAllAsync();
 
-            if (ticket == null || ticket.UserId != userId)
+            var ticket = tickets.FirstOrDefault(t =>
+                t.TicketId == id && t.UserId == userId);
+
+            if (ticket == null)
                 return NotFound();
 
             return View(ticket);

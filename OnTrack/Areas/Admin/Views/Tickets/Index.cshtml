@@ -1,136 +1,582 @@
 ﻿@model IEnumerable<OnTrack.Models.Ticket>
 
 @{
-    ViewData["Title"] = "Manage Tickets";
+    ViewData["Title"] = "Ticket Management";
+
+    var names = ViewBag.PassengerNames as Dictionary<string, string>
+                ?? new Dictionary<string, string>();
+
+    var total = (int)ViewBag.TotalTickets;
+    var pending = (int)ViewBag.Pending;
+    var confirmed = (int)ViewBag.Confirmed;
+    var revenue = (decimal)ViewBag.Revenue;
+
+    var selectedStatus = ViewBag.SelectedStatus as string ?? "";
+    var search = ViewBag.Search as string ?? "";
 }
 
 <style>
     .at-page {
-        background: #f2f6f5;
-        min-height: 80vh;
-        padding: 35px;
-        border-radius: 18px;
-        color: #183744;
+        background: #f2f6f6;
+        color: #123544;
+        padding: 28px;
+        border-radius: 20px;
+        font-family: Arial, sans-serif;
     }
 
-        .at-page h1 {
-            color: #102f3b;
-            font-size: 32px;
-            font-weight: 800;
+    .at-hero {
+        background: linear-gradient(110deg, #10313f, #1c4858);
+        color: white;
+        padding: 36px 42px;
+        border-radius: 24px;
+        margin-bottom: 22px;
+    }
+
+    .at-label {
+        color: #43d6be;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 2px;
+    }
+
+    .at-hero h1 {
+        color: white;
+        font-size: clamp(28px, 4vw, 40px);
+        font-weight: 800;
+        margin: 12px 0 8px;
+    }
+
+    .at-hero p {
+        color: #e0e9ec;
+        margin: 0;
+    }
+
+    .at-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 22px;
+    }
+
+    .at-stat {
+        background: white;
+        border: 1px solid #e2eaea;
+        border-radius: 19px;
+        padding: 24px 26px;
+        box-shadow: 0 8px 25px #15374608;
+        min-width: 0;
+    }
+
+        .at-stat span {
+            display: block;
+            color: #71858e;
+            font-size: 13px;
+            margin-bottom: 10px;
         }
 
-    .at-card {
+        .at-stat strong {
+            color: #10313f;
+            font-size: 30px;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .at-stat small {
+            color: #71858e;
+            font-size: 12px;
+        }
+
+    .at-panel {
         background: white;
-        border: 1px solid #e3ebe9;
-        border-radius: 18px;
-        padding: 24px;
-        margin-top: 25px;
-        box-shadow: 0 8px 28px #102f3b0c;
+        border: 1px solid #e2eaea;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 10px 28px #15374608;
+    }
+
+    .at-heading {
+        padding: 25px 30px 20px;
+        border-bottom: 1px solid #e9eeee;
+    }
+
+        .at-heading h2 {
+            color: #123544;
+            font-size: 23px;
+            font-weight: 800;
+            margin: 0 0 5px;
+        }
+
+        .at-heading p {
+            color: #71858e;
+            margin: 0;
+            font-size: 14px;
+        }
+
+    .at-filter {
+        display: grid;
+        grid-template-columns: 170px minmax(180px, 1fr) auto auto;
+        gap: 16px;
+        align-items: end;
+        padding: 20px 30px;
+        border-bottom: 1px solid #e9eeee;
+    }
+
+    .at-field label {
+        display: block;
+        color: #385563;
+        font-weight: 700;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .at-input {
+        box-sizing: border-box;
+        width: 100%;
+        height: 48px;
+        border: 1px solid #dce6e7;
+        border-radius: 12px;
+        padding: 10px 14px;
+        background: white;
+        color: #123544;
+        font-size: 14px;
+    }
+
+        .at-input:focus {
+            outline: 2px solid #43d6be;
+            border-color: #43d6be;
+        }
+
+    .at-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 39px;
+        box-sizing: border-box;
+        border: none;
+        border-radius: 11px;
+        padding: 10px 15px;
+        background: #10313f;
+        color: white !important;
+        text-decoration: none !important;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+        .at-btn:hover {
+            filter: brightness(1.08);
+        }
+
+    .at-teal {
+        background: #43d6be;
+        color: #10313f !important;
+    }
+
+    .at-red {
+        background: #ffebea;
+        color: #bd3939 !important;
+    }
+
+    .at-light {
+        background: #eaf0f1;
+        color: #123544 !important;
+    }
+
+    .at-table-wrap {
+        overflow-x: auto;
     }
 
     .at-table {
         width: 100%;
         border-collapse: collapse;
+        font-size: 13px;
+        min-width: 950px;
     }
 
+        .at-table thead {
+            background: #f5f8f8;
+        }
+
         .at-table th {
-            background: #102f3b;
-            color: white;
-            padding: 15px 12px;
+            color: #71858e;
+            font-size: 11px;
+            letter-spacing: .8px;
+            text-transform: uppercase;
             text-align: left;
+            padding: 17px 15px;
+            border-bottom: 1px solid #e1eaea;
             white-space: nowrap;
         }
 
         .at-table td {
-            padding: 15px 12px;
-            border-bottom: 1px solid #e8efed;
+            padding: 16px 15px;
+            border-bottom: 1px solid #eaf0f0;
+            color: #123544;
+            vertical-align: middle;
         }
 
-        .at-table tr:hover td {
-            background: #f0fbf8;
+        .at-table tbody tr:last-child td {
+            border-bottom: none;
         }
 
-    .at-btn {
-        display: inline-block;
-        padding: 9px 14px;
-        border-radius: 9px;
-        background: #102f3b;
-        color: white !important;
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 700;
+        .at-table tbody tr:hover {
+            background: #fbfdfd;
+        }
+
+    .at-ticket-id {
+        font-weight: 800;
     }
 
-        .at-btn:hover {
-            background: #43d6be;
-            color: #102f3b !important;
-        }
+    .at-route {
+        font-weight: 800;
+        white-space: nowrap;
+    }
 
-    .at-pill {
+    .at-date {
+        color: #71858e !important;
+        white-space: nowrap;
+    }
+
+    .at-status {
         display: inline-block;
         padding: 6px 12px;
-        border-radius: 30px;
-        background: #dff8f1;
-        color: #087b6d;
-        font-size: 12px;
+        border-radius: 25px;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .at-pending {
+        background: #fff3db;
+        color: #a66a00;
+    }
+
+    .at-confirmed {
+        background: #d9faf2;
+        color: #07816f;
+    }
+
+    .at-completed {
+        background: #e7edff;
+        color: #3454ae;
+    }
+
+    .at-cancelled {
+        background: #ffebea;
+        color: #bd3939;
+    }
+
+    .at-other {
+        background: #edf0f2;
+        color: #52666e;
+    }
+
+    .at-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        min-width: 200px;
+        max-width: 260px;
+    }
+
+        .at-actions form {
+            display: inline-flex;
+            margin: 0;
+        }
+
+    .at-alert {
+        padding: 14px 18px;
+        margin: 18px 30px 0;
+        border-radius: 12px;
+        font-size: 14px;
         font-weight: 700;
     }
 
-    @@media(max-width:768px) {
-        .at-page {
-            padding: 18px;
+    .at-success {
+        background: #d9faf2;
+        color: #087765;
+    }
+
+    .at-error {
+        background: #ffebea;
+        color: #bd3939;
+    }
+
+    .at-empty {
+        padding: 45px 20px;
+        text-align: center;
+        color: #71858e;
+    }
+
+        .at-empty h3 {
+            color: #123544;
         }
 
-        .at-table {
-            min-width: 900px;
+    @@media (max-width: 950px) {
+        .at-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .at-filter {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .at-page {
+            padding: 14px;
+        }
+    }
+
+    @@media (max-width: 550px) {
+        .at-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .at-filter {
+            grid-template-columns: 1fr;
+        }
+
+        .at-hero {
+            padding: 25px 20px;
+        }
+
+        .at-heading {
+            padding: 20px;
         }
     }
 </style>
 
 <div class="at-page">
-    <h1>Ticket Management</h1>
-    <p style="color:#788990">Monitor customer bookings and ticket statuses.</p>
 
-    <div class="at-card">
-        <div style="overflow-x:auto">
+    <section class="at-hero">
+        <div class="at-label">ONTRACK ADMIN</div>
+        <h1>Ticket management.</h1>
+        <p>Review bookings, confirm payments and keep every passenger informed.</p>
+    </section>
+
+    <section class="at-stats">
+        <div class="at-stat">
+            <span>Total tickets</span>
+            <strong>@total</strong>
+        </div>
+
+        <div class="at-stat">
+            <span>Pending</span>
+            <strong>@pending</strong>
+        </div>
+
+        <div class="at-stat">
+            <span>Confirmed</span>
+            <strong>@confirmed</strong>
+        </div>
+
+        <div class="at-stat">
+            <span>Revenue (excl. cancelled)</span>
+            <strong>@revenue.ToString("N2") <small>EGP</small></strong>
+        </div>
+    </section>
+
+    <section class="at-panel">
+        <div class="at-heading">
+            <h2>All Tickets</h2>
+            <p>Search by passenger, station, trip or seat, and manage each booking.</p>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="at-alert at-success">@TempData["Success"]</div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="at-alert at-error">@TempData["Error"]</div>
+        }
+
+        <form method="get"
+              asp-area="Admin"
+              asp-controller="Tickets"
+              asp-action="Index"
+              class="at-filter">
+
+            <div class="at-field">
+                <label for="status">Ticket status</label>
+                <select id="status" name="status" class="at-input">
+                    <option value="" selected="@(selectedStatus == "")">All statuses</option>
+                    <option value="Pending" selected="@(selectedStatus == "Pending")">Pending</option>
+                    <option value="Confirmed" selected="@(selectedStatus == "Confirmed")">Confirmed</option>
+                    <option value="Completed" selected="@(selectedStatus == "Completed")">Completed</option>
+                    <option value="Cancelled" selected="@(selectedStatus == "Cancelled")">Cancelled</option>
+                </select>
+            </div>
+
+            <div class="at-field">
+                <label for="search">Passenger, station or seat</label>
+                <input id="search"
+                       name="search"
+                       class="at-input"
+                       value="@search"
+                       placeholder="e.g. Salma, Cairo, 12A..." />
+            </div>
+
+            <button type="submit" class="at-btn at-teal">
+                Search tickets
+            </button>
+
+            <a asp-area="Admin"
+               asp-controller="Tickets"
+               asp-action="Index"
+               class="at-btn at-light">Clear</a>
+        </form>
+
+        <div class="at-table-wrap">
             <table class="at-table">
                 <thead>
                     <tr>
                         <th>Ticket</th>
-                        <th>Customer ID</th>
-                        <th>Trip</th>
+                        <th>Passenger</th>
+                        <th>Route</th>
+                        <th>Trip date</th>
                         <th>Seat</th>
-                        <th>Booking Date</th>
                         <th>Price</th>
                         <th>Status</th>
-                        <th>Action</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     @if (Model.Any())
                     {
                         @foreach (var ticket in Model)
                         {
+                            var currentStatus = (ticket.Status ?? "").Trim();
+                            var normalized = currentStatus.ToLowerInvariant();
+
+                            var isPending = normalized == "pending"
+                                || normalized == "pending payment";
+
+                            var isConfirmed = normalized == "confirmed";
+                            var isCompleted = normalized == "completed";
+                            var isCancelled = normalized == "cancelled"
+                                || normalized == "canceled";
+
+                            var statusClass = isPending ? "at-pending"
+                                : isConfirmed ? "at-confirmed"
+                                : isCompleted ? "at-completed"
+                                : isCancelled ? "at-cancelled"
+                                : "at-other";
+
+                            var passenger = names.TryGetValue(ticket.UserId, out var userName)
+                                ? userName
+                                : "Unknown";
+
                             <tr>
-                                <td><strong>#@ticket.TicketId</strong></td>
-                                <td>@ticket.UserId</td>
-                                <td>@ticket.TripId</td>
+                                <td class="at-ticket-id">#@ticket.TicketId</td>
+                                <td>@passenger</td>
+
+                                <td class="at-route">
+                                    @ticket.FromStationId
+                                    <span style="color:#24bfa9;">→</span>
+                                    @ticket.ToStationId
+                                </td>
+
+                                <td class="at-date">
+                                    @ticket.BookingDate.ToString("dd MMM yyyy")
+                                </td>
+
                                 <td>@ticket.SeatNumber</td>
-                                <td>@ticket.BookingDate.ToString("dd MMM yyyy")</td>
+
                                 <td>@ticket.Price.ToString("N2")</td>
-                                <td><span class="at-pill">@ticket.Status</span></td>
+
                                 <td>
-                                    <a class="at-btn" asp-area="Admin" asp-controller="Tickets" asp-action="Details" asp-route-id="@ticket.TicketId">Details</a>
+                                    <span class="at-status @statusClass">
+                                        @(string.IsNullOrWhiteSpace(currentStatus)
+                                            ? "Unknown"
+                                            : currentStatus)
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="at-actions">
+                                        <a asp-area="Admin"
+                                           asp-controller="Tickets"
+                                           asp-action="Details"
+                                           asp-route-id="@ticket.TicketId"
+                                           class="at-btn">Details</a>
+
+                                        @if (isPending)
+                                        {
+                                            <form asp-area="Admin"
+                                                  asp-controller="Tickets"
+                                                  asp-action="Confirm"
+                                                  asp-route-id="@ticket.TicketId"
+                                                  method="post">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="at-btn at-teal">
+                                                    Confirm
+                                                </button>
+                                            </form>
+                                        }
+
+                                        @if (isConfirmed)
+                                        {
+                                            <form asp-area="Admin"
+                                                  asp-controller="Tickets"
+                                                  asp-action="Complete"
+                                                  asp-route-id="@ticket.TicketId"
+                                                  method="post">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="at-btn at-light">
+                                                    Mark completed
+                                                </button>
+                                            </form>
+                                        }
+
+                                        @if (isPending || isConfirmed)
+                                        {
+                                            <form asp-area="Admin"
+                                                  asp-controller="Tickets"
+                                                  asp-action="Cancel"
+                                                  asp-route-id="@ticket.TicketId"
+                                                  method="post"
+                                                  onsubmit="return confirm('Are you sure you want to cancel this ticket?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="at-btn at-red">
+                                                    Cancel
+                                                </button>
+                                            </form>
+                                        }
+
+                                        @if (!isCancelled)
+                                        {
+                                            <form asp-area="Admin"
+                                                  asp-controller="Tickets"
+                                                  asp-action="Notify"
+                                                  asp-route-id="@ticket.TicketId"
+                                                  method="post">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="at-btn at-light">
+                                                    Notify
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
                                 </td>
                             </tr>
                         }
                     }
                     else
                     {
-                        <tr><td colspan="8" style="text-align:center;padding:30px">No tickets found.</td></tr>
+                        <tr>
+                            <td colspan="8">
+                                <div class="at-empty">
+                                    <h3>No tickets found</h3>
+                                    <p>Try changing the status filter or search term.</p>
+                                </div>
+                            </td>
+                        </tr>
                     }
                 </tbody>
             </table>
         </div>
-    </div>
+    </section>
 </div>
