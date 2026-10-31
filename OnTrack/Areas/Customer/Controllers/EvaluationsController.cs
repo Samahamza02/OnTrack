@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OnTrack.Data;
 using OnTrack.Models;
+using OnTrack.ViewModels;
 
-namespace OnTrack.Controllers
+namespace OnTrack.Areas.Customer.Controllers
 {
+    [Area("Customer")]
     [Authorize]
     public class EvaluationsController : Controller
     {
@@ -91,5 +93,5 @@ namespace OnTrack.Controllers
         }
     }
 
-
+  
 }
