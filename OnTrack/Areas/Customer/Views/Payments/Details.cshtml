@@ -1,0 +1,204 @@
+﻿ 
+@model OnTrack.Models.Payment
+
+@{
+    ViewData["Title"] = "Payment Details";
+
+    var status = (Model.Status ?? "").ToLowerInvariant();
+
+    var statusClass = status == "paid" ? "paid"
+        : status == "pending" ? "pending"
+        : status == "failed" ? "failed"
+        : "other";
+}
+
+<style>
+    .payment-page {
+        background: #f2f6f6;
+        padding: 35px;
+        border-radius: 20px;
+        min-height: 80vh;
+        color: #153746;
+    }
+
+    .payment-card {
+        max-width: 750px;
+        margin: 25px auto;
+        background: white;
+        border: 1px solid #e2ebeb;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px #15374610;
+    }
+
+    .payment-header {
+        background: linear-gradient(115deg, #10313f, #1b4858);
+        padding: 30px;
+        color: white;
+    }
+
+    .payment-header h2 {
+        color: white;
+        font-weight: 800;
+        margin: 8px 0;
+    }
+
+    .payment-header p {
+        color: #dce9ec;
+        margin: 0;
+    }
+
+    .payment-body {
+        padding: 30px;
+    }
+
+    .payment-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 17px 0;
+        border-bottom: 1px solid #edf1f1;
+    }
+
+    .payment-label {
+        color: #71858e;
+        font-size: 14px;
+    }
+
+    .payment-value {
+        color: #153746;
+        font-weight: 700;
+        text-align: right;
+        overflow-wrap: anywhere;
+    }
+
+    .payment-amount {
+        color: #07816f;
+        font-size: 27px;
+        font-weight: 800;
+    }
+
+    .payment-status {
+        display: inline-block;
+        padding: 7px 15px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .paid {
+        background: #d9faf2;
+        color: #07816f;
+    }
+
+    .pending {
+        background: #fff3db;
+        color: #a66a00;
+    }
+
+    .failed {
+        background: #ffebea;
+        color: #bd3939;
+    }
+
+    .other {
+        background: #edf0f2;
+        color: #52666e;
+    }
+
+    .payment-btn {
+        display: inline-block;
+        padding: 12px 22px;
+        border-radius: 10px;
+        background: #10313f;
+        color: white !important;
+        text-decoration: none;
+        font-weight: 700;
+        margin-top: 22px;
+    }
+
+    .payment-btn:hover {
+        background: #1b4858;
+    }
+
+    @@media(max-width: 600px) {
+        .payment-page {
+            padding: 12px;
+        }
+
+        .payment-body {
+            padding: 20px;
+        }
+    }
+</style>
+
+<div class="payment-page">
+
+    <div class="payment-card">
+
+        <div class="payment-header">
+            <div style="color:#43d6be; font-size:12px; font-weight:800; letter-spacing:2px;">
+                ONTRACK RAILWAYS
+            </div>
+
+            <h2>Payment Details</h2>
+            <p>Review your payment information and transaction details.</p>
+        </div>
+
+        <div class="payment-body">
+
+            <div class="payment-row">
+                <span class="payment-label">Payment ID</span>
+                <span class="payment-value">#@Model.PaymentId</span>
+            </div>
+
+            <div class="payment-row">
+                <span class="payment-label">Ticket ID</span>
+                <span class="payment-value">#@Model.TicketId</span>
+            </div>
+
+            <div class="payment-row">
+                <span class="payment-label">Payment Method</span>
+                <span class="payment-value">@Model.PaymentMethod</span>
+            </div>
+
+            <div class="payment-row">
+                <span class="payment-label">Payment Status</span>
+                <span class="payment-value">
+                    <span class="payment-status @statusClass">
+                        @Model.Status
+                    </span>
+                </span>
+            </div>
+
+            <div class="payment-row">
+                <span class="payment-label">Payment Date</span>
+                <span class="payment-value">@Model.PaidAt</span>
+            </div>
+
+            <div class="payment-row">
+                <span class="payment-label">Transaction Reference</span>
+                <span class="payment-value">
+                    @(string.IsNullOrWhiteSpace(Model.TransactionRef)
+                        ? "Not available"
+                        : Model.TransactionRef)
+                </span>
+            </div>
+
+            <div class="payment-row" style="border-bottom:none;">
+                <span class="payment-label">Total Amount</span>
+                <span class="payment-amount">
+                    @Model.Amount.ToString("N2") EGP
+                </span>
+            </div>
+
+            <a asp-area="Customer"
+               asp-controller="Payments"
+               asp-action="Index"
+               class="payment-btn">
+                ← Back to Payments
+            </a>
+
+        </div>
+    </div>
+</div>
