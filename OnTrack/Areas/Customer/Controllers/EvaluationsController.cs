@@ -91,19 +91,5 @@ namespace OnTrack.Controllers
         }
     }
 
-    public class EvaluationDashboardViewModel
-    {
-        public List<Evaluation> Evaluations { get; set; }
-            = new();
 
-        public int TotalReviews { get; set; }
-
-        public double AverageRating { get; set; }
-
-        public int FiveStarReviews { get; set; }
-
-        public int? SelectedRating { get; set; }
-
-        public string? Search { get; set; }
-    }
 }
