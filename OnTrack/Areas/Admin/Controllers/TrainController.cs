@@ -60,15 +60,25 @@ namespace OnTrack.Areas.Admin.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(Train train)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Trains.Add(train);
-                await _context.SaveChangesAsync();
+            var numberExists = await _context.Trains
+                .AnyAsync(t => t.TrainNumber == train.TrainNumber);
 
-                return RedirectToAction(nameof(Index));
+            if (numberExists)
+            {
+                ModelState.AddModelError(
+                    nameof(train.TrainNumber),
+                    "A train with this number already exists.");
             }
 
-            return View(train);
+            if (!ModelState.IsValid)
+            {
+                return View(train);
+            }
+
+            _context.Trains.Add(train);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Admin/Trains/Edit/5

@@ -33,7 +33,7 @@ namespace OnTrack.Services
                     },
                     new()
                     {
-                        Name = "Trains",
+                        Name = "Train",
                         Count = await _context.Trains.CountAsync()
                     },
                     new()

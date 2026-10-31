@@ -470,6 +470,13 @@
                                    asp-action="Details"
                                    asp-route-id="@ticket.TicketId"
                                    class="ct-btn">View details</a>
+                                   <a asp-area="Customer"
+   asp-controller="Tracking"
+   asp-action="Track"
+   asp-route-id="@ticket.TripId"
+   class="ct-btn ct-btn-teal">
+    Track Train
+</a>
 
                                 @if (isPending)
                                 {

@@ -154,7 +154,7 @@
                                 </svg>
                                 break;
 
-                            case "Trains":
+                            case "Train":
                                 <svg viewBox="0 0 24 24" aria-hidden="true">
                                     <rect x="5" y="2" width="14" height="17" rx="4" />
                                     <path d="M8 6h8v5H8Zm-3 4h14M8 15h.01M16 15h.01M8 22l2-3m6 3-2-3" />
@@ -228,6 +228,19 @@
                         </a>
                     </div>
                 }
+                 @if (statistic.Name == "Train")
+                {
+                    <div class="ot-users-action">
+                        <a asp-area="Admin"
+                           asp-controller="Train"
+                           asp-action="Index"
+                           class="ot-view-users-link">
+                            View Trains
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
+                    </div>
+                }
+
             </article>
         }
     </section>
