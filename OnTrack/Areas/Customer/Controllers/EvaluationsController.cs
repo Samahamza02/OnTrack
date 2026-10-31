@@ -6,8 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using OnTrack.Data;
 using OnTrack.Models;
 
-namespace OnTrack.Controllers
+namespace OnTrack.Areas.Customer.Controllers
 {
+    [Area("Customer")]
     [Authorize]
     public class EvaluationsController : Controller
     {
