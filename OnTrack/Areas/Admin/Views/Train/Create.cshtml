@@ -1,70 +1,421 @@
-﻿@model OnTrack.Models.Train
+﻿
+@model OnTrack.Models.Train
 
 @{
     ViewData["Title"] = "Create Train";
 }
 
-<div class="container mt-4">
+<div class="container py-4">
 
-    <h1>Create Train</h1>
-    <p class="text-muted">Add a new train to the system.</p>
+    <!-- Hero -->
+    <div class="hero-section mb-4">
 
-    <form asp-action="Create" method="post">
+        <div>
+            <span class="hero-label">
+                ONTRACK RAILWAYS
+            </span>
 
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <h1>Create Train</h1>
 
-        <div class="mb-3">
-            <label asp-for="TrainNumber" class="form-label">
-                Train Number
-            </label>
-
-            <input asp-for="TrainNumber"
-                   class="form-control" />
-
-            <span asp-validation-for="TrainNumber"
-                  class="text-danger"></span>
+            <p>
+                Add a new train to the system.
+            </p>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="TrainName" class="form-label">
-                Name
-            </label>
+    </div>
 
-            <input asp-for="TrainName"
-                   class="form-control" />
+    <!-- Train Card -->
+    <div class="train-card">
 
-            <span asp-validation-for="TrainName"
-                  class="text-danger"></span>
+        <div class="train-header">
+
+            <div>
+                <h2>Train Information</h2>
+
+                <p>
+                    Enter the details of the new train below.
+                </p>
+            </div>
+
         </div>
-              <div class="mb-3">
-    <label asp-for="Capacity" class="form-label"></label>
-    <input asp-for="Capacity" class="form-control" type="number" />
-    <span asp-validation-for="Capacity" class="text-danger"></span>
+
+        <div class="train-form">
+
+            <form asp-action="Create" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="validation-error">
+                </div>
+
+                <!-- Train Number -->
+
+                <div class="form-group">
+
+                    <label asp-for="TrainNumber" class="form-label">
+                        Train Number
+                    </label>
+
+                    <input asp-for="TrainNumber"
+                           class="form-input"
+                           placeholder="Enter train number" />
+
+                    <span asp-validation-for="TrainNumber"
+                          class="validation-error">
+                    </span>
+
+                </div>
+
+                <!-- Train Name -->
+
+                <div class="form-group">
+
+                    <label asp-for="TrainName" class="form-label">
+                        Name
+                    </label>
+
+                    <input asp-for="TrainName"
+                           class="form-input"
+                           placeholder="Enter train name" />
+
+                    <span asp-validation-for="TrainName"
+                          class="validation-error">
+                    </span>
+
+                </div>
+
+                <!-- Capacity -->
+
+                <div class="form-group">
+
+                    <label asp-for="Capacity" class="form-label">
+                        Capacity
+                    </label>
+
+                    <input asp-for="Capacity"
+                           class="form-input"
+                           type="number"
+                           placeholder="Enter train capacity" />
+
+                    <span asp-validation-for="Capacity"
+                          class="validation-error">
+                    </span>
+
+                </div>
+
+                <!-- Train Type -->
+
+                <div class="form-group">
+
+                    <label asp-for="TrainType" class="form-label">
+                        Type
+                    </label>
+
+                    <input asp-for="TrainType"
+                           class="form-input"
+                           placeholder="Enter train type" />
+
+                    <span asp-validation-for="TrainType"
+                          class="validation-error">
+                    </span>
+
+                </div>
+
+                <!-- Actions -->
+
+                <div class="form-actions">
+
+                    <button type="submit" class="create-btn">
+                        Create
+                    </button>
+
+                    <a asp-action="Index"
+                       class="cancel-btn">
+                        Back to Trains
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
 </div>
-        <div class="mb-3">
-            <label asp-for="TrainType" class="form-label">
-                Type
-            </label>
 
-            <input asp-for="TrainType"
-                   class="form-control" />
+<style>
 
-            <span asp-validation-for="TrainType"
-                  class="text-danger"></span>
-        </div>
- 
-        <button type="submit" class="btn btn-primary">
-            Create
-        </button>
+    body {
+        background-color: #f4f7f8;
+    }
 
-        <a asp-action="Index"
-           class="btn btn-secondary">
-            Back to Trains
-        </a>
+    .container {
+        max-width: 1030px;
+    }
 
-    </form>
+    /* =========================
+       HERO
+       ========================= */
 
-</div>
+    .hero-section {
+        background: #142c3c;
+        border-radius: 18px;
+        padding: 34px 38px;
+        color: white;
+    }
+
+    .hero-label {
+        color: #42d6bd;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+    }
+
+    .hero-section h1 {
+        margin: 8px 0 8px;
+        font-size: 34px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .hero-section p {
+        margin: 0;
+        color: #e3eaed;
+        font-size: 15px;
+    }
+
+    /* =========================
+       MAIN CARD
+       ========================= */
+
+    .train-card {
+        background: #ffffff;
+        border: 1px solid #e0e7ea;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    /* =========================
+       CARD HEADER
+       ========================= */
+
+    .train-header {
+        padding: 25px 28px;
+        border-bottom: 1px solid #e5eaed;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .train-header h2 {
+        margin: 0 0 5px;
+
+        color: #142c3c;
+
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .train-header p {
+        margin: 0;
+
+        color: #71808a;
+
+        font-size: 14px;
+    }
+
+    /* =========================
+       FORM
+       ========================= */
+
+    .train-form {
+        padding: 28px;
+    }
+
+    .form-group {
+        margin-bottom: 21px;
+    }
+
+    .form-label {
+        display: block;
+
+        margin-bottom: 8px;
+
+        color: #142c3c;
+
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .form-input {
+        display: block;
+
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 13px 14px;
+
+        border: 1px solid #dce6e4;
+        border-radius: 10px;
+
+        background: #f8fbfa;
+
+        color: #142c3c;
+
+        font-size: 14px;
+
+        transition: 0.2s;
+    }
+
+    .form-input::placeholder {
+        color: #89969d;
+    }
+
+    .form-input:focus {
+        outline: none;
+
+        border-color: #42d6bd;
+
+        background: #ffffff;
+
+        box-shadow: 0 0 0 2px rgba(66, 214, 189, 0.12);
+    }
+
+    /* =========================
+       VALIDATION
+       ========================= */
+
+    .validation-error {
+        display: block;
+
+        margin-top: 6px;
+
+        color: #c94c4c;
+
+        font-size: 12px;
+    }
+
+    /* =========================
+       ACTIONS
+       ========================= */
+
+    .form-actions {
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        margin-top: 28px;
+
+        padding-top: 22px;
+
+        border-top: 1px solid #e8edef;
+    }
+
+    /* Create */
+
+    .create-btn {
+        border: 1px solid #142c3c;
+
+        background: #142c3c;
+
+        color: #ffffff;
+
+        padding: 10px 17px;
+
+        border-radius: 8px;
+
+        font-size: 13px;
+
+        font-weight: 600;
+
+        cursor: pointer;
+
+        transition: 0.2s;
+    }
+
+    .create-btn:hover {
+        background: #42d6bd;
+
+        border-color: #42d6bd;
+
+        color: #ffffff;
+    }
+
+    /* Cancel */
+
+    .cancel-btn {
+        display: inline-block;
+
+        padding: 10px 17px;
+
+        border: 1px solid #e0e7ea;
+
+        border-radius: 8px;
+
+        background: #edf1f3;
+
+        color: #142c3c;
+
+        text-decoration: none;
+
+        font-size: 13px;
+
+        font-weight: 600;
+
+        transition: 0.2s;
+    }
+
+    .cancel-btn:hover {
+        background: #e0e7ea;
+
+        color: #142c3c;
+    }
+
+    /* =========================
+       RESPONSIVE
+       ========================= */
+
+    @@media (max-width: 768px) {
+
+        .hero-section {
+            padding: 28px 24px;
+        }
+
+        .hero-section h1 {
+            font-size: 28px;
+        }
+
+        .train-header {
+            padding: 22px 20px;
+        }
+
+        .train-form {
+            padding: 22px 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+
+            align-items: stretch;
+        }
+
+        .create-btn,
+        .cancel-btn {
+            width: 100%;
+
+            box-sizing: border-box;
+
+            text-align: center;
+        }
+
+    }
+
+</style>
 
 @section Scripts {
     @{

@@ -1,71 +1,493 @@
-﻿@model IEnumerable<OnTrack.Models.Train>
+﻿
+@model IEnumerable<OnTrack.Models.Train>
 
 @{
     ViewData["Title"] = "Trains";
 }
 
-<div class="container mt-4">
+<div class="container py-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Hero -->
+    <div class="hero-section mb-4">
         <div>
-            <h1>Trains</h1>
-            <p class="text-muted">Manage all trains in the system.</p>
-        </div>
+            <span class="hero-label">ONTRACK RAILWAYS</span>
 
-        <a asp-area="Admin"
-           asp-controller="Train"
-           asp-action="Create"
-           class="btn btn-primary">
-            Create Train
-        </a>
+            <h1>Trains</h1>
+
+            <p>
+                Manage all trains in the OnTrack system.
+            </p>
+        </div>
     </div>
 
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>Train Number</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
+    <!-- Trains Card -->
+    <div class="trains-card">
 
-        <tbody>
-            @foreach (var train in Model)
+        <div class="trains-header">
+
+            <div>
+                <h2>Train Management</h2>
+
+                <p>
+                    View, manage, and update all trains in the system.
+                </p>
+            </div>
+
+            <a asp-area="Admin"
+               asp-controller="Train"
+               asp-action="Create"
+               class="create-train-btn">
+                + Create Train
+            </a>
+
+        </div>
+
+        <div class="trains-list">
+
+            @if (!Model.Any())
             {
-                <tr>
-                    <td>@train.TrainNumber</td>
-                    <td>@train.TrainName</td>
-                    <td>@train.TrainType</td>
+                <div class="empty-trains">
 
-                    <td>
-                        <a asp-area="Admin"
-                           asp-controller="Train"
-                           asp-action="Details"
-                           asp-route-id="@train.TrainId"
-                           class="btn btn-sm btn-info">
-                            Details
-                        </a>
+                    <div class="empty-icon">
+                        <span>!</span>
+                    </div>
 
-                        <a asp-area="Admin"
-                           asp-controller="Train"
-                           asp-action="Edit"
-                           asp-route-id="@train.TrainId"
-                           class="btn btn-sm btn-warning">
-                            Edit
-                        </a>
+                    <h3>No trains found</h3>
 
-                        <a asp-area="Admin"
-                           asp-controller="Train"
-                           asp-action="Delete"
-                           asp-route-id="@train.TrainId"
-                           class="btn btn-sm btn-danger">
-                            Delete
-                        </a>
-                    </td>
-                </tr>
+                    <p>
+                        There are no trains in the system at the moment.
+                        Create a new train to get started.
+                    </p>
+
+                </div>
             }
-        </tbody>
-    </table>
+            else
+            {
+                <div class="table-wrapper">
+
+                    <table class="trains-table">
+
+                        <thead>
+                            <tr>
+                                <th>Train Number</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var train in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        <span class="train-number">
+                                            @train.TrainNumber
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="train-name">
+                                            @train.TrainName
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="train-type">
+                                            @train.TrainType
+                                        </span>
+                                    </td>
+
+                                    <td>
+
+                                        <div class="train-actions">
+
+                                            <a asp-area="Admin"
+                                               asp-controller="Train"
+                                               asp-action="Details"
+                                               asp-route-id="@train.TrainId"
+                                               class="action-btn details-btn">
+                                                Details
+                                            </a>
+
+                                            <a asp-area="Admin"
+                                               asp-controller="Train"
+                                               asp-action="Edit"
+                                               asp-route-id="@train.TrainId"
+                                               class="action-btn edit-btn">
+                                                Edit
+                                            </a>
+
+                                            <a asp-area="Admin"
+                                               asp-controller="Train"
+                                               asp-action="Delete"
+                                               asp-route-id="@train.TrainId"
+                                               class="action-btn delete-btn">
+                                                Delete
+                                            </a>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
 
 </div>
+
+<style>
+
+    body {
+        background-color: #f4f7f8;
+    }
+
+    .container {
+        max-width: 1030px;
+    }
+
+    /* =========================
+       HERO
+       ========================= */
+
+    .hero-section {
+        background: #142c3c;
+        border-radius: 18px;
+        padding: 34px 38px;
+        color: white;
+    }
+
+    .hero-label {
+        color: #42d6bd;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+    }
+
+    .hero-section h1 {
+        margin: 8px 0 8px;
+        font-size: 34px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .hero-section p {
+        margin: 0;
+        color: #e3eaed;
+        font-size: 15px;
+    }
+
+    /* =========================
+       MAIN CARD
+       ========================= */
+
+    .trains-card {
+        background: #ffffff;
+        border: 1px solid #e0e7ea;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    /* =========================
+       HEADER
+       ========================= */
+
+    .trains-header {
+        padding: 25px 28px;
+        border-bottom: 1px solid #e5eaed;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .trains-header h2 {
+        margin: 0 0 5px;
+        color: #142c3c;
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .trains-header p {
+        margin: 0;
+        color: #71808a;
+        font-size: 14px;
+    }
+
+    /* =========================
+       CREATE BUTTON
+       ========================= */
+
+    .create-train-btn {
+        border: 1px solid #42d6bd;
+        background: #42d6bd;
+        color: #ffffff;
+
+        padding: 10px 16px;
+        border-radius: 8px;
+
+        font-size: 13px;
+        font-weight: 600;
+
+        text-decoration: none;
+        white-space: nowrap;
+
+        transition: 0.2s;
+    }
+
+    .create-train-btn:hover {
+        background: #0c796f;
+        border-color: #0c796f;
+        color: #ffffff;
+    }
+
+    /* =========================
+       TABLE
+       ========================= */
+
+    .trains-list {
+        padding: 0;
+    }
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .trains-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .trains-table thead {
+        background: #142c3c;
+    }
+
+    .trains-table th {
+        padding: 15px 20px;
+
+        color: #ffffff;
+
+        text-align: left;
+
+        font-size: 12px;
+        font-weight: 700;
+
+        letter-spacing: 0.3px;
+
+        white-space: nowrap;
+    }
+
+    .trains-table td {
+        padding: 17px 20px;
+
+        border-bottom: 1px solid #e8edef;
+
+        color: #4f606a;
+
+        font-size: 14px;
+
+        vertical-align: middle;
+    }
+
+    .trains-table tbody tr {
+        transition: background-color 0.2s;
+    }
+
+    .trains-table tbody tr:hover {
+        background-color: #fafcfc;
+    }
+
+    .trains-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* =========================
+       TRAIN DATA
+       ========================= */
+
+    .train-number {
+        display: inline-block;
+
+        background: #e7f8f5;
+        color: #0c796f;
+
+        padding: 5px 10px;
+
+        border-radius: 20px;
+
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .train-name {
+        color: #142c3c;
+        font-weight: 600;
+    }
+
+    .train-type {
+        color: #71808a;
+        font-size: 13px;
+    }
+
+    /* =========================
+       ACTIONS
+       ========================= */
+
+    .train-actions {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        display: inline-block;
+
+        padding: 7px 11px;
+
+        border-radius: 7px;
+
+        font-size: 11px;
+        font-weight: 600;
+
+        text-decoration: none;
+
+        transition: 0.2s;
+    }
+
+    /* Details */
+
+    .details-btn {
+        background: #e7f8f5;
+        color: #0c796f;
+    }
+
+    .details-btn:hover {
+        background: #42d6bd;
+        color: #ffffff;
+    }
+
+    /* Edit */
+
+    .edit-btn {
+        background: #edf1f3;
+        color: #142c3c;
+    }
+
+    .edit-btn:hover {
+        background: #142c3c;
+        color: #ffffff;
+    }
+
+    /* Delete */
+
+    .delete-btn {
+        background: #fff0ef;
+        color: #c94c4c;
+    }
+
+    .delete-btn:hover {
+        background: #c94c4c;
+        color: #ffffff;
+    }
+
+    /* =========================
+       EMPTY STATE
+       ========================= */
+
+    .empty-trains {
+        text-align: center;
+        padding: 70px 30px;
+    }
+
+    .empty-icon {
+        width: 60px;
+        height: 60px;
+
+        margin: 0 auto 18px;
+
+        border-radius: 50%;
+
+        background: #edf1f3;
+        color: #71808a;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .empty-icon span {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .empty-trains h3 {
+        margin: 0 0 8px;
+
+        color: #142c3c;
+
+        font-size: 20px;
+    }
+
+    .empty-trains p {
+        max-width: 500px;
+
+        margin: 0 auto;
+
+        color: #71808a;
+
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* =========================
+       RESPONSIVE
+       ========================= */
+
+    @@media (max-width: 768px) {
+
+        .hero-section {
+            padding: 28px 24px;
+        }
+
+        .hero-section h1 {
+            font-size: 28px;
+        }
+
+        .trains-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .create-train-btn {
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .trains-table {
+            min-width: 750px;
+        }
+
+        .trains-table th,
+        .trains-table td {
+            padding: 14px 15px;
+        }
+
+    }
+
+</style>
