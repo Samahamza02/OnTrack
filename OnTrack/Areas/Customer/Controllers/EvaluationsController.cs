@@ -2,108 +2,78 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OnTrack.Data;
+using OnTrack.Interfaces;
 using OnTrack.Models;
 
-namespace OnTrack.Controllers
+namespace OnTrack.Areas.Customer.Controllers
 {
-    [Authorize]
+    [Area("Customer")]
+    [Authorize(Roles = "Customer")]
     public class EvaluationsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IEvaluationService _evaluationService;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public EvaluationsController(
-            ApplicationDbContext context,
+            IEvaluationService evaluationService,
             UserManager<ApplicationUser> userManager)
         {
-            _context = context;
+            _evaluationService = evaluationService;
             _userManager = userManager;
         }
 
         public async Task<IActionResult> Index(
-            int? rating,
-            string? search)
+            string sortBy = "newest",
+            int? stars = null)
         {
             var userId = _userManager.GetUserId(User);
 
-            var query = _context.Evaluations
-                .Include(e => e.Ticket)
-                .Where(e => e.Ticket.UserId == userId);
+            var allEvaluations = await _evaluationService.GetAllAsync();
 
-            if (rating.HasValue && rating.Value >= 1
-                && rating.Value <= 5)
+            // Only evaluations belonging to the logged-in customer
+            var myEvaluations = allEvaluations
+                .Where(e => e.Ticket != null &&
+                            e.Ticket.UserId == userId)
+                .ToList();
+
+            // Statistics: calculated before applying filters
+            ViewBag.TotalReviews = myEvaluations.Count;
+
+            ViewBag.AverageRating = myEvaluations.Any()
+                ? myEvaluations.Average(e => e.rating)
+                : 0;
+
+            ViewBag.FiveStarTrips =
+                myEvaluations.Count(e => e.rating == 5);
+
+            // Filter by stars
+            if (stars.HasValue && stars.Value >= 1 && stars.Value <= 5)
             {
-                query = query.Where(
-                    e => e.rating == rating.Value);
+                myEvaluations = myEvaluations
+                    .Where(e => e.rating == stars.Value)
+                    .ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(search))
+            // Sort evaluations
+            myEvaluations = sortBy switch
             {
-                query = query.Where(e =>
-                    (e.comment != null &&
-                     e.comment.Contains(search)) ||
-                    e.TicketId.ToString().Contains(search));
-            }
+                "oldest" => myEvaluations
+                    .OrderBy(e => e.CreatedAt).ToList(),
 
-            var evaluations = await query
-                .OrderByDescending(e => e.CreatedAt)
-                .ToListAsync();
+                "highest" => myEvaluations
+                    .OrderByDescending(e => e.rating).ToList(),
 
-            var model = new EvaluationDashboardViewModel
-            {
-                Evaluations = evaluations,
-                SelectedRating = rating,
-                Search = search,
-                TotalReviews = evaluations.Count,
-                AverageRating = evaluations.Count > 0
-                    ? evaluations.Average(e => e.rating)
-                    : 0,
-                FiveStarReviews = evaluations.Count(
-                    e => e.rating == 5)
+                "lowest" => myEvaluations
+                    .OrderBy(e => e.rating).ToList(),
+
+                _ => myEvaluations
+                    .OrderByDescending(e => e.CreatedAt).ToList()
             };
 
-            return View(model);
+            ViewBag.SortBy = sortBy;
+            ViewBag.Stars = stars;
+
+            return View(myEvaluations);
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var userId = _userManager.GetUserId(User);
-
-            var evaluation = await _context.Evaluations
-                .Include(e => e.Ticket)
-                .FirstOrDefaultAsync(e =>
-                    e.EvaluationId == id &&
-                    e.Ticket.UserId == userId);
-
-            if (evaluation == null)
-            {
-                return NotFound();
-            }
-
-            _context.Evaluations.Remove(evaluation);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
-        }
-    }
-
-    public class EvaluationDashboardViewModel
-    {
-        public List<Evaluation> Evaluations { get; set; }
-            = new();
-
-        public int TotalReviews { get; set; }
-
-        public double AverageRating { get; set; }
-
-        public int FiveStarReviews { get; set; }
-
-        public int? SelectedRating { get; set; }
-
-        public string? Search { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿@model OnTrack.Controllers.EvaluationDashboardViewModel
+﻿@model IEnumerable<OnTrack.Models.Evaluation>
 
 @{
     ViewData["Title"] = "My Evaluations";
@@ -6,451 +6,454 @@
 
 <style>
     .evaluation-page {
-        background: #f2f6f7;
+        background: #0b292b;
+        color: #e8f3f1;
         min-height: 100vh;
-        padding: 30px 0;
-        color: #123747;
+        padding: 35px 20px 70px;
+        font-family: Arial, sans-serif;
     }
 
     .evaluation-container {
-        width: 94%;
-        max-width: 1400px;
-        margin: auto;
+        max-width: 1000px;
+        margin: 0 auto;
     }
 
-    .evaluation-hero {
-        background: linear-gradient(110deg, #103342, #1b4b5b);
-        color: white;
-        padding: 36px 40px;
-        border-radius: 24px;
-        margin-bottom: 20px;
-    }
-
-    .evaluation-eyebrow {
-        color: #37d7c0;
+    .eyebrow {
+        color: #71dfc2;
         font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 3px;
-    }
-
-    .evaluation-hero h1 {
-        font-size: 38px;
-        font-weight: 800;
-        margin: 8px 0 4px;
-    }
-
-    .evaluation-hero p {
-        color: #e1edf1;
-        margin: 0;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 16px;
-        margin-bottom: 20px;
-    }
-
-    .stat-card {
-        background: white;
-        padding: 22px 24px;
-        border: 1px solid #e3ebed;
-        border-radius: 18px;
-        box-shadow: 0 6px 20px rgba(16, 51, 66, .04);
-    }
-
-    .stat-label {
-        color: #728591;
-        font-size: 14px;
-    }
-
-    .stat-number {
-        font-size: 30px;
-        font-weight: 800;
-        margin-top: 4px;
-        color: #103342;
-    }
-
-    .evaluation-panel {
-        background: white;
-        border: 1px solid #e3ebed;
-        border-radius: 22px;
-        overflow: hidden;
-        box-shadow: 0 8px 24px rgba(16, 51, 66, .05);
-    }
-
-    .panel-heading {
-        padding: 22px 28px 16px;
-        border-bottom: 1px solid #edf1f2;
-    }
-
-        .panel-heading h2 {
-            font-size: 23px;
-            font-weight: 800;
-            margin: 0 0 4px;
-        }
-
-        .panel-heading p {
-            color: #728591;
-            margin: 0;
-            font-size: 14px;
-        }
-
-    .filter-area {
-        padding: 18px 28px;
-        display: flex;
-        align-items: end;
-        gap: 12px;
-        border-bottom: 1px solid #edf1f2;
-        flex-wrap: wrap;
-    }
-
-    .filter-field {
-        flex: 1;
-        min-width: 150px;
-    }
-
-        .filter-field label {
-            display: block;
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .filter-field input,
-        .filter-field select {
-            width: 100%;
-            height: 44px;
-            padding: 0 13px;
-            border: 1px solid #dce6e9;
-            border-radius: 11px;
-            background: white;
-            color: #123747;
-        }
-
-    .btn-dashboard {
-        min-height: 42px;
-        border: 0;
-        border-radius: 11px;
-        padding: 10px 17px;
-        font-weight: 700;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 13px;
-    }
-
-    .btn-search {
-        background: #38d3bd;
-        color: #103342;
-    }
-
-    .btn-clear {
-        background: #edf2f3;
-        color: #123747;
-    }
-
-    .btn-delete {
-        background: #fde8e7;
-        color: #c62828;
-    }
-
-    .reviews-area {
-        background: #f6f9f9;
-        padding: 20px 22px;
-    }
-
-    .review-card {
-        background: white;
-        border: 1px solid #e2ebed;
-        border-radius: 17px;
-        padding: 22px 24px;
-        margin-bottom: 15px;
-    }
-
-        .review-card:last-child {
-            margin-bottom: 0;
-        }
-
-    .review-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-    }
-
-    .review-ticket {
-        color: #078b8b;
-        font-size: 12px;
-        font-weight: 800;
+        font-weight: bold;
         letter-spacing: 2px;
         text-transform: uppercase;
     }
 
-    .review-route {
-        font-size: 20px;
-        font-weight: 800;
-        margin: 5px 0;
-        color: #103342;
+    .page-title {
+        color: #f0f7f5 !important;
+        font-family: Georgia, serif;
+        font-size: 46px;
+        margin: 8px 0 5px;
     }
 
-    .review-stars {
-        color: #efa52b;
-        font-size: 20px;
-        letter-spacing: 1px;
+        .page-title span {
+            color: #71dfc2 !important;
+            font-style: italic;
+        }
+
+    .page-description {
+        color: #a7c1bb !important;
+        margin-bottom: 25px;
+        font-size: 15px;
     }
 
-    .empty-star {
-        color: #dce5e8;
+    /* Statistics */
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 28px;
     }
 
-    .rating-pill {
-        background: #d9faf4;
-        color: #008b80;
-        border-radius: 30px;
-        padding: 5px 12px;
-        font-size: 12px;
-        font-weight: 800;
-        white-space: nowrap;
+    .stat-card {
+        background: #113b3d;
+        border: 1px solid #1c5553;
+        border-radius: 17px;
+        padding: 20px 22px;
     }
 
-    .rating-low {
-        background: #fde8e7;
-        color: #c62828;
+    .stat-label {
+        color: #a7c1bb !important;
+        font-size: 14px;
     }
 
-    .review-comment {
-        color: #355366;
-        margin: 12px 0 18px;
-        overflow-wrap: anywhere;
+    .stat-number {
+        color: #71dfc2 !important;
+        font-size: 36px;
+        font-weight: bold;
+        margin-top: 5px;
     }
 
-    .review-footer {
-        border-top: 1px solid #edf1f2;
-        padding-top: 15px;
+        .stat-number small {
+            font-size: 15px;
+            color: #a7c1bb !important;
+            font-weight: normal;
+        }
+
+    /* Filters */
+
+    .filters {
         display: flex;
-        gap: 8px;
+        align-items: end;
+        gap: 15px;
+        margin: 25px 0;
         flex-wrap: wrap;
     }
 
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .filter-group label {
+            color: #a7c1bb !important;
+            font-size: 13px;
+        }
+
+    .filter-control {
+        background: #113b3d !important;
+        color: #e8f3f1 !important;
+        border: 1px solid #28615e !important;
+        border-radius: 11px;
+        padding: 11px 14px;
+        min-width: 170px;
+        outline: none;
+    }
+
+        .filter-control option {
+            background: #113b3d;
+            color: #ffffff;
+        }
+
+    .btn-reset {
+        color: #71dfc2 !important;
+        text-decoration: none;
+        padding: 11px 5px;
+        font-size: 14px;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+        .btn-reset:hover {
+            color: #ffffff !important;
+        }
+
+    /* Evaluation Cards */
+
+    .evaluation-card {
+        background: #113b3d;
+        border: 1px solid #1c5553;
+        border-radius: 17px;
+        padding: 22px 24px;
+        margin-bottom: 15px;
+        color: #e8f3f1 !important;
+    }
+
+    .evaluation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .trip-title {
+        color: #e8f3f1 !important;
+        font-size: 19px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .trip-id {
+        color: #a7c1bb !important;
+        font-size: 13px;
+        font-weight: normal;
+    }
+
+    .trip-date {
+        color: #a7c1bb !important;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+    .status-badge {
+        border: 1px solid #28615e;
+        border-radius: 20px;
+        color: #71dfc2 !important;
+        padding: 4px 13px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    /* Stars */
+
+    .stars {
+        margin: 17px 0 10px;
+        font-size: 22px;
+        letter-spacing: 2px;
+    }
+
+    .star-filled {
+        color: #71dfc2 !important;
+    }
+
+    .star-empty {
+        color: #426b68 !important;
+    }
+
+    /* Comment */
+
+    .evaluation-comment {
+        color: #f0f7f5 !important;
+        font-size: 14px;
+        line-height: 1.7;
+        margin-bottom: 12px;
+        font-weight: 400;
+    }
+
+    .review-date {
+        color: #a7c1bb !important;
+        font-size: 13px;
+    }
+
+    /* Empty State */
+
     .empty-state {
-        background: white;
-        border: 1px dashed #cfdddf;
-        border-radius: 16px;
+        background: #113b3d;
+        border: 1px solid #1c5553;
+        border-radius: 17px;
         padding: 40px 20px;
         text-align: center;
-        color: #728591;
+        color: #a7c1bb !important;
     }
 
         .empty-state h3 {
-            color: #103342;
-            font-weight: 800;
+            color: #71dfc2 !important;
+            margin-bottom: 10px;
         }
 
-    @@media (max-width: 700px) {
-        .evaluation-page {
-            padding: 16px 0;
+        .empty-state p {
+            color: #a7c1bb !important;
         }
 
-        .evaluation-container {
-            width: 95%;
-        }
+    /* Responsive */
 
-        .evaluation-hero {
-            padding: 26px 22px;
-            border-radius: 18px;
-        }
-
-            .evaluation-hero h1 {
-                font-size: 29px;
-            }
-
+    @@media (max-width: 650px) {
         .stats-grid {
             grid-template-columns: 1fr;
         }
 
-        .filter-area {
-            padding: 16px;
+        .page-title {
+            font-size: 35px;
         }
 
-        .panel-heading {
-            padding: 20px 18px;
+        .evaluation-header {
+            align-items: flex-start;
         }
 
-        .reviews-area {
-            padding: 12px;
+        .filters {
+            align-items: stretch;
         }
 
-        .review-card {
-            padding: 17px;
+        .filter-group,
+        .filter-control {
+            width: 100%;
         }
     }
 </style>
 
 <div class="evaluation-page">
+
     <div class="evaluation-container">
 
-        <section class="evaluation-hero">
-            <div class="evaluation-eyebrow">YOUR FEEDBACK</div>
-            <h1>How was your journey?</h1>
-            <p>
-                Your ratings help OnTrack improve every trip.
-                Review and manage what you have shared.
-            </p>
-        </section>
+        <!-- Header -->
 
-        <section class="stats-grid">
+        <div class="eyebrow">Customer</div>
+
+        <h1 class="page-title">
+            My <span>Evaluations</span>
+        </h1>
+
+        <p class="page-description">
+            Your feedback and ratings for every trip you've taken.
+        </p>
+
+        <!-- Statistics -->
+
+        <div class="stats-grid">
+
             <div class="stat-card">
                 <div class="stat-label">Total reviews</div>
-                <div class="stat-number">@Model.TotalReviews</div>
+                <div class="stat-number">
+                    @ViewBag.TotalReviews
+                </div>
             </div>
 
             <div class="stat-card">
                 <div class="stat-label">Average rating</div>
                 <div class="stat-number">
-                    @Model.AverageRating.ToString("0.0")
-                    <span style="font-size:14px;color:#728591">/ 5</span>
+                    @(((double)ViewBag.AverageRating).ToString("0.0"))
+                    <small>/ 5</small>
                 </div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-label">5-star reviews</div>
-                <div class="stat-number">@Model.FiveStarReviews</div>
-            </div>
-        </section>
-
-        <section class="evaluation-panel">
-            <div class="panel-heading">
-                <h2>My Evaluations</h2>
-                <p>
-                    Review your completed journeys and manage your feedback.
-                </p>
+                <div class="stat-label">5-star trips</div>
+                <div class="stat-number">
+                    @ViewBag.FiveStarTrips
+                </div>
             </div>
 
-            <form asp-controller="Evaluations"
-                  asp-action="Index"
-                  method="get"
-                  class="filter-area">
+        </div>
 
-                <div class="filter-field" style="max-width:180px">
-                    <label for="rating">Rating</label>
-                    <select id="rating" name="rating">
-                        <option value="">All ratings</option>
-                        @for (int i = 5; i >= 1; i--)
-                        {
-                            if (Model.SelectedRating == i)
-                            {
-                                <option value="@i" selected>
-                                    @i stars
-                                </option>
-                            }
-                            else
-                            {
-                                <option value="@i">@i stars</option>
-                            }
-                        }
-                    </select>
-                </div>
+        <!-- Filters -->
 
-                <div class="filter-field">
-                    <label for="search">Comment or ticket</label>
-                    <input id="search"
-                           name="search"
-                           type="text"
-                           value="@Model.Search"
-                           placeholder="e.g. comfortable, ticket 103..." />
-                </div>
+        <form method="get"
+              asp-area="Customer"
+              asp-controller="Evaluations"
+              asp-action="Index"
+              class="filters">
 
-                <button type="submit"
-                        class="btn-dashboard btn-search">
-                    Search reviews
-                </button>
+            <div class="filter-group">
 
-                <a asp-action="Index"
-                   class="btn-dashboard btn-clear">
-                    Clear
-                </a>
-            </form>
+                <label for="sortBy">Sort by</label>
 
-            <div class="reviews-area">
-                @if (Model.Evaluations.Any())
-                {
-                    @foreach (var item in Model.Evaluations)
+                <select name="sortBy"
+                        id="sortBy"
+                        class="filter-control">
+
+                    <option value="newest"
+                            selected="@(ViewBag.SortBy == "newest")">
+                        Newest first
+                    </option>
+
+                    <option value="oldest"
+                            selected="@(ViewBag.SortBy == "oldest")">
+                        Oldest first
+                    </option>
+
+                    <option value="highest"
+                            selected="@(ViewBag.SortBy == "highest")">
+                        Highest rating
+                    </option>
+
+                    <option value="lowest"
+                            selected="@(ViewBag.SortBy == "lowest")">
+                        Lowest rating
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="filter-group">
+
+                <label for="stars">Stars</label>
+
+                <select name="stars"
+                        id="stars"
+                        class="filter-control">
+
+                    <option value=""
+                            selected="@(ViewBag.Stars == null)">
+                        All
+                    </option>
+
+                    @for (int i = 5; i >= 1; i--)
                     {
-                        <article class="review-card">
-                            <div class="review-top">
-                                <div>
-                                    <div class="review-ticket">
-                                        TICKET #@item.TicketId
-                                        · @item.CreatedAt.ToString("dd MMM yyyy")
-                                    </div>
+                        <option value="@i"
+                                selected="@(ViewBag.Stars != null &&
+                                                                (int)ViewBag.Stars == i)">
+                    @i Stars
+                </option>
+            }
 
-                                    <div class="review-route">
-                                        Station @item.Ticket.FromStationId
-                                        → Station @item.Ticket.ToStationId
-                                    </div>
+        </select>
 
-                                    <div class="review-stars"
-                                         aria-label="@item.rating out of 5 stars">
-                                        @for (int i = 1; i <= 5; i++)
-                                        {
-                                            if (i <= item.rating)
-                                            {
-                                                <span>★</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="empty-star">★</span>
-                                            }
-                                        }
-                                    </div>
-                                </div>
+    </div>
 
-                                <span class="rating-pill @(item.rating <= 2 ? "rating-low" : "")">
-                                    @item.rating / 5
-                                </span>
-                            </div>
+    <button type="submit" class="btn-reset">
+        Apply filters
+    </button>
 
-                            <p class="review-comment">
-                                @(string.IsNullOrWhiteSpace(item.comment)
-                                    ? "No comment added."
-                                    : "“" + item.comment + "”")
-                            </p>
+    <a asp-area="Customer"
+       asp-controller="Evaluations"
+       asp-action="Index"
+       class="btn-reset">
+        Reset
+    </a>
 
-                            <div class="review-footer">
-                                <form asp-action="Delete"
-                                      asp-route-id="@item.EvaluationId"
-                                      method="post"
-                                      onsubmit="return confirm('Are you sure you want to delete this evaluation?');">
+</form>
 
-                                    @Html.AntiForgeryToken()
+<!-- Evaluations -->
+@if (Model != null && Model.Any())
+{
+    @foreach (var evaluation in Model)
+    {
+        <div class="evaluation-card">
 
-                                    <button type="submit"
-                                            class="btn-dashboard btn-delete">
-                                        Delete
-                                    </button>
-                                </form>
-                            </div>
-                        </article>
+            <div class="evaluation-header">
+
+                <div>
+
+                    <h3 class="trip-title">
+                        Ticket #@evaluation.TicketId
+
+                        <span class="trip-id">
+                            Evaluation #@evaluation.EvaluationId
+                        </span>
+                    </h3>
+
+                    <div class="trip-date">
+                        Booked on
+                        @evaluation.Ticket.BookingDate.ToString("dd MMM yyyy")
+                    </div>
+
+                </div>
+
+                <span class="status-badge">
+                    @evaluation.Ticket.Status
+                </span>
+
+            </div>
+
+            <!-- Rating Stars -->
+
+            <div class="stars">
+
+                @for (int i = 1; i <= 5; i++)
+                {
+                    if (i <= evaluation.rating)
+                    {
+                        <span class="star-filled">★</span>
+                    }
+                    else
+                    {
+                        <span class="star-empty">★</span>
                     }
                 }
-                else
-                {
-                    <div class="empty-state">
-                        <h3>No evaluations found</h3>
-                        <p>
-                            You have no reviews matching your search.
-                            Try changing the filter or clearing the search.
-                        </p>
-                        <a asp-action="Index"
-                           class="btn-dashboard btn-search">
-                            Show all reviews
-                        </a>
-                    </div>
-                }
+
             </div>
-        </section>
+
+            <!-- Customer Comment -->
+
+            <p class="evaluation-comment">
+                @evaluation.comment
+            </p>
+
+            <!-- Review Date -->
+
+            <div class="review-date">
+                Reviewed on
+                @evaluation.CreatedAt.ToString("dd MMM yyyy, HH:mm")
+            </div>
+
+        </div>
+    }
+}
+else
+{
+    <div class="empty-state">
+
+        <h3>No evaluations yet</h3>
+
+        <p>
+            You haven't submitted any trip reviews yet.
+            Your evaluations will appear here.
+        </p>
+
     </div>
+}
+
+</div>
+
 </div>
